@@ -6,8 +6,8 @@
 
 const MidiMessage EMPTY_MESSAGE = MidiMessage(ACTIVE_SENSE);
 
-Trigger::Trigger(DBObjID id, TriggerAction ta, MessageBlock *out_msg)
-  : DBObj(id),
+Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock *out_msg)
+  : DBObj(id), Nameable(name),
     _trigger_input_identifier(""),
     _trigger_key_code(UNDEFINED),
     _trigger_message(ACTIVE_SENSE),

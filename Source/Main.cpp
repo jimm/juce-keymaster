@@ -1,6 +1,9 @@
 #include <JuceHeader.h>
 #include "MainComponent.h"
 
+#define DEFAULT_WINDOW_X (-1)
+#define DEFAULT_WINDOW_Y (-1)
+
 //==============================================================================
 class KeyMasterApplication  : public juce::JUCEApplication
 {
@@ -88,9 +91,9 @@ public:
         setResizable(true, true);
 
         auto settings = app_properties.getUserSettings();
-        auto x = settings->getIntValue("window.x", -1);
-        auto y = settings->getIntValue("window.y", -1);
-        if (x >= 0 && y >= 0)
+        auto x = settings->getIntValue("window.x", DEFAULT_WINDOW_X);
+        auto y = settings->getIntValue("window.y", DEFAULT_WINDOW_Y);
+        if (x != DEFAULT_WINDOW_X && y != DEFAULT_WINDOW_Y)
           setBounds(x, y, getWidth(), getHeight());
         else
           centreWithSize(getWidth(), getHeight());

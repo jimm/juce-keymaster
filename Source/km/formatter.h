@@ -6,9 +6,6 @@
 String note_num_to_name(int num);
 int note_name_to_num(String &str); // str may point to an integer string like "64" as well
 
-String format_program(int bank_msb, int bank_lsb, int prog);
-String format_controllers(Connection *conn);
-
 // Translates up to first two hex chars into an unsigned char value. Zero,
 // one, or two chars used.
 juce::int8 hex_to_byte(String &hex);

@@ -33,7 +33,7 @@ KeyMaster *create_KeyMaster() {
 // ================ allocation ================
 
 KeyMaster::KeyMaster(bool testing)
-  : _clock(), _running(false), _testing(testing)
+  : _cursor(0), _clock(), _running(false), _testing(testing)
 {
   initialiseWithDefaultDevices(0, 0); // AudioDeviceManager
   load_instruments();
@@ -139,7 +139,8 @@ void KeyMaster::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& 
   // TODO listen for program changes and jump to song
   for (auto &trigger : _triggers)
     trigger->signal_message(source, message);
-  _cursor->patch()->midi_in(source, message);
+  if (_cursor != nullptr)       // we might get MIDI before we're fully constructed
+    _cursor->patch()->midi_in(source, message);
 }
 
 // ================ clock ================

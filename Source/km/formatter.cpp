@@ -78,42 +78,6 @@ String format_program(int bank_msb, int bank_lsb, int prog) {
   return str;
 }
 
-String format_controllers(Connection *conn) {
-  String str(" ");
-  int first = true;
-
-  for (int i = 0; i < 128; ++i) {
-    Controller *cc = conn->cc_map(i);
-    if (cc == nullptr)
-      continue;
-
-    if (first) first = false; else str += ", ";
-    str += cc->cc_num();
-
-    if (cc->filtered()) {
-      str += 'x';
-      continue;
-    }
-
-    if (cc->cc_num() != cc->translated_cc_num())
-      str += String::formatted("->%d", cc->translated_cc_num());
-
-    if (cc->min_in() != 0 || cc->max_in() != 127
-        || cc->min_out() != 0 || cc->max_out() != 127)
-    {
-      str += ' ';
-      if (cc->pass_through_0())
-        str += 0;
-      str += String::formatted(" [%d, %d] -> [%d, %d]",
-                               cc->min_in(), cc->max_in(),
-                               cc->min_out(), cc->max_out());
-      if (cc->pass_through_127())
-        str += 127;
-    }
-  }
-  return str;
-}
-
 // ================ parsing MIDI messages ================
 
 // Translates up to first two hex chars into an int8 value. Zero,

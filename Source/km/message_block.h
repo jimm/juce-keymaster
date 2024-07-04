@@ -5,7 +5,7 @@
 #include "nameable.h"
 #include "midi_device.h"
 
-class MessageBlock : public DBObj, Nameable {
+class MessageBlock : public DBObj, public Nameable {
 public:
   MessageBlock(DBObjID id, const String &name);
 

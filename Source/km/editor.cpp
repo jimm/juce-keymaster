@@ -13,7 +13,7 @@ MessageBlock *Editor::create_message() {
 }
 
 Trigger *Editor::create_trigger(MidiInput *input) {
-  return new Trigger(UNDEFINED_ID, TA_NEXT_PATCH, nullptr);
+  return new Trigger(UNDEFINED_ID, "New Trigger", TA_NEXT_PATCH, nullptr);
 }
 
 Song *Editor::create_song() {

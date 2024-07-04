@@ -5,6 +5,15 @@
               companyWebsite="jimmenard.com" companyEmail="jim@jimmenard.com"
               bundleIdentifier="jimm.KeyMaster" cppLanguageStandard="20">
   <MAINGROUP id="vDaUrm" name="KeyMaster">
+    <GROUP id="{9BE1D933-937C-5CFF-F347-C7F459F49700}" name="gui">
+      <FILE id="EVhdgE" name="list_box_model.h" compile="0" resource="0"
+            file="Source/gui/list_box_model.h"/>
+      <FILE id="q3dOAr" name="menu_manager.cpp" compile="1" resource="0"
+            file="Source/gui/menu_manager.cpp"/>
+      <FILE id="XLb80c" name="menu_manager.h" compile="0" resource="0" file="Source/gui/menu_manager.h"/>
+      <FILE id="aqlAwx" name="patch_table.cpp" compile="1" resource="0" file="Source/gui/patch_table.cpp"/>
+      <FILE id="WEHvst" name="patch_table.h" compile="0" resource="0" file="Source/gui/patch_table.h"/>
+    </GROUP>
     <GROUP id="{8AD29ABF-EE30-7F4D-E2E2-47E01378E3CF}" name="km">
       <FILE id="ESbA9m" name="clock.cpp" compile="1" resource="0" file="Source/km/clock.cpp"/>
       <FILE id="APiV11" name="clock.h" compile="0" resource="0" file="Source/km/clock.h"/>
@@ -18,6 +27,7 @@
       <FILE id="RQZMY5" name="curve.cpp" compile="1" resource="0" file="Source/km/curve.cpp"/>
       <FILE id="xEnEXe" name="curve.h" compile="0" resource="0" file="Source/km/curve.h"/>
       <FILE id="zConXR" name="db_obj.h" compile="0" resource="0" file="Source/km/db_obj.h"/>
+      <FILE id="ORSoMy" name="midi_device.h" compile="0" resource="0" file="Source/km/midi_device.h"/>
       <FILE id="GNNYht" name="editor.cpp" compile="1" resource="0" file="Source/km/editor.cpp"/>
       <FILE id="WZkXMj" name="editor.h" compile="0" resource="0" file="Source/km/editor.h"/>
       <FILE id="trzsny" name="error.cpp" compile="1" resource="0" file="Source/km/error.cpp"/>

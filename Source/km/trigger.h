@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "db_obj.h"
 #include "message_block.h"
+#include "nameable.h"
 
 class KeyMaster;
 
@@ -17,9 +18,9 @@ typedef enum TriggerAction {
   TA_MESSAGE
 } TriggerAction;
 
-class Trigger : public DBObj {
+class Trigger : public DBObj, public Nameable {
 public:
-  Trigger(DBObjID id, TriggerAction action, MessageBlock *output);
+  Trigger(DBObjID id, const String &name, TriggerAction action, MessageBlock *output);
   ~Trigger() {}
 
   inline int trigger_key_code() { return _trigger_key_code; }

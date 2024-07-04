@@ -15,8 +15,7 @@ Connection::Connection(DBObjID id, MidiInputEntry::Ptr in, int in_chan, MidiOutp
     _running(false), _changing_was_running(false)
 {
   _prog.bank_msb = _prog.bank_lsb = _prog.prog = UNDEFINED;
-  _zone.low = 0;
-  _zone.high = 127;
+  _zone = { 0, 127 };
   for (int i = 0; i < 128; ++i)
     _cc_maps[i] = nullptr;
 }
