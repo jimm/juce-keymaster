@@ -18,8 +18,8 @@ Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock 
 }
 
 // `message` might be EMPTY_MESSAGE, which will always be ignored.
-void Trigger::set_trigger_message(MidiInput *input, MidiMessage message) {
-  _trigger_input_identifier = input->getIdentifier();
+void Trigger::set_trigger_message(String input_identifier, MidiMessage message) {
+  _trigger_input_identifier = input_identifier;
   _trigger_message = message;
   _trigger_message_num_bytes = message.getRawDataSize();
 }
@@ -46,28 +46,28 @@ void Trigger::perform_action() {
   KeyMaster *km = KeyMaster_instance();
 
   switch (_action) {
-  case TA_NEXT_SONG:
+  case TriggerAction::NEXT_SONG:
     km->next_song();
     break;
-  case TA_PREV_SONG:
+  case TriggerAction::PREV_SONG:
     km->prev_song();
     break;
-  case TA_NEXT_PATCH:
+  case TriggerAction::NEXT_PATCH:
     km->next_patch();
     break;
-  case TA_PREV_PATCH:
+  case TriggerAction::PREV_PATCH:
     km->prev_patch();
     break;
-  case TA_PANIC:
+  case TriggerAction::PANIC:
     km->panic(false);
     break;
-  case TA_SUPER_PANIC:
+  case TriggerAction::SUPER_PANIC:
     km->panic(true);
     break;
-  case TA_TOGGLE_CLOCK:
+  case TriggerAction::TOGGLE_CLOCK:
     km->toggle_clock();
     break;
-  case TA_MESSAGE:
+  case TriggerAction::MESSAGE:
     _output_message->send_to_all_outputs();
     break;
   }

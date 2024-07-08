@@ -12,7 +12,7 @@ public:
   Trigger *create_trigger(MidiInput *input);
   Song *create_song();
   Patch *create_patch();
-  Connection *create_connection(MidiInputEntry::Ptr input, MidiOutputEntry::Ptr output);
+  Connection *create_connection(MidiDeviceInfo input_info, MidiOutput *output);
   SetList *create_set_list();
 
   void add_message(MessageBlock *message);

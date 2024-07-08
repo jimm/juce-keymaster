@@ -4,7 +4,6 @@ class MessageFilter {
 public:
   // true means allow, false means filter out
 
-
   MessageFilter();
 
   bool note() { return _note; } // both on and off

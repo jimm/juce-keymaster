@@ -13,7 +13,7 @@ MessageBlock *Editor::create_message() {
 }
 
 Trigger *Editor::create_trigger(MidiInput *input) {
-  return new Trigger(UNDEFINED_ID, "New Trigger", TA_NEXT_PATCH, nullptr);
+  return new Trigger(UNDEFINED_ID, "New Trigger", TriggerAction::NEXT_PATCH, nullptr);
 }
 
 Song *Editor::create_song() {
@@ -28,10 +28,12 @@ Patch *Editor::create_patch() {
   return new Patch(UNDEFINED_ID, "New Patch");
 }
 
-Connection *Editor::create_connection(MidiInputEntry::Ptr input, MidiOutputEntry::Ptr output)
+Connection *Editor::create_connection(MidiDeviceInfo input_info, MidiOutput *output)
 {
-  return new Connection(UNDEFINED_ID, input, CONNECTION_ALL_CHANNELS,
-                        output, CONNECTION_ALL_CHANNELS);
+  return new Connection
+    (UNDEFINED_ID,
+     input_info, CONNECTION_ALL_CHANNELS,
+     output, CONNECTION_ALL_CHANNELS);
 }
 
 SetList *Editor::create_set_list() {

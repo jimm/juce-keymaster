@@ -46,7 +46,7 @@ void PatchTableListBoxModel::paintCell(
   String str;
   switch (columnId) {
   case 1:                       // input name
-    str = c->input()->deviceInfo.name;
+    str = c->input_info().name;
     break;
   case 2:                       // input chan
     if (c->input_chan() == CONNECTION_ALL_CHANNELS)
@@ -55,7 +55,7 @@ void PatchTableListBoxModel::paintCell(
       str = String(c->input_chan());
     break;
   case 3:                       // output name
-    str = c->output()->deviceInfo.name;
+    str = c->output()->getName();
     break;
   case 4:                       // output chan
     if (c->output_chan() == CONNECTION_ALL_CHANNELS)

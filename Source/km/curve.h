@@ -11,8 +11,6 @@ public:
 
   Curve(DBObjID id, const String &name, const String &short_name);
 
-  void from_string(juce::String &str);
-
   String short_name() { return _short_name; }
 
 protected:

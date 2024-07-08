@@ -62,9 +62,9 @@ void Patch::send_message_to_outputs(MessageBlock *message) {
 
   Array<String> output_ids;
   for (auto& conn : _connections)
-    output_ids.addIfNotAlreadyThere(conn->output()->deviceInfo.identifier);
+    output_ids.addIfNotAlreadyThere(conn->output()->getIdentifier());
 
   for (auto output : KeyMaster_instance()->outputs())
-    if (output_ids.contains(output->deviceInfo.identifier))
+    if (output_ids.contains(output->info.identifier))
       message->send_to(output);
 }

@@ -2,24 +2,25 @@
 
 struct MidiInputEntry final : ReferenceCountedObject {
   explicit MidiInputEntry(MidiDeviceInfo info, MidiInputCallback *listener)
-    : deviceInfo(info), device(MidiInput::openDevice(info.identifier, listener))
+    : info(info), device(MidiInput::openDevice(info.identifier, listener).get())
     {
       device->start();
     }
 
-  MidiDeviceInfo deviceInfo;
-  std::unique_ptr<MidiInput> device;
+  MidiDeviceInfo info;
+  MidiInput *device;
 
   using Ptr = ReferenceCountedObjectPtr<MidiInputEntry>;
 };
 
 struct MidiOutputEntry final : ReferenceCountedObject {
   explicit MidiOutputEntry(MidiDeviceInfo info)
-    : deviceInfo (info), device(MidiOutput::openDevice(info.identifier))
-    {}
+    : info(info), device(MidiOutput::openDevice(info.identifier).get())
+    {
+    }
 
-  MidiDeviceInfo deviceInfo;
-  std::unique_ptr<MidiOutput> device;
+  MidiDeviceInfo info;
+  MidiOutput *device;
 
   using Ptr = ReferenceCountedObjectPtr<MidiOutputEntry>;
 };

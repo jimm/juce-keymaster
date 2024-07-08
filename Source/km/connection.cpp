@@ -6,9 +6,9 @@
 #define is_system(b) ((b) >= SYSEX)
 #define is_realtime(b) ((b) >= 0xf8)
 
-Connection::Connection(DBObjID id, MidiInputEntry::Ptr in, int in_chan, MidiOutputEntry::Ptr out, int out_chan)
+Connection::Connection(DBObjID id, MidiDeviceInfo input_info, int in_chan, MidiOutput *out, int out_chan)
   : DBObj(id),
-    _input(in), _output(out),
+    _input_info(input_info), _output(out),
     _input_chan(in_chan), _output_chan(out_chan),
     _xpose(0), _velocity_curve(nullptr),
     _processing_sysex(false),
@@ -34,14 +34,16 @@ void Connection::start() {
   // else the output channel if specified. If they are both ALL then we
   // don't know which channel to send the program change on, so we don't
   // send one.
-  int chan = program_change_send_channel();
-  if (chan != CONNECTION_ALL_CHANNELS) {
-    if (_prog.bank_msb >= 0)
-      _output->device->sendMessageNow(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_MSB, _prog.bank_msb));
-    if (_prog.bank_lsb >= 0)
-      _output->device->sendMessageNow(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_LSB, _prog.bank_lsb));
-    if (_prog.prog >= 0)
-      _output->device->sendMessageNow(MidiMessage::programChange(chan, _prog.prog));
+  if (_output != nullptr) {
+    int chan = program_change_send_channel();
+    if (chan != CONNECTION_ALL_CHANNELS) {
+      if (_prog.bank_msb >= 0)
+        _output->sendMessageNow(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_MSB, _prog.bank_msb));
+      if (_prog.bank_lsb >= 0)
+        _output->sendMessageNow(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_LSB, _prog.bank_lsb));
+      if (_prog.prog >= 0)
+        _output->sendMessageNow(MidiMessage::programChange(chan, _prog.prog));
+    }
   }
 
   _processing_sysex = false;
@@ -85,6 +87,9 @@ void Connection::end_changes() {
 // Takes a MIDI message `msg` from an input, processes it, and sends it to
 // an output (unless it's been filtered out).
 void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
+  if (source->getIdentifier() != _input_info.identifier)
+    return;
+
   const juce::uint8 *data = msg.getRawData();
   juce::uint8 status = data[0];
 
@@ -206,9 +211,11 @@ int Connection::inside_zone(int note) {
 }
 
 void Connection::midi_out(MidiMessage *message) {
-  _output->device->sendMessageNow(*message);
+  if (_output != nullptr)
+    _output->sendMessageNow(*message);
 }
 
 void Connection::midi_out(MidiMessage message) {
-  _output->device->sendMessageNow(message);
+  if (_output != nullptr)
+    _output->sendMessageNow(message);
 }

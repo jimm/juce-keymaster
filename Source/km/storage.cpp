@@ -1,87 +1,82 @@
-#include <fstream>
-#include <streambuf>
-#include <stdlib.h>
-#include <strings.h>
-#include <errno.h>
-#include <err.h>
 #include <JuceHeader.h>
-#include <sqlite3.h>
 #include "keymaster.h"
 #include "consts.h"
 #include "cursor.h"
 #include "storage.h"
 #include "formatter.h"
-#include "schema.sql.h"
 #include "midi_device.h"
 
 #define SCHEMA_VERSION 1
 
-Storage::Storage(const String &path) : loading_version(0) {
-  // int status = sqlite3_open(path, &db);
-  // if (status != 0) {
-  //   db = nullptr;
-  //   char error_buf[BUFSIZ];
-  //   snprintf(error_buf, BUFSIZ, "error opening database file %s", path);
-  //   error_str = error_buf;
-  // }
+Storage::Storage(const File &f) : file(f), loading_version(0) {
 }
 
 Storage::~Storage() {
-  // close();
-  // // sqlite3_prepare_v3() seems to set errno to 2 for no good reason that I
-  // // can tell. Reinitialize it here.
-  // errno = 0;
 }
 
-// Does not stop old km or start new km.
+void debug(ReferenceCountedArray<MidiInputEntry> &inputs) {
+  for (auto &input : inputs) {
+    String str;
+    str << " input " << input->info.identifier << ", ref count " << input->getReferenceCount();
+    Logger::writeToLog(str);
+  }
+}
+
+void debug(ReferenceCountedArray<MidiOutputEntry> &outputs) {
+  for (auto &output : outputs) {
+    String str;
+    str << "output " << output->info.identifier << ", ref count " << output->getReferenceCount();
+    Logger::writeToLog(str);
+  }
+}
+
+// Does not stop or delete the old instance or start the new one.
 KeyMaster *Storage::load(bool testing) {
-  // KeyMaster *old_km = KeyMaster_instance();
-
-  // if (db == nullptr)
-  //   return old_km;
-
   km = new KeyMaster(testing); // side-effect: KeyMaster static instance set
-  km->load_instruments();
 
-  load_schema_version();
-  load_velocity_curves();
-  load_messages();
-  load_triggers();
-  load_songs();
-  load_set_lists();
+  var data = JSON::parse(file);
+  auto nullish = var();
+  Array<var> arr { nullish };
+  auto nullish_arr = var(arr);
+
+  load_schema_version(data.getProperty("schema_version", nullish)); // TODO check version
+  load_curves(data.getProperty("curves", nullish));
+  load_messages(data.getProperty("messages", nullish));
+  load_triggers(data.getProperty("triggers", nullish));
+  load_songs(data.getProperty("songs", nullish_arr));
+  load_set_lists(data.getProperty("set_lists", nullish_arr));
   create_default_patches();
 
-  close();
   return km;
 }
 
 // Ignores all in-memory database object ids, generating new ones instead.
 // Objects are written in "dependency order" so that all newly assigned ids
 // are available for later writing.
-void Storage::save(KeyMaster *keymaster, bool testing) {
-  // if (db == nullptr)
-  //   return;
-
-  initialize();
-  if (has_error())
-    return;
-
+void Storage::save(KeyMaster *keymaster) {
   km = keymaster;
-  save_schema_version();
-  save_velocity_curves();
-  save_messages();
-  save_triggers();
-  save_songs();
-  save_set_lists();
+  assign_ids();
 
-  close();
-}
+  Logger::writeToLog("before save");
+  debug(km->inputs());
+  debug(km->outputs());
 
-void Storage::close() {
-  // if (db != nullptr) {
-  //   sqlite3_close_v2(db);
-  //   db = nullptr;
-  // }
+  DynamicObject obj;
+  obj.setProperty("schema_version", schema_version());
+  obj.setProperty("messages", messages());
+  obj.setProperty("triggers", triggers());
+  obj.setProperty("songs", songs());
+  obj.setProperty("set_lists", set_lists());
+  obj.setProperty("curves", curves());
+
+  FileOutputStream output(file);
+  output.setPosition(0);
+  output.truncate();
+  obj.writeAsJSON(output, JSON::FormatOptions());
+
+  Logger::writeToLog("after save");
+  debug(km->inputs());
+  debug(km->outputs());
 }
 
 bool Storage::has_error() {
@@ -92,202 +87,96 @@ String Storage::error() {
   return error_str;
 }
 
-// Initializes the database by dropping/recreating all tables and adding
-// some data.
-void Storage::initialize() {
-  // char *error_buf;
-
-  // // execute schema strings defined in schema.sql.h
-  // int status = sqlite3_exec(db, SCHEMA_SQL, nullptr, nullptr, &error_buf);
-  // if (status != 0) {
-  //   fprintf(stderr, 
-  //   error_str = String::formatted("error initializing database: %s", error_buf);
-  //   sqlite3_free(error_buf);
-  // }
-
-  // Array<Curve *> generated;
-  // generate_default_curves(generated);
-  // save_velocity_curves(generated);
-}
-
-int Storage::schema_version() {
-  return SCHEMA_VERSION;
-}
-
 // ================================================================
 // load helpers
 // ================================================================
 
-void Storage::load_schema_version() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql = "select version from schema_version";
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // if (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   loading_version = sqlite3_column_int(stmt, 1);
-  // }
-  // sqlite3_finalize(stmt);
-
-  // if (loading_version > SCHEMA_VERSION)
-  //   fprintf(stderr, "warning: db schema version is v%d, but I only understand v%d\n",
-  //           loading_version, SCHEMA_VERSION);
+void Storage::load_schema_version(var schema_version) {
+  // TODO do something with this
 }
 
-void Storage::load_velocity_curves() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql = "select id, name, short_name, curve from velocity_curves";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   int col = 0;
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, col++);
-  //   const char *name = text_or_null(stmt, col++, "");
-  //   const char *short_name = text_or_null(stmt, col++, "");
-  //   const char *bytes = (const char *)sqlite3_column_text(stmt, col++);
-
-  //   Curve *curve = new Curve(id, name, short_name);
-  //   km->add_velocity_curve(curve);
-  //   curve->from_chars(bytes);
-  // }
-  // sqlite3_finalize(stmt);
+void Storage::load_curves(var curves) {
+  var v;
+  for (int i = 0; i < curves.size(); ++i) {
+    var vcurve = curves[i];
+    Curve *curve = new Curve(
+      (int)vcurve.getProperty("id", v),
+      (String)vcurve.getProperty("name", "New Curve"),
+      (String)vcurve.getProperty("short_name", "nc"));
+    var vals = vcurve.getProperty("values", v);
+    for (int j = 0; j < 128; ++j)
+      curve->curve[j] = (int)vals[j];
+    km->curves().add(curve);
+  }
 }
 
-void Storage::load_messages() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql = "select id, name, bytes from messages order by id";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-  //   const char *name = text_or_null(stmt, 1, "");
-  //   const char *bytes = (const char *)sqlite3_column_text(stmt, 2);
-
-  //   MessageBlock *m = new MessageBlock(id, name);
-  //   km->add_message(m);
-  //   m->from_chars(bytes);
-  // }
-  // sqlite3_finalize(stmt);
+void Storage::load_messages(var messages) {
+  var v;
+  for (int i = 0; i < messages.size(); ++i) {
+    var vmsg = messages[i];
+    MessageBlock *m = new MessageBlock(
+      (int)vmsg.getProperty("id", v),
+      (String)vmsg.getProperty("name", v));
+    auto bytes_str = (String)vmsg.getProperty("bytes", v);
+    m->from_string(bytes_str);
+    km->messages().add(m);
+  }
 }
 
-void Storage::load_triggers() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "select id, trigger_key_code, input_identifier, trigger_message_bytes,"
-  //   "   action, message_id"
-  //   " from triggers"
-  //   " order by id";
+void Storage::load_triggers(var triggers) {
+  var v;
+  for (int i = 0; i < triggers.size(); ++i) {
+    var vmsg = triggers[i];
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-  //   int trigger_key_code = int_or_null(stmt, 1);
-  //   const char *input_identifier = (const char *)sqlite3_column_text(stmt, 2);
-  //   const char *bytes = (const char *)sqlite3_column_text(stmt, 3);
-  //   const char *action_name = (const char *)sqlite3_column_text(stmt, 4);
-  //   sqlite3_int64 message_id = id_or_null(stmt, 5);
+    TriggerAction action = static_cast<TriggerAction>((int)vmsg.getProperty("action", v));
+    Trigger *t = new Trigger(
+      (int)vmsg.getProperty("id", v),
+      (String)vmsg.getProperty("name", v),
+      action,
+      nullptr);
 
-  //   MessageBlock *output_message = nullptr;
-  //   if (message_id != UNDEFINED_ID)
-  //     output_message = find_message_by_id("trigger", id, message_id);
-
-  //   TriggerAction action = TA_MESSAGE;
-  //   if (action_name == nullptr)
-  //     action = TA_MESSAGE;
-  //   else if (strcmp(action_name, "next_song") == 0)
-  //     action = TA_NEXT_SONG;
-  //   else if (strcmp(action_name, "prev_song") == 0)
-  //     action = TA_PREV_SONG;
-  //   else if (strcmp(action_name, "next_patch") == 0)
-  //     action = TA_NEXT_PATCH;
-  //   else if (strcmp(action_name, "prev_patch") == 0)
-  //     action = TA_PREV_PATCH;
-  //   else if (strcmp(action_name, "panic") == 0)
-  //     action = TA_PANIC;
-  //   else if (strcmp(action_name, "super_panic") == 0)
-  //     action = TA_SUPER_PANIC;
-  //   else if (strcmp(action_name, "toggle_clock") == 0)
-  //     action = TA_TOGGLE_CLOCK;
-
-  //   Trigger *t = new Trigger(id, action, output_message);
-  //   km->add_trigger(t);
-
-  //   if (trigger_key_code != UNDEFINED)
-  //     t->set_trigger_key_code(trigger_key_code);
-  //   if (input_id != UNDEFINED_ID) {
-  //     Input *input = find_input_by_id("trigger", id, input_id);
-  //     MidiMessage trigger_message = single_message_from_hex_bytes((char *)bytes);
-  //     t->set_trigger_message(input, trigger_message);
-  //   }
-  // }
-  // sqlite3_finalize(stmt);
+    auto bytes_str = (String)vmsg.getProperty("bytes", v);
+    if (vmsg.hasProperty("input_identifier")) {
+      MessageBlock mblock(UNDEFINED_ID, "");
+      mblock.from_string((String)vmsg.getProperty("trigger_message_bytes", v));
+      t->set_trigger_message((String)vmsg.getProperty("input_identifier", v),
+                             mblock.midi_messages().getEventPointer(0)->message);
+    }
+    if (vmsg.hasProperty("key_code"))
+      t->set_trigger_key_code((int)vmsg.getProperty("key_code", v));
+    if (vmsg.hasProperty("output_message_id"))
+      t->set_output_message(find_message_by_id("trigger", t->id(), (int)vmsg.getProperty("output_message_id", v)));
+    km->triggers().add(t);
+  }
 }
 
-void Storage::load_songs() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql = "select id, name, notes, bpm, clock_on_at_start from songs order by name";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-  //   const char *name = (const char *)sqlite3_column_text(stmt, 1);
-  //   const char *notes = (const char *)sqlite3_column_text(stmt, 2);
-  //   float bpm = sqlite3_column_double(stmt, 3);
-  //   int clock_on_at_start = sqlite3_column_int(stmt, 4);
-
-  //   Song *s = new Song(id, name);
-  //   if (notes != nullptr) s->set_notes(notes);
-  //   s->set_bpm(bpm);
-  //   s->set_clock_on_at_start(clock_on_at_start != 0);
-  //   km->all_songs()->add_song(s);
-  //   load_patches(s);
-  // }
-  // sqlite3_finalize(stmt);
+void Storage::load_songs(var songs) {
+  var v;
+  for (int i = 0; i < songs.size(); ++i) {
+    var vsong = songs[i];
+    Song *s = new Song(
+      (int)vsong.getProperty("id", v),
+      (String)vsong.getProperty("name", v));
+    s->set_bpm((float)vsong.getProperty("bpm", v));
+    s->set_clock_on_at_start((bool)vsong.getProperty("clock_on_at_start", v));
+    s->set_notes((String)vsong.getProperty("notes", v));
+    load_patches(s, vsong.getProperty("patches", v));
+    km->all_songs()->songs().add(s);
+  }
 }
 
-void Storage::load_patches(Song *s) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "select id, name, start_message_id, stop_message_id"
-  //   " from patches"
-  //   " where song_id = ?"
-  //   " order by position";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // sqlite3_bind_int64(stmt, 1, s->id());
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-  //   const char *name = (const char *)sqlite3_column_text(stmt, 1);
-  //   sqlite3_int64 start_message_id = id_or_null(stmt, 2);
-  //   sqlite3_int64 stop_message_id = id_or_null(stmt, 3);
-
-  //   Patch *p = new Patch(id, name);
-  //   if (start_message_id != UNDEFINED_ID) {
-  //     for (auto& message : km->messages()) {
-  //       if (message->id() == start_message_id)
-  //         p->set_start_message(message);
-  //     }
-  //     if (p->start_message() == nullptr) {
-  //       error_str = String.formatted(
-  //               "patch %lld (%s) can't find start message with id %lld\n",
-  //               id, name, start_message_id);
-  //     }
-  //   }
-  //   if (stop_message_id != UNDEFINED_ID) {
-  //     for (auto& message : km->messages()) {
-  //       if (message->id() == stop_message_id)
-  //         p->set_stop_message(message);
-  //     }
-  //     if (p->stop_message() == nullptr) {
-  //       error_str = String.formatted(
-  //               "patch %lld (%s) can't find stop message with id %lld\n",
-  //               id, name, stop_message_id);
-  //     }
-  //   }
-
-  //   s->add_patch(p);
-  //   load_connections(p);
-  // }
-
-  // sqlite3_finalize(stmt);
+void Storage::load_patches(Song *song, var patches) {
+  var v;
+  for (int i = 0; i < patches.size(); ++i) {
+    var vpatch = patches[i];
+    Patch *p = new Patch(
+      UNDEFINED_ID,
+      (String)vpatch.getProperty("name", v));
+    p->set_start_message(find_message_by_id("patch", UNDEFINED_ID, (int)vpatch.getProperty("start_message_id", v)));
+    p->set_stop_message(find_message_by_id("patch", UNDEFINED_ID, (int)vpatch.getProperty("stop_message_id", v)));
+    load_connections(p, vpatch.getProperty("connections", v));
+    song->patches().add(p);
+  }
 }
 
 void Storage::create_default_patches() {
@@ -302,432 +191,316 @@ void Storage::create_default_patch(Song *s) {
   s->add_patch(p);
   if (km->inputs().isEmpty() || km->outputs().isEmpty())
     return;
-  MidiInputEntry::Ptr input = km->inputs()[0];
-  MidiOutputEntry::Ptr output = km->outputs()[0];
+  MidiInputEntry::Ptr input = km->inputs().size() > 0 ? km->inputs()[0] : nullptr;
+  MidiDeviceInfo input_identifier = input ? input->info : MidiDeviceInfo("unknown", "unknown");
+  MidiOutput *output = km->outputs().size() > 0 ? km->outputs()[0]->device : nullptr;
   Connection *conn =
-    new Connection(UNDEFINED_ID, input, CONNECTION_ALL_CHANNELS,
+    new Connection(UNDEFINED_ID, input_identifier, CONNECTION_ALL_CHANNELS,
                    output, CONNECTION_ALL_CHANNELS);
   p->add_connection(conn);
 }
 
-void Storage::load_connections(Patch *p) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "select id,"
-  //   "   input_id, input_chan, output_id, output_chan,"
-  //   "   bank_msb, bank_lsb, prog,"
-  //   "   zone_low, zone_high, xpose, velocity_curve_id,"
-  //   "   note, poly_pressure, chan_pressure, program_change, pitch_bend,"
-  //   "   controller, song_pointer, song_select, tune_request, sysex,"
-  //   "   clock, start_continue_stop, system_reset"
-  //   " from connections"
-  //   " where patch_id = ?"
-  //   " order by position";
+void Storage::load_connections(Patch *patch, var connections) {
+  var v;
+  var undef(UNDEFINED);
+  for (int i = 0; i < connections.size(); ++i) {
+    var vconn = connections[i];
+    String input_identifier = (String)vconn.getProperty("input_id", v);
+    String output_identifier = (String)vconn.getProperty("output_id", v);
+    MidiInputEntry::Ptr input = find_input_by_id("conn", UNDEFINED_ID, input_identifier);
+    MidiOutputEntry::Ptr output = find_output_by_id("conn", UNDEFINED_ID, output_identifier);
+    Connection *c = new Connection(UNDEFINED_ID,
+                                   input ? input->info : MidiDeviceInfo("unknown", input_identifier),
+                                   (int)vconn.getProperty("input_chan", undef),
+                                   output ? output->device : nullptr,
+                                   (int)vconn.getProperty("input_chan", undef));
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // sqlite3_bind_int64(stmt, 1, p->id());
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   int col = 0;
+    c->set_program_bank_msb((int)vconn.getProperty("bank_msb", undef));
+    c->set_program_bank_lsb((int)vconn.getProperty("bank_lsb", undef));
+    c->set_program_prog((int)vconn.getProperty("program", undef));
+    var zone_arr = vconn.getProperty("zone", v);
+    c->set_zone_low((int)zone_arr[0]);
+    c->set_zone_high((int)zone_arr[1]);
+    c->set_xpose((int)vconn.getProperty("xpose", v));
 
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, col++);
-  //   sqlite3_int64 input_id = sqlite3_column_int64(stmt, col++);
-  //   int input_chan = int_or_null(stmt, col++, CONNECTION_ALL_CHANNELS);
-  //   sqlite3_int64 output_id = sqlite3_column_int64(stmt, col++);
-  //   int output_chan = int_or_null(stmt, col++, CONNECTION_ALL_CHANNELS);
-  //   int bank_msb = int_or_null(stmt, col++);
-  //   int bank_lsb = int_or_null(stmt, col++);
-  //   int prog = int_or_null(stmt, col++);
-  //   int zone_low = int_or_null(stmt, col++, 0);
-  //   int zone_high = int_or_null(stmt, col++, 127);
-  //   int xpose = int_or_null(stmt, col++, 0);
-  //   sqlite3_int64 velocity_curve_id = sqlite3_column_int64(stmt, col++);
+    int vcurve_id = (int)vconn.getProperty("velocity_curve_id", v);
+    for (auto &curve : km->curves())
+      if (curve->id() == vcurve_id) {
+        c->set_velocity_curve(curve);
+        break;
+      }
 
-  //   int note = sqlite3_column_int(stmt, col++);
-  //   int poly_pressure = sqlite3_column_int(stmt, col++);
-  //   int chan_pressure = sqlite3_column_int(stmt, col++);
-  //   int program_change = sqlite3_column_int(stmt, col++);
-  //   int pitch_bend = sqlite3_column_int(stmt, col++);
-  //   int controller = sqlite3_column_int(stmt, col++);
-  //   int song_pointer = sqlite3_column_int(stmt, col++);
-  //   int song_select = sqlite3_column_int(stmt, col++);
-  //   int tune_request = sqlite3_column_int(stmt, col++);
-  //   int sysex = sqlite3_column_int(stmt, col++);
-  //   int clock = sqlite3_column_int(stmt, col++);
-  //   int start_continue_stop = sqlite3_column_int(stmt, col++);
-  //   int system_reset = sqlite3_column_int(stmt, col++);
+    load_message_filter(c, vconn.getProperty("message_filter", v));
+    load_controller_mappings(c, vconn);
 
-  //   Input *input = find_input_by_id("connection", id, input_id);
-  //   Output *output = find_output_by_id("connection", id, output_id);
-  //   Connection *conn = new Connection(id, input, input_chan, output, output_chan);
-  //   MessageFilter &mf = conn->message_filter();
-
-  //   conn->set_program_bank_msb(bank_msb);
-  //   conn->set_program_bank_lsb(bank_lsb);
-  //   conn->set_program_prog(prog);
-  //   conn->set_zone_low(zone_low);
-  //   conn->set_zone_high(zone_high);
-  //   conn->set_xpose(xpose);
-  //   conn->set_velocity_curve(km->velocity_curve_with_id(velocity_curve_id));
-  //   mf.set_note(note);
-  //   mf.set_poly_pressure(poly_pressure);
-  //   mf.set_chan_pressure(chan_pressure);
-  //   mf.set_program_change(program_change);
-  //   mf.set_pitch_bend(pitch_bend);
-  //   mf.set_controller(controller);
-  //   mf.set_song_pointer(song_pointer);
-  //   mf.set_song_select(song_select);
-  //   mf.set_tune_request(tune_request);
-  //   mf.set_sysex(sysex);
-  //   mf.set_clock(clock);
-  //   mf.set_start_continue_stop(start_continue_stop);
-  //   mf.set_system_reset(system_reset);
-
-  //   load_controller_mappings(conn);
-
-  //   p->add_connection(conn);
-  // }
-  // sqlite3_finalize(stmt);
+    patch->connections().add(c);
+  }
 }
 
-void Storage::load_controller_mappings(Connection *conn) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "select id, cc_num, translated_cc_num, filtered,"
-  //   "   pass_through_0, pass_through_127,"
-  //   "   min_in, max_in, min_out, max_out"
-  //   " from controller_mappings"
-  //   " where connection_id = ?";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // sqlite3_bind_int64(stmt, 1, conn->id());
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-  //   int cc_num = sqlite3_column_int(stmt, 1);
-  //   int translated_cc_num = sqlite3_column_int(stmt, 2);
-  //   int filtered_bool = sqlite3_column_int(stmt, 3);
-  //   int pass_through_0 = sqlite3_column_int(stmt, 4);
-  //   int pass_through_127 = sqlite3_column_int(stmt, 5);
-  //   int min_in = sqlite3_column_int(stmt, 6);
-  //   int max_in = sqlite3_column_int(stmt, 7);
-  //   int min_out = sqlite3_column_int(stmt, 8);
-  //   int max_out = sqlite3_column_int(stmt, 9);
-
-  //   Controller *cc = new Controller(id, cc_num);
-  //   cc->set_translated_cc_num(translated_cc_num);
-  //   cc->set_filtered(filtered_bool != 0);
-  //   cc->set_range(pass_through_0, pass_through_127,
-  //                 min_in, max_in, min_out, max_out);
-  //   conn->set_cc_map(cc->cc_num(), cc);
-  // }
-  // sqlite3_finalize(stmt);
+void Storage::load_message_filter(Connection *conn, var vmf) {
+  auto mf = conn->message_filter();
+  int flags = (int)vmf;
+  mf.set_note((flags & (1 << 0)) != 0);
+  mf.set_poly_pressure((flags & (1 << 1)) != 0);
+  mf.set_chan_pressure((flags & (1 << 2)) != 0);
+  mf.set_program_change((flags & (1 << 3)) != 0);
+  mf.set_pitch_bend((flags & (1 << 4)) != 0);
+  mf.set_controller((flags & (1 << 5)) != 0);
+  mf.set_song_pointer((flags & (1 << 6)) != 0);
+  mf.set_song_select((flags & (1 << 7)) != 0);
+  mf.set_tune_request((flags & (1 << 8)) != 0);
+  mf.set_sysex((flags & (1 << 9)) != 0);
+  mf.set_clock((flags & (1 << 10)) != 0);
+  mf.set_start_continue_stop((flags & (1 << 11)) != 0);
+  mf.set_system_reset((flags & (1 << 12)) != 0);
 }
 
-void Storage::load_set_lists() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql = "select id, name from set_lists order by name";
+void Storage::load_controller_mappings(Connection *conn, var vconn) {
+  if (!vconn.hasProperty("controller_mappings"))
+    return;
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-  //   const char *name = (const char *)sqlite3_column_text(stmt, 1);
-  //   SetList *slist = new SetList(id, name);
-  //   km->add_set_list(slist);
-  //   load_set_list_songs(slist);
-  // }
-  // sqlite3_finalize(stmt);
+  var v;
+  var arr = vconn.getProperty("controller_mappings", v);
+  for (int i = 0; i < arr.size(); ++i) {
+    var cmap = arr[i];
+    int cc_num = (int)cmap.getProperty("cc_num", v);
+    Controller *c = new Controller(UNDEFINED, cc_num);
+    c->set_cc_num((int)cmap.getProperty("cc_num", v));
+    c->set_translated_cc_num((int)cmap.getProperty("translated_cc_num", v));
+    c->set_filtered((bool)cmap.getProperty("filtered", v));
+    c->set_range(
+      (bool)cmap.getProperty("pass_through_0", v),
+      (bool)cmap.getProperty("pass_through_127", v),
+      (int)cmap.getProperty("min_in", v),
+      (int)cmap.getProperty("max_in", v),
+      (int)cmap.getProperty("min_out", v),
+      (int)cmap.getProperty("max_out", v));
+    conn->set_cc_map(cc_num, c);
+  }
 }
 
-void Storage::load_set_list_songs(SetList *slist) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "select song_id"
-  //   " from set_lists_songs"
-  //   " where set_list_id = ?"
-  //   " order by position";
+void Storage::load_set_lists(var slists) {
+  var v;
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // sqlite3_bind_int64(stmt, 1, slist->id());
-  // while (sqlite3_step(stmt) == SQLITE_ROW) {
-  //   sqlite3_int64 song_id = sqlite3_column_int64(stmt, 0);
-  //   Song *song = find_song_by_id("set list", slist->id(), song_id);
-  //   slist->add_song(song);
-  // }
-  // sqlite3_finalize(stmt);
+  for (int i = 0; i < slists.size(); ++i) {
+    var vsl = slists[i];
+    SetList *sl = new SetList(UNDEFINED, (String)vsl.getProperty("name", v));
+    var song_id_arr = vsl.getProperty("song_ids", v);
+    for (int j = 0; j < song_id_arr.size(); ++j) {
+      int song_id = (int)song_id_arr[j];
+      sl->songs().add(find_song_by_id("set_list", UNDEFINED, song_id));
+    }
+    km->set_lists().add(sl);
+  }
 }
 
 // ================================================================
 // save helpers
 // ================================================================
 
-void Storage::save_schema_version() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql = "insert into schema_version values (?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // sqlite3_bind_int(stmt, 1, SCHEMA_VERSION);
-  // sqlite3_step(stmt);
-  // sqlite3_finalize(stmt);
+void Storage::assign_ids(Array<DBObj *> objs) {
+  int i = 1;
+  for (auto &obj : objs)
+    obj->set_id(i++);
 }
 
-void Storage::save_velocity_curves() {
-  // save_velocity_curves(km->velocity_curves());
+void Storage::assign_ids() {
+  int i = 1;
+  for (auto &curve : km->curves())
+    curve->set_id(i++);
+  i = 0;
+  for (auto &message : km->messages())
+    message->set_id(i++);
+  i = 0;
+  for (auto &trigger : km->triggers())
+    trigger->set_id(i++);
+  i = 0;
+  for (auto &song : km->all_songs()->songs())
+    song->set_id(i++);
 }
 
-void Storage::save_velocity_curves(Array<Curve *> &curves) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into velocity_curves (id, name, short_name, curve) values (?, ?, ?, ?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // for (auto& curve : curves) {
-  //   char *hex_chars = bytes_to_hex(curve->curve, 128);
-
-  //   int col = 1;
-  //   sqlite3_bind_null(stmt, col++);
-  //   sqlite3_bind_text(stmt, col++, curve->name(), -1, SQLITE_TRANSIENT);
-  //   sqlite3_bind_text(stmt, col++, curve->short_name(), -1, SQLITE_TRANSIENT);
-  //   sqlite3_bind_text(stmt, col++, hex_chars, -1, SQLITE_TRANSIENT);
-  //   sqlite3_step(stmt);
-  //   extract_id(curve);
-  //   sqlite3_reset(stmt);
-
-  //   free(hex_chars);
-  // }
-  // sqlite3_finalize(stmt);
+var Storage::schema_version() {
+  return var(SCHEMA_VERSION);
 }
 
-void Storage::save_messages() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into messages (id, name, bytes) values (?, ?, ?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // for (auto& msg : km->messages()) {
-  //   sqlite3_bind_null(stmt, 1);
-  //   sqlite3_bind_text(stmt, 2, msg->name(), -1, SQLITE_TRANSIENT);
-  //   sqlite3_bind_text(stmt, 3, msg->to_string(), -1, SQLITE_TRANSIENT);
-  //   sqlite3_step(stmt);
-  //   extract_id(msg);
-  //   sqlite3_reset(stmt);
-  // }
-  // sqlite3_finalize(stmt);
+var Storage::curves() {
+  return curves(km->curves());
 }
 
-void Storage::save_triggers() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into triggers"
-  //   "   (id, trigger_key_code, input_identifier, trigger_message_bytes, action, message_id)"
-  //   " values"
-  //   "   (?, ?, ?, ?, ?, ?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // for (auto& trigger : km->triggers()) {
-  //   Input *input = trigger->input();
-
-  //   sqlite3_bind_null(stmt, 1);
-  //   bind_int_or_null(stmt, 2, trigger->trigger_key_code());
-  //   bind_obj_id_or_null(stmt, 3, input);
-  //   if (trigger->trigger_message() == Pm_Message(0, 0, 0))
-  //     sqlite3_bind_null(stmt, 4);
-  //   else
-  //     sqlite3_bind_text(stmt, 4,
-  //                       single_message_to_hex_bytes(trigger->trigger_message()),
-  //                       -1, SQLITE_TRANSIENT);
-  //   if (trigger->output_message() != nullptr) {
-  //     sqlite3_bind_null(stmt, 5);
-  //     sqlite3_bind_int64(stmt, 6, trigger->output_message()->id());
-  //   }
-  //   else {
-  //     const char * action;
-  //     switch (trigger->action()) {
-  //     case TA_NEXT_SONG: action = "next_song"; break;
-  //     case TA_PREV_SONG: action = "prev_song"; break;
-  //     case TA_NEXT_PATCH: action = "next_patch"; break;
-  //     case TA_PREV_PATCH: action = "prev_patch"; break;
-  //     case TA_PANIC: action = "panic"; break;
-  //     case TA_SUPER_PANIC: action = "super_panic"; break;
-  //     case TA_TOGGLE_CLOCK: action = "toggle_clock"; break;
-  //     default: break;
-  //     }
-  //     sqlite3_bind_text(stmt, 5, action, -1, SQLITE_TRANSIENT);
-  //     sqlite3_bind_null(stmt, 6);
-  //   }
-  //   sqlite3_step(stmt);
-  //   extract_id(trigger);
-  //   sqlite3_reset(stmt);
-  // }
-  // sqlite3_finalize(stmt);
+var Storage::curves(Array<Curve *> &curves) {
+  Array<var> curve_vars;
+  for (auto curve : curves) {
+    DynamicObject::Ptr c(new DynamicObject());
+    c->setProperty("id", var(curve->id()));
+    c->setProperty("name", var(curve->name()));
+    c->setProperty("short_name", var(curve->short_name()));
+    Array<var> values;
+    for (int i = 0; i < 128; ++i)
+      values.add(var(curve->curve[i]));
+    c->setProperty("values", values);
+    curve_vars.add(var(c.get()));
+  }
+  return var(curve_vars);
 }
 
-void Storage::save_songs() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into songs (id, name, notes, bpm, clock_on_at_start) values (?, ?, ?, ?, ?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // for (auto& song : km->all_songs()->songs()) {
-  //   sqlite3_bind_null(stmt, 1);
-  //   sqlite3_bind_text(stmt, 2, song->name(), -1, SQLITE_TRANSIENT);
-  //   if (song->notes().isEmpty())
-  //     sqlite3_bind_null(stmt, 3);
-  //   else
-  //     sqlite3_bind_text(stmt, 3, song->notes(), -1, SQLITE_TRANSIENT);
-  //   sqlite3_bind_double(stmt, 4, song->bpm());
-  //   sqlite3_bind_int(stmt, 5, song->clock_on_at_start() ? 1 : 0);
-  //   sqlite3_step(stmt);
-  //   extract_id(song);
-  //   sqlite3_reset(stmt);
-  //   save_patches(song);
-  // }
-  // sqlite3_finalize(stmt);
+var Storage::messages() {
+  Array<var> messages;
+  for (auto message : km->messages()) {
+    DynamicObject::Ptr m(new DynamicObject());
+    m->setProperty("id", var(message->id()));
+    m->setProperty("name", var(message->name()));
+    m->setProperty("bytes", var(message->to_hex_string()));
+    messages.add(var(m.get()));
+  }
+  return var(messages);
 }
 
-void Storage::save_patches(Song *song) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into patches"
-  //   "   (id, song_id, position, name, start_message_id, stop_message_id)"
-  //   " values (?, ?, ?, ?, ?, ?)";
+var Storage::triggers() {
+  Array<var> triggers;
+  for (auto trigger : km->triggers()) {
+    DynamicObject::Ptr t(new DynamicObject());
+    t->setProperty("id", var(trigger->id()));
+    t->setProperty("name", var(trigger->name()));
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // int position = 0;
-  // for (auto& patch : song->patches()) {
-  //   sqlite3_bind_null(stmt, 1);
-  //   sqlite3_bind_int64(stmt, 2, song->id());
-  //   sqlite3_bind_int(stmt, 3, position++);
-  //   sqlite3_bind_text(stmt, 4, patch->name(), -1, SQLITE_TRANSIENT);
-  //   bind_obj_id_or_null(stmt, 5, patch->start_message());
-  //   bind_obj_id_or_null(stmt, 6, patch->stop_message());
-  //   sqlite3_step(stmt);
-  //   extract_id(patch);
-  //   sqlite3_reset(stmt);
-  //   save_connections(patch);
-  // }
-  // sqlite3_finalize(stmt);
+    int action_int = (int)trigger->action();
+    t->setProperty("action", var(action_int));
+
+    if (trigger->trigger_input_identifier().isNotEmpty()) {
+      t->setProperty("input_identifier", var(trigger->trigger_input_identifier()));
+      t->setProperty("trigger_message_bytes",
+                     var(String::toHexString(trigger->trigger_message().getRawData(),
+                                             trigger->trigger_message().getRawDataSize())));
+    }
+    if (trigger->trigger_key_code() != UNDEFINED)
+      t->setProperty("key_code", var(trigger->trigger_key_code()));
+    if (trigger->output_message())
+      t->setProperty("output_message_id", var(trigger->output_message()->id()));
+    triggers.add(var(t.get()));
+  }
+  return var(triggers);
 }
 
-void Storage::save_connections(Patch *patch) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into connections"
-  //   "   (id, patch_id, position, input_id, input_chan, output_id, output_chan,"
-  //   "    bank_msb, bank_lsb, prog, zone_low, zone_high, xpose, velocity_curve_id,"
-  //   "    note, poly_pressure, chan_pressure, program_change, pitch_bend,"
-  //   "    controller, song_pointer, song_select, tune_request, sysex,"
-  //   "    clock, start_continue_stop, system_reset)"
-  //   " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // int position = 0;
-  // for (auto& conn : patch->connections()) {
-  //   int col = 1;
-  //   sqlite3_bind_null(stmt, col++);
-  //   sqlite3_bind_int64(stmt, col++, patch->id());
-  //   sqlite3_bind_int(stmt, col++, position++);
-  //   sqlite3_bind_int64(stmt, col++, conn->input()->id());
-  //   bind_int_or_null(stmt, col++, conn->input_chan(), CONNECTION_ALL_CHANNELS);
-  //   sqlite3_bind_int64(stmt, col++, conn->output()->id());
-  //   bind_int_or_null(stmt, col++, conn->output_chan(), CONNECTION_ALL_CHANNELS);
-  //   bind_int_or_null(stmt, col++, conn->program_bank_msb());
-  //   bind_int_or_null(stmt, col++, conn->program_bank_lsb());
-  //   bind_int_or_null(stmt, col++, conn->program_prog());
-  //   sqlite3_bind_int(stmt, col++, conn->zone_low());
-  //   sqlite3_bind_int(stmt, col++, conn->zone_high());
-  //   sqlite3_bind_int(stmt, col++, conn->xpose());
-  //   bind_obj_id_or_null(stmt, col++, conn->velocity_curve());
-
-  //   MessageFilter &mf = conn->message_filter();
-  //   sqlite3_bind_int(stmt, col++, mf.note() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.poly_pressure() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.chan_pressure() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.program_change() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.pitch_bend() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.controller() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.song_pointer() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.song_select() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.tune_request() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.sysex() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.clock() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.start_continue_stop() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, col++, mf.system_reset() ? 1 : 0);
-
-  //   sqlite3_step(stmt);
-  //   extract_id(conn);
-  //   sqlite3_reset(stmt);
-  //   save_controller_mappings(conn);
-  // }
-  // sqlite3_finalize(stmt);
+var Storage::songs() {
+  Array<var> songs;
+  for (auto song : km->all_songs()->songs()) {
+    DynamicObject::Ptr s(new DynamicObject());
+    s->setProperty("id", var(song->id()));
+    s->setProperty("name", var(song->name()));
+    s->setProperty("bpm", var(song->bpm()));
+    s->setProperty("clock_on_at_start", var(song->clock_on_at_start()));
+    s->setProperty("notes", var(song->notes()));
+    s->setProperty("patches", patches(song->patches()));
+    songs.add(var(s.get()));
+  }
+  return var(songs);
 }
 
-void Storage::save_controller_mappings(Connection *conn) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into controller_mappings"
-  //   "   (id, connection_id, cc_num, translated_cc_num, filtered,"
-  //   "    pass_through_0, pass_through_127, min_in, max_in, min_out, max_out)"
-  //   " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // for (int i = 0; i < 128; ++i) {
-  //   Controller *cc = conn->cc_map(i);
-  //   if (cc == nullptr)
-  //     continue;
-
-  //   int j = 1;
-  //   sqlite3_bind_null(stmt, j++);
-  //   sqlite3_bind_int64(stmt, j++, conn->id());
-  //   sqlite3_bind_int(stmt, j++, cc->cc_num());
-  //   sqlite3_bind_int(stmt, j++, cc->translated_cc_num());
-  //   sqlite3_bind_int(stmt, j++, cc->filtered() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, j++, cc->pass_through_0() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, j++, cc->pass_through_127() ? 1 : 0);
-  //   sqlite3_bind_int(stmt, j++, cc->min_in());
-  //   sqlite3_bind_int(stmt, j++, cc->max_in());
-  //   sqlite3_bind_int(stmt, j++, cc->min_out());
-  //   sqlite3_bind_int(stmt, j++, cc->max_out());
-  //   sqlite3_step(stmt);
-  //   extract_id(cc);
-  //   sqlite3_reset(stmt);
-  // }
-  // sqlite3_finalize(stmt);
+var Storage::patches(Array<Patch *> &patches) {
+  Array<var> ps;
+  for (auto patch : patches) {
+    DynamicObject::Ptr p(new DynamicObject());
+    p->setProperty("name", var(patch->name()));
+    p->setProperty("connections", var(connections(patch->connections())));
+    if (patch->start_message())
+      p->setProperty("start_message_id", patch->start_message()->id());
+    if (patch->stop_message())
+      p->setProperty("stop_message_id", patch->stop_message()->id());
+    ps.add(var(p.get()));
+  }
+  return var(ps);
 }
 
-void Storage::save_set_lists() {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into set_lists (id, name) values (?, ?)";
+var Storage::connections(Array<Connection *> &connections) {
+  Array<var> cs;
+  for (auto conn : connections) {
+    DynamicObject::Ptr c(new DynamicObject());
+    c->setProperty("input_id", conn->input_info().identifier);
+    c->setProperty("output_id", conn->output()->getIdentifier());
+    if (conn->input_chan() != UNDEFINED)
+      c->setProperty("input_chan", conn->input_chan());
+    if (conn->output_chan() != UNDEFINED)
+      c->setProperty("output_chan", conn->output_chan());
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // for (auto &set_list : km->set_lists()) {
-  //   if (set_list == km->all_songs())
-  //     continue;
-  //   sqlite3_bind_null(stmt, 1);
-  //   sqlite3_bind_text(stmt, 2, set_list->name(), -1, SQLITE_TRANSIENT);
-  //   sqlite3_step(stmt);
-  //   extract_id(set_list);
-  //   sqlite3_reset(stmt);
-  //   save_set_list_songs(set_list);
-  // }
-  // sqlite3_finalize(stmt);
+    DynamicObject::Ptr prog(new DynamicObject());
+    if (conn->program_bank_msb() != UNDEFINED)
+      prog->setProperty("bank_msb", var(conn->program_bank_msb()));
+    if (conn->program_bank_lsb() != UNDEFINED)
+      prog->setProperty("bank_msb", var(conn->program_bank_lsb()));
+    if (conn->program_bank_msb() != UNDEFINED)
+      prog->setProperty("program", var(conn->program_prog()));
+    c->setProperty("program", var(prog.get()));
+
+    DynamicObject::Ptr zone(new DynamicObject());
+    Array<var> zone_arr = { var(conn->zone_low()), var(conn->zone_high()) };
+    c->setProperty("zone", var(zone_arr));
+
+    c->setProperty("xpose", conn->xpose());
+    if (conn->velocity_curve() != nullptr)
+      c->setProperty("velocity_curve_id", conn->velocity_curve()->id());
+    c->setProperty("message_filter", message_filter(conn->message_filter()));
+
+    Array<var> cc_maps;
+    for (int i = 0; i < 128; ++i) {
+      Controller *cc_map = conn->cc_map(i);
+      if (cc_map != nullptr)
+        cc_maps.add(controller_mapping(cc_map));
+    }
+    if (!cc_maps.isEmpty())
+      c->setProperty("controller_mappings", var(cc_maps));
+    
+    cs.add(var(c.get()));
+  }
+  return var(cs);
 }
 
-void Storage::save_set_list_songs(SetList *set_list) {
-  // sqlite3_stmt *stmt;
-  // const char * const sql =
-  //   "insert into set_lists_songs (set_list_id, song_id, position)"
-  //   " values (?, ?, ?)";
+var Storage::controller_mapping(Controller *controller) {
+  DynamicObject::Ptr c(new DynamicObject());
 
-  // sqlite3_prepare_v3(db, sql, -1, 0, &stmt, nullptr);
-  // int position = 0;
-  // for (auto &song : set_list->songs()) {
-  //   sqlite3_bind_int64(stmt, 1, set_list->id());
-  //   sqlite3_bind_int64(stmt, 2, song->id());
-  //   sqlite3_bind_int(stmt, 3, position++);
-  //   sqlite3_step(stmt);
-  //   sqlite3_reset(stmt);
-  // }
-  // sqlite3_finalize(stmt);
+  c->setProperty("cc_num", var(controller->cc_num()));
+  c->setProperty("translated_cc_num", var(controller->translated_cc_num()));
+  c->setProperty("filtered", var(controller->filtered()));
+  c->setProperty("pass_through_0", var(controller->pass_through_0()));
+  c->setProperty("pass_through_127", var(controller->pass_through_127()));
+  c->setProperty("min_in", var(controller->min_in()));
+  c->setProperty("max_in", var(controller->max_in()));
+  c->setProperty("min_out", var(controller->min_out()));
+  c->setProperty("max_out", var(controller->max_out()));
+  
+  return var(c.get());
+}
+
+var Storage::message_filter(MessageFilter &mf) {
+  int flags = 0;
+  if (mf.note()) flags |= (1 << 0);
+  if (mf.poly_pressure()) flags |= (1 << 1);
+  if (mf.chan_pressure()) flags |= (1 << 2);
+  if (mf.program_change()) flags |= (1 << 3);
+  if (mf.pitch_bend()) flags |= (1 << 4);
+  if (mf.controller()) flags |= (1 << 5);
+  if (mf.song_pointer()) flags |= (1 << 6);
+  if (mf.song_select()) flags |= (1 << 7);
+  if (mf.tune_request()) flags |= (1 << 8);
+  if (mf.sysex()) flags |= (1 << 9);
+  if (mf.clock()) flags |= (1 << 10);
+  if (mf.start_continue_stop()) flags |= (1 << 11);
+  if (mf.system_reset()) flags |= (1 << 12);
+  return var(flags);
+}
+
+var Storage::set_lists() {
+  Array<var> set_lists;
+
+  for (auto slist : km->set_lists()) {
+    DynamicObject::Ptr sl(new DynamicObject());
+    sl->setProperty("name", slist->name());
+    Array<var> song_ids;
+    for (auto song : slist->songs())
+      song_ids.add(var((int)song->id()));
+    sl->setProperty("song_ids", var(song_ids));
+    set_lists.add(var(sl.get()));
+  }
+
+  return var(set_lists);
 }
 
 // ================================================================
@@ -738,7 +511,7 @@ MidiInputEntry::Ptr Storage::find_input_by_id(
   const char * const searcher_name, DBObjID searcher_id, const String &id
 ) {
   for (auto &input : km->inputs())
-    if (input->deviceInfo.identifier == id)
+    if (input->info.identifier == id)
       return input;
   set_find_error_message(searcher_name, searcher_id, "input", id);
   return nullptr;
@@ -748,7 +521,7 @@ MidiOutputEntry::Ptr Storage::find_output_by_id(
   const char * const searcher_name, DBObjID searcher_id, const String &id
 ) {
   for (auto &output : km->outputs())
-    if (output->deviceInfo.identifier == id)
+    if (output->info.identifier == id)
       return output;
   set_find_error_message(searcher_name, searcher_id, "output", id);
   return nullptr;

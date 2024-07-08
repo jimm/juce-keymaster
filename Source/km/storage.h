@@ -8,49 +8,45 @@
 
 class Storage {
 public:
-  Storage(const String &path);
+  Storage(const File &f);
   ~Storage();
 
-  void initialize();            // public for testing
-  void close();                 // ditto
-
   KeyMaster *load(bool testing = false);
-  void save(KeyMaster *km, bool testing = false);
+  void save(KeyMaster *km);
   bool has_error();
   String error();
 
-  int schema_version();         // for testing
-
 private:
-  // sqlite3 *db;
   KeyMaster *km;
+  const File &file;
   int loading_version;
   String error_str;
 
-  void load_schema_version();
-  void load_instruments();
-  void load_velocity_curves();
-  void load_messages();
-  void load_triggers();
-  void load_songs();
-  void load_patches(Song *);
-  void load_connections(Patch *);
-  void load_controller_mappings(Connection *);
-  void load_set_lists();
-  void load_set_list_songs(SetList *);
+  void load_schema_version(var);
+  void load_instruments(var);
+  void load_curves(var);
+  void load_messages(var);
+  void load_triggers(var);
+  void load_songs(var);
+  void load_patches(Song *, var);
+  void load_connections(Patch *, var);
+  void load_message_filter(Connection *, var);
+  void load_controller_mappings(Connection *, var);
+  void load_set_lists(var);
 
-  void save_schema_version();
-  void save_instruments();
-  void save_velocity_curves();
-  void save_velocity_curves(Array<Curve *> &curves);
-  void save_messages();
-  void save_triggers();
-  void save_songs();
-  void save_patches(Song *);
-  void save_connections(Patch *);
-  void save_controller_mappings(Connection *);
-  void save_set_lists();
-  void save_set_list_songs(SetList *);
+  void assign_ids();
+  void assign_ids(Array<DBObj *> objs);
+  var schema_version();
+  var curves();
+  var curves(Array<Curve *> &curves);
+  var messages();
+  var triggers();
+  var songs();
+  var patches(Array<Patch *> &patches);
+  var connections(Array<Connection *> &connections);
+  var controller_mapping(Controller *controller);
+  var message_filter(MessageFilter &mf);
+  var set_lists();
 
   void create_default_patches();
   void create_default_patch(Song *);

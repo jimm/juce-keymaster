@@ -10,10 +10,13 @@ public:
   virtual int getNumRows() override { return 0; }
 
   void paintListBoxItem(int rowNumber, Graphics &g, int width, int height, bool rowIsSelected) override {
-    if (rowIsSelected)
+    if (rowIsSelected) {
       g.fillAll(Colours::lightblue);
+      g.setColour(Colours::black);
+    }
+    else
+      g.setColour(LookAndFeel::getDefaultLookAndFeel().findColour(ListBox::textColourId));
 
-    g.setColour(LookAndFeel::getDefaultLookAndFeel().findColour(ListBox::textColourId));
     g.setFont(14.0f);
 
     auto text = getText(rowNumber);

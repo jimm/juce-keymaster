@@ -4,15 +4,9 @@
 #include <JuceHeader.h>
 #include "formatter.h"
 #include "consts.h"
-#include "connection.h"
-#include "controller.h"
+
 static const int NOTE_OFFSETS[] = {
   9, 11, 0, 2, 4, 5, 7
-};
-
-static const char HEX_DIGITS[] = {
-  '0', '1', '2', '3', '4', '5', '6', '7',
-  '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 };
 
 String note_num_to_name(int num) {
@@ -76,57 +70,4 @@ String format_program(int bank_msb, int bank_lsb, int prog) {
     str += "    ";
 
   return str;
-}
-
-// ================ parsing MIDI messages ================
-
-// Translates up to first two hex chars into an int8 value. Zero,
-// one, or two chars used.
-int8 hex_to_byte(String &hex) {
-  return (int8)hex.substring(0, 2).getHexValue32();
-}
-
-// private helper
-//
-bool check_byte_value(int val) {
-  if (val >= 0 && val <= 255)
-    return true;
-
-  // error_message("byte value %d is out of range", val);
-  return false;
-}
-
-// Reads two-digit hex chars and converts them to bytes, returning a newly
-// allocated buffer.
-Array<uint8> hex_to_bytes(String &hex) {
-  Array<uint8> buf;
-
-  while (hex.isNotEmpty()) {
-    buf.add(hex_to_byte(hex));
-    hex = hex.substring(2);
-  }
-  return buf;
-}
-
-// Converts `bytes` into two-digit hex characters and returns a newly
-// allocated zero-terminated buffer.
-String bytes_to_hex(int8 *bytes, int len) {
-  String hex;
-
-  int i = 0;
-  while (i < len) {
-    hex += HEX_DIGITS[(bytes[i++] >> 4) & 0x0f];
-    hex += HEX_DIGITS[bytes[i++] & 0x0f];
-  }
-  return hex;
-}
-
-// Translates hex bytes in `str` into a single non-sysex MIDI message. If
-// `str` is empty returns an active sensing message.
-MidiMessage message_from_hex(String &hex) {
-  if (hex.isEmpty())
-    return MidiMessage(ACTIVE_SENSE);
-
-  Array<uint8> data = hex_to_bytes(hex);
-  return MidiMessage(data.data(), data.size());
 }

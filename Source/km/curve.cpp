@@ -79,8 +79,3 @@ Curve::Curve(DBObjID id, const String &name, const String &short_name)
   : DBObj(id), Nameable(name), _short_name(short_name)
 {
 }
-
-void Curve::from_string(juce::String &str) {
-  Array<juce::uint8> bytes = hex_to_bytes(str);
-  memcpy(curve, bytes.data(), 128);
-}

@@ -1,6 +1,6 @@
 #pragma once
 
-typedef unsigned long DBObjID;
+typedef int DBObjID;
 
 // Storage/accessors for database ids. These ids are only used during
 // loading and saving of data by a Storage object. Do NOT rely on their

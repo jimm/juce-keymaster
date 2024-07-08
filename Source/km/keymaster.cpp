@@ -6,6 +6,8 @@
 #define PATCH_STOP  {if (_cursor->patch() != nullptr) _cursor->patch()->stop();}
 #define PATCH_START {update_clock(); if (_cursor->patch() != nullptr) _cursor->patch()->start();}
 
+#define PRD Logger::writeToLog
+#define FS String::formatted
 
 static KeyMaster *km_instance = nullptr;
 
@@ -19,13 +21,11 @@ KeyMaster *create_KeyMaster() {
 
   KeyMaster *km = new KeyMaster();
   km->set_testing(testing);
-  km->initialize();
 
-  if (old_km != nullptr) {
-    old_km->stop();
+  if (old_km != nullptr)
     delete old_km;
-  }
 
+  km->initialize();
   km->start();
   return km;
 }
@@ -48,9 +48,6 @@ KeyMaster::~KeyMaster() {
   if (km_instance == this)
     km_instance = nullptr;
 
-  _inputs.clear();
-  _outputs.clear();
-
   for (auto& t : _triggers)
     delete t;
   for (auto& song : all_songs()->songs())
@@ -59,8 +56,11 @@ KeyMaster::~KeyMaster() {
     delete set_list;
   for (auto& msg : _messages)
     delete msg;
-  for (auto& curve : _velocity_curves)
+  for (auto& curve : _curves)
     delete curve;
+
+  _inputs.clear();
+  _outputs.clear();
 }
 
 // ================ accessors ================
@@ -74,24 +74,24 @@ void KeyMaster::remove_message(MessageBlock *message) {
   delete message;
 }
 
-void KeyMaster::add_velocity_curve(Curve *velocity_curve) {
-  _velocity_curves.add(velocity_curve);
+void KeyMaster::add_curve(Curve *curve) {
+  _curves.add(curve);
 }
 
-void KeyMaster::remove_velocity_curve(Curve *velocity_curve) {
-  _velocity_curves.removeFirstMatchingValue(velocity_curve);
-  delete velocity_curve;
+void KeyMaster::remove_curve(Curve *curve) {
+  _curves.removeFirstMatchingValue(curve);
+  delete curve;
 }
 
-Curve * KeyMaster::velocity_curve_with_name(const String &name) {
-  for (auto &curve : _velocity_curves)
+Curve * KeyMaster::curve_with_name(const String &name) {
+  for (auto &curve : _curves)
     if (curve->name() == name)
       return curve;
   return nullptr;
 }
 
-Curve * KeyMaster::velocity_curve_with_id(DBObjID id) {
-  for (auto &curve : _velocity_curves)
+Curve * KeyMaster::curve_with_id(DBObjID id) {
+  for (auto &curve : _curves)
     if (curve->id() == id)
       return curve;
   return nullptr;
@@ -136,6 +136,9 @@ void KeyMaster::stop() {
 }
 
 void KeyMaster::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) {
+  if (message.isActiveSense())
+    return;
+
   // TODO listen for program changes and jump to song
   for (auto &trigger : _triggers)
     trigger->signal_message(source, message);
@@ -158,7 +161,7 @@ void KeyMaster::update_clock() {
 // ================ initialization ================
 
 void KeyMaster::initialize() {
-  generate_default_curves(this->_velocity_curves);
+  generate_default_curves(this->_curves);
   create_songs();
 }
 
@@ -177,6 +180,7 @@ void KeyMaster::load_instruments() {
 
 void KeyMaster::create_songs() {
   for (auto& input : _inputs) {
+
     // this input to each individual output
     for (auto& output : _outputs) {
       String name = input->device->getName() + " -> " + output->device->getName();
@@ -188,8 +192,8 @@ void KeyMaster::create_songs() {
 
       Connection *conn = new Connection(
         UNDEFINED,
-        input, CONNECTION_ALL_CHANNELS,
-        output, CONNECTION_ALL_CHANNELS);
+        input->info, CONNECTION_ALL_CHANNELS,
+        output->device, CONNECTION_ALL_CHANNELS);
       patch->add_connection(conn);
 
     }
@@ -206,8 +210,8 @@ void KeyMaster::create_songs() {
       for (auto& output : _outputs) {
         Connection *conn = new Connection(
           UNDEFINED,
-          input, CONNECTION_ALL_CHANNELS,
-          output, CONNECTION_ALL_CHANNELS);
+          input->info, CONNECTION_ALL_CHANNELS,
+          output->device, CONNECTION_ALL_CHANNELS);
         patch->add_connection(conn);
       }
     }
@@ -296,10 +300,10 @@ void KeyMaster::jump_to_patch_index(int i) {
 // ================ doing things ================
 
 void KeyMaster::panic(bool send_notes_off) {
-  MidiBuffer buf;
+  MidiMessageSequence buf;
 
   if (send_notes_off) {
-    MidiBuffer buf;
+    MidiMessageSequence buf;
     for (int i = 0; i < 16; ++i) {
       for (int j = 0; j < 128; ++j)
         buf.addEvent(MidiMessage::noteOff(i, j), 0);
@@ -310,8 +314,9 @@ void KeyMaster::panic(bool send_notes_off) {
       buf.addEvent(MidiMessage::controllerEvent(i, CM_ALL_NOTES_OFF, 0), 0);
   }
 
-  for (auto& out : _outputs)
-    out->device->sendBlockOfMessagesNow(buf);
+  for (auto &msg : buf)
+    for (auto &out : _outputs)
+      out->device->sendMessageNow(msg->message);
 }
 
 // ================ helpers ================

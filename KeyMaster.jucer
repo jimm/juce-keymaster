@@ -46,7 +46,6 @@
       <FILE id="ekPF4B" name="nameable.h" compile="0" resource="0" file="Source/km/nameable.h"/>
       <FILE id="rLm8bY" name="patch.cpp" compile="1" resource="0" file="Source/km/patch.cpp"/>
       <FILE id="Pe5kri" name="patch.h" compile="0" resource="0" file="Source/km/patch.h"/>
-      <FILE id="IYBlg4" name="schema.sql.h" compile="0" resource="0" file="Source/km/schema.sql.h"/>
       <FILE id="VBCyBg" name="set_list.cpp" compile="1" resource="0" file="Source/km/set_list.cpp"/>
       <FILE id="aUPRkp" name="set_list.h" compile="0" resource="0" file="Source/km/set_list.h"/>
       <FILE id="PJkYWC" name="song.cpp" compile="1" resource="0" file="Source/km/song.cpp"/>

@@ -21,7 +21,7 @@ public:
   inline Array<SetList *> &set_lists() { return _set_lists; }
   inline Array<Trigger *> &triggers() { return _triggers; }
   inline Array<MessageBlock *> &messages() { return _messages; }
-  inline Array<Curve *> &velocity_curves() { return _velocity_curves; }
+  inline Array<Curve *> &curves() { return _curves; }
   inline Cursor *cursor() { return _cursor; }
   inline Clock &clock() { return _clock; }
   inline bool is_testing() { return _testing; }
@@ -29,10 +29,10 @@ public:
   void add_message(MessageBlock *message);
   void remove_message(MessageBlock *message);
 
-  void add_velocity_curve(Curve *velocity_curve);
-  void remove_velocity_curve(Curve *velocity_curve);
-  Curve *velocity_curve_with_name(const String &name);
-  Curve *velocity_curve_with_id(DBObjID id);
+  void add_curve(Curve *curve);
+  void remove_curve(Curve *curve);
+  Curve *curve_with_name(const String &name);
+  Curve *curve_with_id(DBObjID id);
 
   void add_trigger(Trigger *trigger);
   void remove_trigger(Trigger *trigger);
@@ -93,7 +93,7 @@ private:
   bool _running;
   bool _testing;
   Array<MessageBlock *> _messages;
-  Array<Curve *> _velocity_curves;
+  Array<Curve *> _curves;
 
   // ================ initialization ================
   void create_songs();

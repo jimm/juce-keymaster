@@ -2,6 +2,7 @@
 #include "km/keymaster.h"
 #include "gui/list_box_model.h"
 #include "gui/patch_table.h"
+#include "km/storage.h"         // DEBUG
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -10,6 +11,14 @@ MainComponent::MainComponent(juce::ApplicationProperties &props)
 {
   km = create_KeyMaster();
   km->start();
+
+  File f("/tmp/keymaster.json"); // DEBUG
+  Storage(f).save(km);           // DEBUG
+  delete km;                     // DEBUG
+  auto s = Storage(f);
+  km = s.load();        // DEBUG
+  if (s.has_error())
+    Logger::writeToLog(s.error());
 
   make_menu_bar();
   make_set_list_songs_pane();

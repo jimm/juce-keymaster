@@ -20,11 +20,11 @@ typedef struct zone {
   
 class Connection : public DBObj {
 public:
-  Connection(DBObjID id, MidiInputEntry::Ptr in, int in_chan, MidiOutputEntry::Ptr out, int out_chan);
+  Connection(DBObjID id, MidiDeviceInfo input_info, int in_chan, MidiOutput *output, int out_chan);
   ~Connection();
 
-  inline MidiInputEntry::Ptr input() { return _input; }
-  inline MidiOutputEntry::Ptr output() { return _output; }
+  inline MidiDeviceInfo input_info() { return _input_info; }
+  inline MidiOutput *output() { return _output; }
   inline int input_chan() { return _input_chan; }
   inline int output_chan() { return _output_chan; }
   inline int program_bank_msb() { return _prog.bank_msb; }
@@ -40,8 +40,8 @@ public:
   inline bool changing_was_running() { return _changing_was_running; }
   inline Controller *cc_map(int i) { return _cc_maps[i]; }
 
-  inline void set_input(MidiInputEntry::Ptr val) { _input = val; }
-  inline void set_output(MidiOutputEntry::Ptr val) { _output = val; }
+  inline void set_input_info(MidiDeviceInfo val) { _input_info = val; }
+  inline void set_output(MidiOutput *val) { _output = val; }
   inline void set_input_chan(int val) { _input_chan = val; }
   inline void set_output_chan(int val) { _output_chan = val; }
   inline void set_program_bank_msb(int val) { _prog.bank_msb = val; }
@@ -73,8 +73,8 @@ public:
   void remove_cc_num(int cc_num);
 
 private:
-  MidiInputEntry::Ptr _input;
-  MidiOutputEntry::Ptr _output;
+  MidiDeviceInfo _input_info;
+  MidiOutput *_output;
   int _input_chan;
   int _output_chan;
   struct program _prog;
