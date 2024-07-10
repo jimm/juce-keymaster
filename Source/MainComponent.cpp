@@ -1,7 +1,5 @@
 #include "MainComponent.h"
 #include "km/keymaster.h"
-#include "gui/list_box_model.h"
-#include "gui/patch_table.h"
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
@@ -95,7 +93,7 @@ void MainComponent::config_label(Label &label, const char *text) {
   label.setColour(Label::textColourId, Colours::lightgreen);
 }
 
-void MainComponent::config_list_box(const char *label_text, Label &label, ListBox &list_box, ListBoxModel *model) {
+void MainComponent::config_list_box(const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model) {
   config_label(label, label_text);
   box_models.add(model);
   list_box.setModel(model);
@@ -103,47 +101,48 @@ void MainComponent::config_list_box(const char *label_text, Label &label, ListBo
 }
 
 void MainComponent::make_set_list_songs_pane() {
-  SetList *set_list = km->cursor()->set_list();
-  auto model = new SetListSongsListBoxModel(set_list);
+  auto model = new SetListSongsListBoxModel();
   config_list_box("Set List Songs", set_list_songs_label, set_list_songs, model);
-  if (set_list)
-    set_list_songs.selectRow(set_list->songs().indexOf(km->cursor()->song()));
+  km->cursor()->addActionListener(&set_list_songs);
+  set_list_songs.selectRow(model->selected_row_num());
 }
 
 void MainComponent::make_song_patches_pane() {
-  Song *song = km->cursor()->song();
-  auto model = new SongPatchesListBoxModel(song);
+  auto model = new SongPatchesListBoxModel();
   config_list_box("Song Patches", song_patches_label, song_patches, model);
-  if (song)
-    song_patches.selectRow(song->patches().indexOf(km->cursor()->patch()));
+  km->cursor()->addActionListener(&song_patches);
+  song_patches.selectRow(model->selected_row_num());
 }
 
 void MainComponent::make_song_notes_pane() {
-  Song *song = km->cursor()->song();
   config_label(song_notes_label, "Song Notes");
+
+  Song *song = km->cursor()->song();
+  // FIXME need to update this when the song changes
   if (song)
     song_notes.setText(song->notes(), NotificationType::dontSendNotification);
   addAndMakeVisible(song_notes);
 }
 
 void MainComponent::make_set_lists_pane() {
-  auto model = new SetListsListBoxModel(km->set_lists());
+  auto model = new SetListsListBoxModel();
   config_list_box("Set Lists", set_lists_label, set_lists, model);
-  set_lists.selectRow(km->set_lists().indexOf(km->cursor()->set_list()));
+  km->cursor()->addActionListener(&set_lists);
+  set_lists.selectRow(model->selected_row_num());
 }
 
 void MainComponent::make_messages_pane() {
-  auto model = new MessagesListBoxModel(km->messages());
+  auto model = new MessagesListBoxModel();
   config_list_box("Messages", messages_label, messages, model);
 }
 
 void MainComponent::make_triggers_pane() {
-  auto model = new TriggersListBoxModel(km->triggers());
+  auto model = new TriggersListBoxModel();
   config_list_box("Triggers", triggers_label, triggers, model);
 }
 
 void MainComponent::make_patch_pane() {
-  patch_table = new PatchTableListBoxModel(km->cursor()->patch());
+  patch_table = new PatchTableListBoxModel();
   table_box_models.add(patch_table);
   config_label(patch_table_label, "Patch Connections");
   addAndMakeVisible(patch_table);

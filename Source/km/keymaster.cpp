@@ -6,9 +6,6 @@
 #define PATCH_STOP  {if (_cursor->patch() != nullptr) _cursor->patch()->stop();}
 #define PATCH_START {update_clock(); if (_cursor->patch() != nullptr) _cursor->patch()->start();}
 
-#define PRD Logger::writeToLog
-#define FS String::formatted
-
 static KeyMaster *km_instance = nullptr;
 
 KeyMaster *KeyMaster_instance() {

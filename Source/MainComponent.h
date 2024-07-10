@@ -2,8 +2,12 @@
 
 #include <JuceHeader.h>
 #include "gui/menu_manager.h"
-#include "gui/list_box_model.h"
+#include "gui/messages_list_box.h"
 #include "gui/patch_table.h"
+#include "gui/set_list_songs_list_box.h"
+#include "gui/set_lists_list_box.h"
+#include "gui/song_patches_list_box.h"
+#include "gui/triggers_list_box.h"
 
 class KeyMaster;
 
@@ -33,22 +37,22 @@ private:
   OwnedArray<PatchTableListBoxModel> table_box_models;
 
   Label set_list_songs_label;
-  ListBox set_list_songs;
+  SetListSongsListBox set_list_songs;
 
   Label song_patches_label;
-  ListBox song_patches;
+  SongPatchesListBox song_patches;
 
   Label song_notes_label;
   Label song_notes;
 
   Label set_lists_label;
-  ListBox set_lists;
+  SetListsListBox set_lists;
 
   Label messages_label;
-  ListBox messages;
+  MessagesListBox messages;
 
   Label triggers_label;
-  ListBox triggers;
+  TriggersListBox triggers;
 
   Label patch_table_label;
   PatchTableListBoxModel *patch_table;
@@ -56,7 +60,7 @@ private:
   void make_menu_bar();
 
   void config_label(Label &label, const char *text);
-  void config_list_box(const char *label_text, Label &label, ListBox &list_box, ListBoxModel *model);
+  void config_list_box(const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model);
 
   void make_set_list_songs_pane();
   void make_song_patches_pane();

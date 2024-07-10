@@ -10,6 +10,8 @@
  * songs and patches, and how to find them given name regexes.
  */
 
+static const String moved = "moved";
+
 Cursor::Cursor(KeyMaster *key_master)
   : km(key_master)
 {
@@ -62,7 +64,7 @@ Patch *Cursor::patch() {
   return s->patches()[patch_index];
 }
 
-void Cursor::next_song() {
+void Cursor::next_song(bool send_changed) {
   if (set_list_index == UNDEFINED)
     return;
   SetList *sl = set_list();
@@ -71,35 +73,43 @@ void Cursor::next_song() {
 
   ++song_index;
   patch_index = 0;
+  if (send_changed)
+    sendActionMessage(moved);
 }
 
-void Cursor::prev_song() {
+void Cursor::prev_song(bool send_changed) {
   if (set_list_index == UNDEFINED || song_index == 0)
     return;
 
   --song_index;
   patch_index = 0;
+  if (send_changed)
+    sendActionMessage(moved);
 }
 
-void Cursor::next_patch() {
+void Cursor::next_patch(bool send_changed) {
   Song *s = song();
   if (s == nullptr)
     return;
 
   if (patch_index == s->patches().size()-1)
-    next_song();
+    next_song(false);
   else
     ++patch_index;
+  if (send_changed)
+    sendActionMessage(moved);
 }
 
-void Cursor::prev_patch() {
+void Cursor::prev_patch(bool send_changed) {
   if (song() == nullptr)
     return;
 
   if (patch_index == 0)
-    prev_song();
+    prev_song(false);
   else
     --patch_index;
+  if (send_changed)
+    sendActionMessage(moved);
 }
 
 bool Cursor::has_next_song() {
@@ -153,6 +163,7 @@ void Cursor::jump_to_patch_index(int i) {
     return;
 
   patch_index = i;
+  sendActionMessage(moved);
 }
 
 // If `song` is in current set list, make it the current song. If not, don't

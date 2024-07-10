@@ -6,7 +6,7 @@
 
 class KeyMaster;
 
-class Cursor {
+class Cursor : public ActionBroadcaster {
 public:
   KeyMaster *km;
   int set_list_index;
@@ -23,10 +23,10 @@ public:
   Song *song();
   Patch *patch();
 
-  void next_song();
-  void prev_song();
-  void next_patch();
-  void prev_patch();
+  void next_song(bool send_changed = true);
+  void prev_song(bool send_changed = true);
+  void next_patch(bool send_changed = true);
+  void prev_patch(bool send_changed = true);
 
   bool has_next_song();
   bool has_prev_song();

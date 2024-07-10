@@ -3,9 +3,7 @@
 #include "../km/patch.h"
 #include "patch_table.h"
 
-PatchTableListBoxModel::PatchTableListBoxModel(Patch *p)
-  : _patch(p)
-{
+PatchTableListBoxModel::PatchTableListBoxModel() {
   addAndMakeVisible(_table);
   _table.setModel(this);
   _table.setColour(ListBox::outlineColourId, Colours::grey);
@@ -35,14 +33,14 @@ void PatchTableListBoxModel::paintRowBackground(
 void PatchTableListBoxModel::paintCell(
   Graphics& g, int rowNumber, int columnId, int width, int height, bool _rowIsSelected)
 {
-  if (_patch == nullptr)
-    return;
-
-  Connection *c = _patch->connections()[rowNumber];
-
   g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
   g.setFont(FontOptions(14.0f));
 
+  Patch *p = patch();
+  if (p == nullptr)
+    return;
+
+  Connection *c = p->connections()[rowNumber];
   String str;
   switch (columnId) {
   case 1:                       // input name
