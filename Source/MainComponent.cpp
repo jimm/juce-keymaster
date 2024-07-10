@@ -2,23 +2,15 @@
 #include "km/keymaster.h"
 #include "gui/list_box_model.h"
 #include "gui/patch_table.h"
-#include "km/storage.h"         // DEBUG
 
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
 
 MainComponent::MainComponent(juce::ApplicationProperties &props)
 {
-  km = create_KeyMaster();
+  km = new KeyMaster();         // side-effect: KeyMaster static instance set
+  km->initialize();             // generate default curves and initial song/patch
   km->start();
-
-  File f("/tmp/keymaster.json"); // DEBUG
-  Storage(f).save(km);           // DEBUG
-  delete km;                     // DEBUG
-  auto s = Storage(f);
-  km = s.load();        // DEBUG
-  if (s.has_error())
-    Logger::writeToLog(s.error());
 
   make_menu_bar();
   make_set_list_songs_pane();
@@ -28,11 +20,6 @@ MainComponent::MainComponent(juce::ApplicationProperties &props)
   make_messages_pane();
   make_triggers_pane();
   make_patch_pane();
-
-  // set_lists = new SetLists(km->set_lists());
-  // set_list = new SetList("Set List"
-  // song_list = new SongList("All Songs", km->set_list_songs()->songs());
-  // addAndMakeVisible(song_list);
 
   auto settings = props.getUserSettings();
   auto width = settings->getIntValue("window.width", DEFAULT_WINDOW_WIDTH);

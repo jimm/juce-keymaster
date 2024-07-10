@@ -15,21 +15,6 @@ KeyMaster *KeyMaster_instance() {
   return km_instance;
 }
 
-KeyMaster *create_KeyMaster() {
-  KeyMaster *old_km = KeyMaster_instance();
-  bool testing = old_km != nullptr && old_km->is_testing();
-
-  KeyMaster *km = new KeyMaster();
-  km->set_testing(testing);
-
-  if (old_km != nullptr)
-    delete old_km;
-
-  km->initialize();
-  km->start();
-  return km;
-}
-
 // ================ allocation ================
 
 KeyMaster::KeyMaster(bool testing)
@@ -193,7 +178,7 @@ void KeyMaster::create_songs() {
       Connection *conn = new Connection(
         UNDEFINED,
         input->info, CONNECTION_ALL_CHANNELS,
-        output->device, CONNECTION_ALL_CHANNELS);
+        output->device.get(), CONNECTION_ALL_CHANNELS);
       patch->add_connection(conn);
 
     }
@@ -211,7 +196,7 @@ void KeyMaster::create_songs() {
         Connection *conn = new Connection(
           UNDEFINED,
           input->info, CONNECTION_ALL_CHANNELS,
-          output->device, CONNECTION_ALL_CHANNELS);
+          output->device.get(), CONNECTION_ALL_CHANNELS);
         patch->add_connection(conn);
       }
     }

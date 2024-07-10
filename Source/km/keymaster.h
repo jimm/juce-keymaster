@@ -102,4 +102,3 @@ private:
 
 
 KeyMaster *KeyMaster_instance();
-KeyMaster *create_KeyMaster();

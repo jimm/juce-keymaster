@@ -14,22 +14,6 @@ Storage::Storage(const File &f) : file(f), loading_version(0) {
 Storage::~Storage() {
 }
 
-void debug(ReferenceCountedArray<MidiInputEntry> &inputs) {
-  for (auto &input : inputs) {
-    String str;
-    str << " input " << input->info.identifier << ", ref count " << input->getReferenceCount();
-    Logger::writeToLog(str);
-  }
-}
-
-void debug(ReferenceCountedArray<MidiOutputEntry> &outputs) {
-  for (auto &output : outputs) {
-    String str;
-    str << "output " << output->info.identifier << ", ref count " << output->getReferenceCount();
-    Logger::writeToLog(str);
-  }
-}
-
 // Does not stop or delete the old instance or start the new one.
 KeyMaster *Storage::load(bool testing) {
   km = new KeyMaster(testing); // side-effect: KeyMaster static instance set
@@ -57,10 +41,6 @@ void Storage::save(KeyMaster *keymaster) {
   km = keymaster;
   assign_ids();
 
-  Logger::writeToLog("before save");
-  debug(km->inputs());
-  debug(km->outputs());
-
   DynamicObject obj;
   obj.setProperty("schema_version", schema_version());
   obj.setProperty("messages", messages());
@@ -73,10 +53,6 @@ void Storage::save(KeyMaster *keymaster) {
   output.setPosition(0);
   output.truncate();
   obj.writeAsJSON(output, JSON::FormatOptions());
-
-  Logger::writeToLog("after save");
-  debug(km->inputs());
-  debug(km->outputs());
 }
 
 bool Storage::has_error() {
@@ -163,6 +139,7 @@ void Storage::load_songs(var songs) {
     load_patches(s, vsong.getProperty("patches", v));
     km->all_songs()->songs().add(s);
   }
+  km->sort_all_songs();
 }
 
 void Storage::load_patches(Song *song, var patches) {
@@ -172,8 +149,12 @@ void Storage::load_patches(Song *song, var patches) {
     Patch *p = new Patch(
       UNDEFINED_ID,
       (String)vpatch.getProperty("name", v));
-    p->set_start_message(find_message_by_id("patch", UNDEFINED_ID, (int)vpatch.getProperty("start_message_id", v)));
-    p->set_stop_message(find_message_by_id("patch", UNDEFINED_ID, (int)vpatch.getProperty("stop_message_id", v)));
+    if (vpatch.hasProperty("start_message_id"))
+      p->set_start_message(find_message_by_id("patch", UNDEFINED_ID,
+                                              (int)vpatch.getProperty("start_message_id", v)));
+    if (vpatch.hasProperty("stop_message_id"))
+      p->set_stop_message(find_message_by_id("patch", UNDEFINED_ID,
+                                             (int)vpatch.getProperty("stop_message_id", v)));
     load_connections(p, vpatch.getProperty("connections", v));
     song->patches().add(p);
   }
@@ -193,7 +174,7 @@ void Storage::create_default_patch(Song *s) {
     return;
   MidiInputEntry::Ptr input = km->inputs().size() > 0 ? km->inputs()[0] : nullptr;
   MidiDeviceInfo input_identifier = input ? input->info : MidiDeviceInfo("unknown", "unknown");
-  MidiOutput *output = km->outputs().size() > 0 ? km->outputs()[0]->device : nullptr;
+  MidiOutput *output = km->outputs().size() > 0 ? km->outputs().begin()[0]->device.get() : nullptr;
   Connection *conn =
     new Connection(UNDEFINED_ID, input_identifier, CONNECTION_ALL_CHANNELS,
                    output, CONNECTION_ALL_CHANNELS);
@@ -212,7 +193,7 @@ void Storage::load_connections(Patch *patch, var connections) {
     Connection *c = new Connection(UNDEFINED_ID,
                                    input ? input->info : MidiDeviceInfo("unknown", input_identifier),
                                    (int)vconn.getProperty("input_chan", undef),
-                                   output ? output->device : nullptr,
+                                   output ? output->device.get() : nullptr,
                                    (int)vconn.getProperty("input_chan", undef));
 
     c->set_program_bank_msb((int)vconn.getProperty("bank_msb", undef));
@@ -491,6 +472,9 @@ var Storage::set_lists() {
   Array<var> set_lists;
 
   for (auto slist : km->set_lists()) {
+    if (slist == km->all_songs())
+      continue;
+
     DynamicObject::Ptr sl(new DynamicObject());
     sl->setProperty("name", slist->name());
     Array<var> song_ids;
