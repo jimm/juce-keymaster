@@ -42,39 +42,42 @@ void MainComponent::resized()
   menu_manager.resized(area);
 
   area = area.reduced(4);
-  auto top_area = area.removeFromTop((area.getHeight() * 2 / 3) - 2);
-  auto bottom_area = area.removeFromBottom(area.getHeight() - 2);
+  auto top_area = area.removeFromTop(area.getHeight() / 2);
+  auto bottom_area = area.removeFromBottom(area.getHeight() / 2);
+  auto middle_area = area;
 
-  Grid top_grid;
   using Track = Grid::TrackInfo;
   using Fr = Grid::Fr;
   using Px = Grid::Px;
 
-  top_grid.templateRows = {
-    Track(Px(20)), Track(Fr(2)),
-    Track(Px(20)), Track(Fr(1)),
-  };
+  Grid top_grid;
+  top_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
   top_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
-  top_grid.setGap(Px(4));
-
   top_grid.items = {
     // top row labels
     GridItem(set_list_songs_label), GridItem(song_patches_label), GridItem(song_notes_label),
     // top row components
     GridItem(set_list_songs), GridItem(song_patches), GridItem(song_notes),
-    // middle row labels
-    GridItem(set_lists_label), GridItem(messages_label), GridItem(triggers_label),
-    // middle row components
-    GridItem(set_lists), GridItem(messages), GridItem(triggers)
   };
-
+  // USE THIS BEFORE PERFORM LAYOUT?
+  // top_grid.setGap(Px(4));
   top_grid.performLayout(top_area);
+
+  Grid middle_grid;
+  middle_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
+  middle_grid.templateColumns = { Track(Fr(1)) };
+  middle_grid.items = { GridItem(patch_table_label), GridItem(patch_table) };
+  middle_grid.performLayout(middle_area);
 
   Grid bottom_grid;
   bottom_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
-  bottom_grid.templateColumns = { Track(Fr(1)) };
-
-  bottom_grid.items = { GridItem(patch_table_label), GridItem(patch_table) };
+  bottom_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
+  bottom_grid.items = {
+    // bottom row labels
+    GridItem(set_lists_label), GridItem(messages_label), GridItem(triggers_label),
+    // bottom row components
+    GridItem(set_lists), GridItem(messages), GridItem(triggers)
+  };
   bottom_grid.performLayout(bottom_area);
 }
 
