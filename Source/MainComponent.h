@@ -27,10 +27,43 @@ public:
   void paint(Graphics& g) override;
   void resized() override;
 
+  //==============================================================================
+  void new_project();
+  void open_project();
+  void close_project();
+  void save_project();
+  void save_project_as();
+  void undo();
+  void redo();
+  void cut();
+  void copy();
+  void paste();
+  void new_message();
+  void new_trigger();
+  void new_song();
+  void new_patch();
+  void new_connection();
+  void new_set_list();
+  void delete_message();
+  void delete_trigger();
+  void delete_song();
+  void delete_patch();
+  void delete_connection();
+  void delete_set_list();
+  void next_song();
+  void prev_song();
+  void next_patch();
+  void prev_patch();
+  void find_song();
+  void find_set_list();
+  void toggle_clock();
+  void all_notes_off();
+  void super_panic();
+  void midi_monitor();
+
 private:
   //==============================================================================
 
-  KeyMaster *km;
   MenuManager menu_manager;
 
   OwnedArray<ListBoxModel> box_models;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-// #include <sqlite3.h>
 #include <JuceHeader.h>
 #include "keymaster.h"
 #include "midi_device.h"

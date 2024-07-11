@@ -6,8 +6,8 @@
 
 MainComponent::MainComponent(juce::ApplicationProperties &props)
 {
-  km = new KeyMaster();         // side-effect: KeyMaster static instance set
-  km->initialize();             // generate default curves and initial song/patch
+  KeyMaster *km = new KeyMaster(); // side-effect: KeyMaster static instance set
+  km->initialize();        // generate default curves and initial song/patch
   km->start();
 
   make_menu_bar();
@@ -27,7 +27,8 @@ MainComponent::MainComponent(juce::ApplicationProperties &props)
 
 MainComponent::~MainComponent()
 {
-  delete km;
+  if (KeyMaster_instance())
+    delete KeyMaster_instance();
 }
 
 void MainComponent::paint(Graphics& g)
@@ -80,8 +81,103 @@ void MainComponent::resized()
 // ================ menu ================
 
 void MainComponent::make_menu_bar() {
-  menu_manager.set_keymaster(km);
   menu_manager.make_menu_bar(this);
+}
+
+void MainComponent::new_project() {
+}
+
+void MainComponent::open_project() {
+}
+
+void MainComponent::close_project() {
+}
+
+void MainComponent::save_project() {
+}
+
+void MainComponent::save_project_as() {
+}
+
+void MainComponent::undo() {
+}
+
+void MainComponent::redo() {
+}
+
+void MainComponent::cut() {
+}
+
+void MainComponent::copy() {
+}
+
+void MainComponent::paste() {
+}
+
+void MainComponent::new_message() {
+}
+
+void MainComponent::new_trigger() {
+}
+
+void MainComponent::new_song() {
+}
+
+void MainComponent::new_patch() {
+}
+
+void MainComponent::new_connection() {
+}
+
+void MainComponent::new_set_list() {
+}
+
+void MainComponent::delete_message() {
+}
+
+void MainComponent::delete_trigger() {
+}
+
+void MainComponent::delete_song() {
+}
+
+void MainComponent::delete_patch() {
+}
+
+void MainComponent::delete_connection() {
+}
+
+void MainComponent::delete_set_list() {
+}
+
+void MainComponent::next_song() {
+}
+
+void MainComponent::prev_song() {
+}
+
+void MainComponent::next_patch() {
+}
+
+void MainComponent::prev_patch() {
+}
+
+void MainComponent::find_song() {
+}
+
+void MainComponent::find_set_list() {
+}
+
+void MainComponent::toggle_clock() {
+}
+
+void MainComponent::all_notes_off() {
+}
+
+void MainComponent::super_panic() {
+}
+
+void MainComponent::midi_monitor() {
 }
 
 // ================ components ================
@@ -103,21 +199,21 @@ void MainComponent::config_list_box(const char *label_text, Label &label, KmList
 void MainComponent::make_set_list_songs_pane() {
   auto model = new SetListSongsListBoxModel();
   config_list_box("Set List Songs", set_list_songs_label, set_list_songs, model);
-  km->cursor()->addActionListener(&set_list_songs);
+  KeyMaster_instance()->cursor()->addActionListener(&set_list_songs);
   set_list_songs.selectRow(model->selected_row_num());
 }
 
 void MainComponent::make_song_patches_pane() {
   auto model = new SongPatchesListBoxModel();
   config_list_box("Song Patches", song_patches_label, song_patches, model);
-  km->cursor()->addActionListener(&song_patches);
+  KeyMaster_instance()->cursor()->addActionListener(&song_patches);
   song_patches.selectRow(model->selected_row_num());
 }
 
 void MainComponent::make_song_notes_pane() {
   config_label(song_notes_label, "Song Notes");
 
-  Song *song = km->cursor()->song();
+  Song *song = KeyMaster_instance()->cursor()->song();
   // FIXME need to update this when the song changes
   if (song)
     song_notes.setText(song->notes(), NotificationType::dontSendNotification);
@@ -127,7 +223,7 @@ void MainComponent::make_song_notes_pane() {
 void MainComponent::make_set_lists_pane() {
   auto model = new SetListsListBoxModel();
   config_list_box("Set Lists", set_lists_label, set_lists, model);
-  km->cursor()->addActionListener(&set_lists);
+  KeyMaster_instance()->cursor()->addActionListener(&set_lists);
   set_lists.selectRow(model->selected_row_num());
 }
 

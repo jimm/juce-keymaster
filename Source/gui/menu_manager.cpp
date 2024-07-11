@@ -1,5 +1,5 @@
 #include "menu_manager.h"
-#include "../km/keymaster.h"
+#include "../MainComponent.h"
 
 enum CommandIDs {
   // File
@@ -221,72 +221,104 @@ bool MenuManager::perform(const InvocationInfo& info) {
   switch (info.commandID) {
   // ==== File
   case CommandIDs::new_project:
-    warn_unimplemented();
+    handler->new_project();
     break;
   case CommandIDs::open_project:
+    handler->open_project();
     break;
   case CommandIDs::close_project:
+    warn_unimplemented();
+    // handler->close_project();
     break;
   case CommandIDs::save_project:
+    handler->save_project();
     break;
   case CommandIDs::save_project_as:
+    handler->save_project_as();
     break;
   // ==== Edit
   case CommandIDs::undo:
+    handler->undo();
     break;
   case CommandIDs::redo:
+    handler->redo();
     break;
   case CommandIDs::cut:
+    handler->cut();
     break;
   case CommandIDs::copy:
+    handler->copy();
     break;
   case CommandIDs::paste:
+    handler->paste();
     break;
   case CommandIDs::new_message:
+    handler->new_message();
     break;
   case CommandIDs::new_trigger:
+    handler->new_trigger();
     break;
   case CommandIDs::new_song:
+    handler->new_song();
     break;
   case CommandIDs::new_patch:
+    handler->new_patch();
     break;
   case CommandIDs::new_connection:
+    handler->new_connection();
     break;
   case CommandIDs::new_set_list:
+    handler->new_set_list();
     break;
   case CommandIDs::delete_message:
+    handler->delete_message();
     break;
   case CommandIDs::delete_trigger:
+    handler->delete_trigger();
     break;
   case CommandIDs::delete_song:
+    handler->delete_song();
     break;
   case CommandIDs::delete_patch:
+    handler->delete_patch();
     break;
   case CommandIDs::delete_connection:
+    handler->delete_connection();
     break;
   case CommandIDs::delete_set_list:
+    handler->delete_set_list();
     break;
   // ==== Go
   case CommandIDs::next_song:
+    handler->next_song();
     break;
   case CommandIDs::prev_song:
+    handler->prev_song();
     break;
   case CommandIDs::next_patch:
+    handler->next_patch();
     break;
   case CommandIDs::prev_patch:
+    handler->prev_patch();
     break;
   case CommandIDs::find_song:
+    handler->find_song();
     break;
   case CommandIDs::find_set_list:
+    handler->find_set_list();
     break;
   // ==== MIDI
   case CommandIDs::toggle_clock:
+    handler->toggle_clock();
     break;
   case CommandIDs::all_notes_off:
+    handler->all_notes_off();
     break;
   case CommandIDs::super_panic:
+    handler->super_panic();
     break;
   case CommandIDs::midi_monitor:
+    handler->midi_monitor();
     break;
   default:
     return false;
@@ -357,7 +389,9 @@ PopupMenu MenuManager::getMenuForIndex(int menuIndex, const String& _menuName) {
 
 // ================ other
 
-void MenuManager::make_menu_bar(Component *c) {
+void MenuManager::make_menu_bar(MainComponent *c) {
+  handler = c;
+
 #if JUCE_MAC
   MenuBarModel::setMacMainMenu(this);
 #else

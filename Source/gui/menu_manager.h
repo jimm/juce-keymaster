@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-class KeyMaster;
+class MainComponent;
 
 class MenuManager : public ApplicationCommandTarget, public MenuBarModel {
 public:
@@ -24,14 +24,13 @@ public:
 
   // ================ other
 
-  void set_keymaster(KeyMaster *km_ptr) { km = km_ptr; }
-  void make_menu_bar(Component *c);
+  void make_menu_bar(MainComponent *c);
 
   // May update area
   void resized(Rectangle<int> &area);
 
 private:
-  KeyMaster *km;
+  MainComponent *handler;
   std::unique_ptr<MenuBarComponent> menu_bar;
   ApplicationCommandManager command_manager;
 
