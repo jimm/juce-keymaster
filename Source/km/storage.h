@@ -59,15 +59,4 @@ private:
                               const char * const, DBObjID);
   void set_find_error_message(const char * const, DBObjID,
                               const char * const, const String &id);
-
-  // // SQL statement helpers
-  // int int_or_null(sqlite3_stmt *stmt, int col_num, int null_val=UNDEFINED);
-  // DBObjID id_or_null(sqlite3_stmt *stmt, int col_num, DBObjID null_val=UNDEFINED_ID);
-  // const char *text_or_null(sqlite3_stmt *stmt, int col_num, const char *null_val);
-  // void bind_obj_id_or_null(sqlite3_stmt *stmt, int col_num, DBObj *obj_ptr);
-  // void bind_int_or_null(sqlite3_stmt *stmt, int col_num, int val, int nullval=UNDEFINED);
-  // void extract_id(DBObj *db_obj);
-
-  // MidiMessage single_message_from_hex_bytes(char *);
-  // String single_message_to_hex_bytes(MidiMessage msg);
 };

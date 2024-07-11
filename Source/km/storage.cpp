@@ -94,7 +94,7 @@ void Storage::load_messages(var messages) {
       (int)vmsg.getProperty("id", v),
       (String)vmsg.getProperty("name", v));
     auto bytes_str = (String)vmsg.getProperty("bytes", v);
-    m->from_string(bytes_str);
+    m->from_hex_string(bytes_str);
     km->messages().add(m);
   }
 }
@@ -114,7 +114,7 @@ void Storage::load_triggers(var triggers) {
     auto bytes_str = (String)vmsg.getProperty("bytes", v);
     if (vmsg.hasProperty("input_identifier")) {
       MessageBlock mblock(UNDEFINED_ID, "");
-      mblock.from_string((String)vmsg.getProperty("trigger_message_bytes", v));
+      mblock.from_hex_string((String)vmsg.getProperty("trigger_message_bytes", v));
       t->set_trigger_message((String)vmsg.getProperty("input_identifier", v),
                              mblock.midi_messages().getEventPointer(0)->message);
     }
