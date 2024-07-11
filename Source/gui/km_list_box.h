@@ -39,5 +39,5 @@ public:
     updateContent();
     selectRow(((KmListBoxModel *)getListBoxModel())->selected_row_num());
     repaint();
-  };
+  }
 };

@@ -6,6 +6,7 @@
 #include "gui/patch_table.h"
 #include "gui/set_list_songs_list_box.h"
 #include "gui/set_lists_list_box.h"
+#include "gui/song_notes_label.h"
 #include "gui/song_patches_list_box.h"
 #include "gui/triggers_list_box.h"
 
@@ -76,7 +77,7 @@ private:
   SongPatchesListBox song_patches;
 
   Label song_notes_label;
-  Label song_notes;
+  SongNotesLabel song_notes;
 
   Label set_lists_label;
   SetListsListBox set_lists;

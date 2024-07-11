@@ -18,6 +18,8 @@
             file="Source/gui/set_list_songs_list_box.h"/>
       <FILE id="mB2Jwz" name="set_lists_list_box.h" compile="0" resource="0"
             file="Source/gui/set_lists_list_box.h"/>
+      <FILE id="bqPIax" name="song_notes_label.h" compile="0" resource="0"
+            file="Source/gui/song_notes_label.h"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"
             file="Source/gui/song_patches_list_box.h"/>
       <FILE id="uOmhHq" name="triggers_list_box.h" compile="0" resource="0"

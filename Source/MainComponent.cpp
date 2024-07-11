@@ -215,11 +215,10 @@ void MainComponent::make_song_patches_pane() {
 
 void MainComponent::make_song_notes_pane() {
   config_label(song_notes_label, "Song Notes");
+  song_notes.setJustificationType(Justification(Justification::topLeft));
 
-  Song *song = KeyMaster_instance()->cursor()->song();
-  // FIXME need to update this when the song changes
-  if (song)
-    song_notes.setText(song->notes(), NotificationType::dontSendNotification);
+  song_notes.update_contents();
+  KeyMaster_instance()->cursor()->addActionListener(&song_notes);
   addAndMakeVisible(song_notes);
 }
 
