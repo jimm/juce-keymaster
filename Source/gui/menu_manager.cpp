@@ -2,8 +2,9 @@
 #include "../MainComponent.h"
 
 enum CommandIDs {
+  __separator__ = 1,
   // File
-  new_project = 1,
+  new_project,
   open_project,
   close_project,
   save_project,
@@ -40,6 +41,60 @@ enum CommandIDs {
   midi_monitor
 };
 
+static Array<CommandIDs> file_commands {
+  CommandIDs::new_project,
+  CommandIDs::open_project,
+  CommandIDs::close_project,
+  CommandIDs::__separator__,
+  CommandIDs::save_project,
+  CommandIDs::save_project_as,
+};
+static Array<CommandIDs> edit_commands {
+  CommandIDs::undo,
+  CommandIDs::redo,
+  CommandIDs::cut,
+  CommandIDs::copy,
+  CommandIDs::paste,
+  CommandIDs::__separator__,
+  CommandIDs::new_message,
+  CommandIDs::new_trigger,
+  CommandIDs::new_song,
+  CommandIDs::new_patch,
+  CommandIDs::new_connection,
+  CommandIDs::new_set_list,
+  CommandIDs::__separator__,
+  CommandIDs::delete_message,
+  CommandIDs::delete_trigger,
+  CommandIDs::delete_song,
+  CommandIDs::delete_patch,
+  CommandIDs::delete_connection,
+  CommandIDs::delete_set_list,
+};
+static Array<CommandIDs> go_commands {
+  CommandIDs::next_song,
+  CommandIDs::prev_song,
+  CommandIDs::__separator__,
+  CommandIDs::next_patch,
+  CommandIDs::prev_patch,
+  CommandIDs::__separator__,
+  CommandIDs::find_song,
+  CommandIDs::find_set_list,
+};
+static Array<CommandIDs> midi_commands {
+  CommandIDs::toggle_clock,
+  CommandIDs::__separator__,
+  CommandIDs::all_notes_off,
+  CommandIDs::super_panic,
+  CommandIDs::__separator__,
+  CommandIDs::midi_monitor
+};
+static Array<CommandIDs> *command_arrays[4] = {
+  &file_commands,
+  &edit_commands,
+  &go_commands,
+  &midi_commands,
+};
+
 MenuManager::~MenuManager() {
 #if JUCE_MAC
   MenuBarModel::setMacMainMenu(nullptr);
@@ -49,47 +104,12 @@ MenuManager::~MenuManager() {
 
 // ================ ApplicationCommandTarget
 
-
 void MenuManager::getAllCommands (Array<CommandID>& c) {
-  Array<CommandID> commands {
-    // File
-    CommandIDs::new_project,
-    CommandIDs::open_project,
-    CommandIDs::close_project,
-    CommandIDs::save_project,
-    CommandIDs::save_project_as,
-    // Edit
-    CommandIDs::undo,
-    CommandIDs::redo,
-    CommandIDs::cut,
-    CommandIDs::copy,
-    CommandIDs::paste,
-    CommandIDs::new_message,
-    CommandIDs::new_trigger,
-    CommandIDs::new_song,
-    CommandIDs::new_patch,
-    CommandIDs::new_connection,
-    CommandIDs::new_set_list,
-    CommandIDs::delete_message,
-    CommandIDs::delete_trigger,
-    CommandIDs::delete_song,
-    CommandIDs::delete_patch,
-    CommandIDs::delete_connection,
-    CommandIDs::delete_set_list,
-    // Go
-    CommandIDs::next_song,
-    CommandIDs::prev_song,
-    CommandIDs::next_patch,
-    CommandIDs::prev_patch,
-    CommandIDs::find_song,
-    CommandIDs::find_set_list,
-    // MIDI
-    CommandIDs::toggle_clock,
-    CommandIDs::all_notes_off,
-    CommandIDs::super_panic,
-    CommandIDs::midi_monitor
-  };
-  c.addArray(commands);
+  c.addArray(file_commands);
+  c.addArray(edit_commands);
+  c.addArray(go_commands);
+  c.addArray(midi_commands);
+  c.removeAllInstancesOf(CommandIDs::__separator__);
 }
 
 void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) {
@@ -334,55 +354,11 @@ StringArray MenuManager::getMenuBarNames() {
 
 PopupMenu MenuManager::getMenuForIndex(int menuIndex, const String& _menuName) {
   PopupMenu menu;
-
-  switch (menuIndex) {
-  case 0:                       // File
-    menu.addCommandItem(&command_manager, CommandIDs::new_project);
-    menu.addCommandItem(&command_manager, CommandIDs::open_project);
-    menu.addCommandItem(&command_manager, CommandIDs::close_project);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::save_project);
-    menu.addCommandItem(&command_manager, CommandIDs::save_project_as);
-    break;
-  case 1:                       // Edit
-    menu.addCommandItem(&command_manager, CommandIDs::undo);
-    menu.addCommandItem(&command_manager, CommandIDs::redo);
-    menu.addCommandItem(&command_manager, CommandIDs::cut);
-    menu.addCommandItem(&command_manager, CommandIDs::copy);
-    menu.addCommandItem(&command_manager, CommandIDs::paste);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::new_message);
-    menu.addCommandItem(&command_manager, CommandIDs::new_trigger);
-    menu.addCommandItem(&command_manager, CommandIDs::new_song);
-    menu.addCommandItem(&command_manager, CommandIDs::new_patch);
-    menu.addCommandItem(&command_manager, CommandIDs::new_connection);
-    menu.addCommandItem(&command_manager, CommandIDs::new_set_list);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::delete_message);
-    menu.addCommandItem(&command_manager, CommandIDs::delete_trigger);
-    menu.addCommandItem(&command_manager, CommandIDs::delete_song);
-    menu.addCommandItem(&command_manager, CommandIDs::delete_patch);
-    menu.addCommandItem(&command_manager, CommandIDs::delete_connection);
-    menu.addCommandItem(&command_manager, CommandIDs::delete_set_list);
-    break;
-  case 2:                       // Go
-    menu.addCommandItem(&command_manager, CommandIDs::next_song);
-    menu.addCommandItem(&command_manager, CommandIDs::prev_song);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::next_patch);
-    menu.addCommandItem(&command_manager, CommandIDs::prev_patch);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::find_song);
-    menu.addCommandItem(&command_manager, CommandIDs::find_set_list);
-    break;
-  case 3:                       // MIDI
-    menu.addCommandItem(&command_manager, CommandIDs::toggle_clock);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::all_notes_off);
-    menu.addCommandItem(&command_manager, CommandIDs::super_panic);
-    menu.addSeparator();
-    menu.addCommandItem(&command_manager, CommandIDs::midi_monitor);
-    break;
+  for (auto cmd : *command_arrays[menuIndex]) {
+    if (cmd == CommandIDs::__separator__)
+      menu.addSeparator();
+    else
+      menu.addCommandItem(&command_manager, cmd);
   }
   return menu;
 }
@@ -402,14 +378,9 @@ void MenuManager::make_menu_bar(MainComponent *c) {
   setApplicationCommandManagerToWatch(&command_manager);
   command_manager.registerAllCommandsForTarget(this);
 
-  // this ensures that commands invoked on the application are correctly
-  // forwarded to this demo
+  // This ensures that commands invoked on the application are correctly
+  // forwarded.
   command_manager.setFirstCommandTarget(this);
-
-  // this lets the command manager use keypresses that arrive in our window to send out commands
-  c->addKeyListener(command_manager.getKeyMappings());
-
-  c->setWantsKeyboardFocus(true);
 }
 
 void MenuManager::resized(Rectangle<int> &area) {
@@ -419,6 +390,7 @@ void MenuManager::resized(Rectangle<int> &area) {
 }
 
 void MenuManager::warn_unimplemented() {
-  AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "Not Implemented",
-                                   "This command has not yet been implemented");
+  AlertWindow::showMessageBoxAsync(
+    MessageBoxIconType::WarningIcon, "Not Implemented",
+    "This command has not yet been implemented");
 }
