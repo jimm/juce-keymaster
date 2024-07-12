@@ -7,7 +7,8 @@
 #include "message_block.h"
 #include "set_list.h"
 #include "trigger.h"
-#include "midi_device.h"
+#include "input.h"
+#include "output.h"
 
 class KeyMaster : private AudioDeviceManager, MidiInputCallback {
 public:
@@ -15,8 +16,8 @@ public:
   ~KeyMaster();
 
   // ================ accessors ================
-  inline ReferenceCountedArray<MidiInputEntry> &inputs() { return _inputs; }
-  inline ReferenceCountedArray<MidiOutputEntry> &outputs() { return _outputs; }
+  inline ReferenceCountedArray<Input> &inputs() { return _inputs; }
+  inline ReferenceCountedArray<Output> &outputs() { return _outputs; }
   inline SetList *all_songs() { return _set_lists[0]; }
   inline Array<SetList *> &set_lists() { return _set_lists; }
   inline Array<Trigger *> &triggers() { return _triggers; }
@@ -84,8 +85,8 @@ public:
   void sort_all_songs();
 
 private:
-  ReferenceCountedArray<MidiInputEntry> _inputs;
-  ReferenceCountedArray<MidiOutputEntry> _outputs;
+  ReferenceCountedArray<Input> _inputs;
+  ReferenceCountedArray<Output> _outputs;
   Array<Trigger *> _triggers;
   Array<SetList *> _set_lists; // all set lists, including all_songs
   Cursor *_cursor;

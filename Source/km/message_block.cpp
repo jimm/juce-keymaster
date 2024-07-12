@@ -53,9 +53,9 @@ void MessageBlock::send_to_all_outputs() {
     send_to(out);
 }
 
-void MessageBlock::send_to(MidiOutputEntry::Ptr out) {
+void MessageBlock::send_to(Output::Ptr out) {
   for (auto &msg : _midi_messages)
-    out->device->sendMessageNow(msg->message);
+    out->midi_out(msg->message);
 }
 
 // MidiInputCallback method only used when parsing a block of MIDI bytes

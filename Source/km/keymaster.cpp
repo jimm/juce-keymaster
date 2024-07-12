@@ -153,11 +153,11 @@ void KeyMaster::load_instruments() {
 
   _inputs.clear();
   for (auto info : MidiInput::getAvailableDevices())
-    _inputs.add(new MidiInputEntry(info, this));
+    _inputs.add(new Input(info, this));
 
   _outputs.clear();
   for (auto info : MidiOutput::getAvailableDevices())
-    _outputs.add(new MidiOutputEntry(info));
+    _outputs.add(new Output(info));
 }
 
 void KeyMaster::create_songs() {
@@ -165,7 +165,7 @@ void KeyMaster::create_songs() {
 
     // this input to each individual output
     for (auto& output : _outputs) {
-      String name = input->device->getName() + " -> " + output->device->getName();
+      String name = input->name() + " -> " + output->name();
       Song *song = new Song(UNDEFINED_ID, name);
       all_songs()->add_song(song);
 
@@ -174,15 +174,15 @@ void KeyMaster::create_songs() {
 
       Connection *conn = new Connection(
         UNDEFINED,
-        input->info, CONNECTION_ALL_CHANNELS,
-        output->device.get(), CONNECTION_ALL_CHANNELS);
+        input, CONNECTION_ALL_CHANNELS,
+        output, CONNECTION_ALL_CHANNELS);
       patch->add_connection(conn);
 
     }
 
     if (_outputs.size() > 1) {
       // one more song: this input to all _outputs at once
-      String name = input->device->getName() + " -> all outputs";
+      String name = input->name() + " -> all outputs";
       Song *song = new Song(UNDEFINED_ID, name);
       all_songs()->add_song(song);
 
@@ -192,8 +192,8 @@ void KeyMaster::create_songs() {
       for (auto& output : _outputs) {
         Connection *conn = new Connection(
           UNDEFINED,
-          input->info, CONNECTION_ALL_CHANNELS,
-          output->device.get(), CONNECTION_ALL_CHANNELS);
+          input, CONNECTION_ALL_CHANNELS,
+          output, CONNECTION_ALL_CHANNELS);
         patch->add_connection(conn);
       }
     }
@@ -298,7 +298,7 @@ void KeyMaster::panic(bool send_notes_off) {
 
   for (auto &msg : buf)
     for (auto &out : _outputs)
-      out->device->sendMessageNow(msg->message);
+      out->midi_out(msg->message);
 }
 
 // ================ helpers ================

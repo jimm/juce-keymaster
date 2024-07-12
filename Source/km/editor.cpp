@@ -28,12 +28,9 @@ Patch *Editor::create_patch() {
   return new Patch(UNDEFINED_ID, "New Patch");
 }
 
-Connection *Editor::create_connection(MidiDeviceInfo input_info, MidiOutput *output)
+Connection *Editor::create_connection(Input::Ptr input, Output::Ptr output)
 {
-  return new Connection
-    (UNDEFINED_ID,
-     input_info, CONNECTION_ALL_CHANNELS,
-     output, CONNECTION_ALL_CHANNELS);
+  return new Connection(UNDEFINED_ID, input, CONNECTION_ALL_CHANNELS, output, CONNECTION_ALL_CHANNELS);
 }
 
 SetList *Editor::create_set_list() {

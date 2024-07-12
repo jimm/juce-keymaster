@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 #include "db_obj.h"
 #include "nameable.h"
-#include "midi_device.h"
+#include "output.h"
 
 class MessageBlock : public DBObj, public Nameable, public MidiInputCallback {
 public:
@@ -17,7 +17,7 @@ public:
   String to_editable_hex_string();
 
   void send_to_all_outputs();
-  void send_to(MidiOutputEntry::Ptr);
+  void send_to(Output::Ptr);
 
   // MidiInputCallback method only used when parsing a block of MIDI bytes
   void handleIncomingMidiMessage(MidiInput *source, const MidiMessage &message) override;

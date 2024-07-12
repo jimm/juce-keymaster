@@ -36,5 +36,5 @@ void Clock::stop() {
 // until the next tick, in _milliseconds.
 void Clock::hiResTimerCallback() {
   for (auto &output : KeyMaster_instance()->outputs())
-    output->device->sendMessageNow(CLOCK_MESSAGE);
+    output->midi_out(CLOCK_MESSAGE);
 }

@@ -6,9 +6,9 @@
 #define is_system(b) ((b) >= SYSEX)
 #define is_realtime(b) ((b) >= 0xf8)
 
-Connection::Connection(DBObjID id, MidiDeviceInfo input_info, int in_chan, MidiOutput *out, int out_chan)
+Connection::Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr output, int out_chan)
   : DBObj(id),
-    _input_info(input_info), _output(out),
+    _input(input), _output(output),
     _input_chan(in_chan), _output_chan(out_chan),
     _xpose(0), _velocity_curve(nullptr),
     _processing_sysex(false),
@@ -21,6 +21,8 @@ Connection::Connection(DBObjID id, MidiDeviceInfo input_info, int in_chan, MidiO
 }
 
 Connection::~Connection() {
+  _input = nullptr;
+  _output = nullptr;
   for (int i = 0; i < 128; ++i)
     if (_cc_maps[i] != nullptr)
       delete _cc_maps[i];
@@ -30,19 +32,15 @@ void Connection::start() {
   if (_running)
     return;
 
-  // The program output channel is either the output channel if specified or
-  // else the output channel if specified. If they are both ALL then we
-  // don't know which channel to send the program change on, so we don't
-  // send one.
   if (_output != nullptr) {
     int chan = program_change_send_channel();
     if (chan != CONNECTION_ALL_CHANNELS) {
       if (_prog.bank_msb >= 0)
-        _output->sendMessageNow(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_MSB, _prog.bank_msb));
+        midi_out(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_MSB, _prog.bank_msb));
       if (_prog.bank_lsb >= 0)
-        _output->sendMessageNow(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_LSB, _prog.bank_lsb));
+        midi_out(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_LSB, _prog.bank_lsb));
       if (_prog.prog >= 0)
-        _output->sendMessageNow(MidiMessage::programChange(chan, _prog.prog));
+        midi_out(MidiMessage::programChange(chan, _prog.prog));
     }
   }
 
@@ -87,7 +85,7 @@ void Connection::end_changes() {
 // Takes a MIDI message `msg` from an input, processes it, and sends it to
 // an output (unless it's been filtered out).
 void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
-  if (source->getIdentifier() != _input_info.identifier)
+  if (_input == nullptr || source->getIdentifier() != _input->identifier())
     return;
 
   const juce::uint8 *data = msg.getRawData();
@@ -212,10 +210,10 @@ int Connection::inside_zone(int note) {
 
 void Connection::midi_out(MidiMessage *message) {
   if (_output != nullptr)
-    _output->sendMessageNow(*message);
+    _output->midi_out(*message);
 }
 
 void Connection::midi_out(MidiMessage message) {
   if (_output != nullptr)
-    _output->sendMessageNow(message);
+    _output->midi_out(message);
 }

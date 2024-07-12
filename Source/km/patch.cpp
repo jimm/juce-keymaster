@@ -60,11 +60,10 @@ void Patch::send_message_to_outputs(MessageBlock *message) {
   if (message == nullptr)
     return;
 
-  Array<String> output_ids;
+  Array<Output::Ptr> outputs;
   for (auto& conn : _connections)
-    output_ids.addIfNotAlreadyThere(conn->output()->getIdentifier());
+    outputs.addIfNotAlreadyThere(conn->output());
 
-  for (auto output : KeyMaster_instance()->outputs())
-    if (output_ids.contains(output->info.identifier))
-      message->send_to(output);
+  for (auto output : outputs)
+    message->send_to(output);
 }

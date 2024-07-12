@@ -2,7 +2,6 @@
 
 #include <JuceHeader.h>
 #include "keymaster.h"
-#include "midi_device.h"
 
 class Editor {
 public:
@@ -12,7 +11,7 @@ public:
   Trigger *create_trigger(MidiInput *input);
   Song *create_song();
   Patch *create_patch();
-  Connection *create_connection(MidiDeviceInfo input_info, MidiOutput *output);
+  Connection *create_connection(Input::Ptr input, Output::Ptr output);
   SetList *create_set_list();
 
   void add_message(MessageBlock *message);

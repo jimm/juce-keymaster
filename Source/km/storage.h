@@ -3,7 +3,8 @@
 #include <string>
 #include <JuceHeader.h>
 #include "keymaster.h"
-#include "midi_device.h"
+#include "input.h"
+#include "output.h"
 
 class Storage {
 public:
@@ -50,8 +51,8 @@ private:
   void create_default_patches();
   void create_default_patch(Song *);
 
-  MidiInputEntry::Ptr find_input_by_id(const char * const, DBObjID, const String &);
-  MidiOutputEntry::Ptr find_output_by_id(const char * const, DBObjID, const String &);
+  Input::Ptr find_input_by_id(const char * const, DBObjID, const String &);
+  Output::Ptr find_output_by_id(const char * const, DBObjID, const String &);
   MessageBlock *find_message_by_id(const char * const, DBObjID, DBObjID);
   Song *find_song_by_id(const char * const, DBObjID, DBObjID);
   void set_find_error_message(const char * const, DBObjID,

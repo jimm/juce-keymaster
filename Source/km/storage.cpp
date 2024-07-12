@@ -4,7 +4,8 @@
 #include "cursor.h"
 #include "storage.h"
 #include "formatter.h"
-#include "midi_device.h"
+#include "input.h"
+#include "output.h"
 
 #define SCHEMA_VERSION 1
 
@@ -172,12 +173,12 @@ void Storage::create_default_patch(Song *s) {
   s->add_patch(p);
   if (km->inputs().isEmpty() || km->outputs().isEmpty())
     return;
-  MidiInputEntry::Ptr input = km->inputs().size() > 0 ? km->inputs()[0] : nullptr;
-  MidiDeviceInfo input_identifier = input ? input->info : MidiDeviceInfo("unknown", "unknown");
-  MidiOutput *output = km->outputs().size() > 0 ? km->outputs().begin()[0]->device.get() : nullptr;
   Connection *conn =
-    new Connection(UNDEFINED_ID, input_identifier, CONNECTION_ALL_CHANNELS,
-                   output, CONNECTION_ALL_CHANNELS);
+    new Connection(UNDEFINED_ID,
+                   km->inputs().size() > 0 ? km->inputs()[0] : nullptr,
+                   CONNECTION_ALL_CHANNELS,
+                   km->outputs().size() > 0 ? km->outputs()[0] : nullptr,
+                   CONNECTION_ALL_CHANNELS);
   p->add_connection(conn);
 }
 
@@ -188,13 +189,11 @@ void Storage::load_connections(Patch *patch, var connections) {
     var vconn = connections[i];
     String input_identifier = (String)vconn.getProperty("input_id", v);
     String output_identifier = (String)vconn.getProperty("output_id", v);
-    MidiInputEntry::Ptr input = find_input_by_id("conn", UNDEFINED_ID, input_identifier);
-    MidiOutputEntry::Ptr output = find_output_by_id("conn", UNDEFINED_ID, output_identifier);
     Connection *c = new Connection(UNDEFINED_ID,
-                                   input ? input->info : MidiDeviceInfo("unknown", input_identifier),
+                                   find_input_by_id("conn", UNDEFINED_ID, input_identifier),
                                    (int)vconn.getProperty("input_chan", undef),
-                                   output ? output->device.get() : nullptr,
-                                   (int)vconn.getProperty("input_chan", undef));
+                                   find_output_by_id("conn", UNDEFINED_ID, output_identifier),
+                                   (int)vconn.getProperty("output_chan", undef));
 
     c->set_program_bank_msb((int)vconn.getProperty("bank_msb", undef));
     c->set_program_bank_lsb((int)vconn.getProperty("bank_lsb", undef));
@@ -395,8 +394,8 @@ var Storage::connections(Array<Connection *> &connections) {
   Array<var> cs;
   for (auto conn : connections) {
     DynamicObject::Ptr c(new DynamicObject());
-    c->setProperty("input_id", conn->input_info().identifier);
-    c->setProperty("output_id", conn->output()->getIdentifier());
+    c->setProperty("input_id", conn->input()->identifier());
+    c->setProperty("output_id", conn->output()->identifier());
     if (conn->input_chan() != UNDEFINED)
       c->setProperty("input_chan", conn->input_chan());
     if (conn->output_chan() != UNDEFINED)
@@ -491,22 +490,24 @@ var Storage::set_lists() {
 // find by id
 // ================================================================
 
-MidiInputEntry::Ptr Storage::find_input_by_id(
+Input::Ptr Storage::find_input_by_id(
   const char * const searcher_name, DBObjID searcher_id, const String &id
 ) {
-  for (auto &input : km->inputs())
-    if (input->info.identifier == id)
-      return input;
+  Input::Ptr input = Input::find_by_id(id);
+  if (input)
+    return input;
+
   set_find_error_message(searcher_name, searcher_id, "input", id);
   return nullptr;
 }
 
-MidiOutputEntry::Ptr Storage::find_output_by_id(
+Output::Ptr Storage::find_output_by_id(
   const char * const searcher_name, DBObjID searcher_id, const String &id
 ) {
-  for (auto &output : km->outputs())
-    if (output->info.identifier == id)
-      return output;
+  Output::Ptr output = Output::find_by_id(id);
+  if (output)
+    return output;
+
   set_find_error_message(searcher_name, searcher_id, "output", id);
   return nullptr;
 }

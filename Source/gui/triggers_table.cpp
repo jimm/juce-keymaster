@@ -46,11 +46,8 @@ String TriggersTableListBoxModel::input_string(Trigger *t) {
   if (id.isEmpty())
     return "";
 
-  for (auto in : KeyMaster_instance()->inputs())
-    if (id == in->info.identifier)
-      return in->info.name;
-
-  return "<not connected>";
+  Input::Ptr input = Input::find_by_id(t->trigger_input_identifier());
+  return input ? input->name() : "<not connected>";
 }
 
 String TriggersTableListBoxModel::action_string(Trigger *t) {
