@@ -41,6 +41,7 @@ KeyMaster::~KeyMaster() {
   for (auto& curve : _curves)
     delete curve;
 
+  _identifier_to_input.clear();
   _inputs.clear();
   _outputs.clear();
 }
@@ -124,8 +125,19 @@ void KeyMaster::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& 
   // TODO listen for program changes and jump to song
   for (auto &trigger : _triggers)
     trigger->signal_message(source, message);
-  if (_cursor != nullptr)       // we might get MIDI before we're fully constructed
-    _cursor->patch()->midi_in(source, message);
+
+  if (_cursor == nullptr) // we might get MIDI before we're fully constructed
+    return;
+
+  // Let the input tell us which patch to use. By default it's the current
+  // patch, but if this is a note off or sustain off then we need to send
+  // that to the same patch as that used by the corresponding note on or
+  // sustain on.
+  Patch *p = _identifier_to_input.contains(source->getIdentifier())
+    ? _identifier_to_input[source->getIdentifier()]->patch_for_message(message)
+    : _cursor->patch();
+
+  p->midi_in(source, message);
 }
 
 // ================ clock ================
@@ -152,8 +164,12 @@ void KeyMaster::load_instruments() {
     return;
 
   _inputs.clear();
-  for (auto info : MidiInput::getAvailableDevices())
-    _inputs.add(new Input(info, this));
+  _identifier_to_input.clear();
+  for (auto info : MidiInput::getAvailableDevices()) {
+    Input::Ptr input = new Input(info, this);
+    _inputs.add(input);
+    _identifier_to_input.set(input->identifier(), input);
+  }
 
   _outputs.clear();
   for (auto info : MidiOutput::getAvailableDevices())

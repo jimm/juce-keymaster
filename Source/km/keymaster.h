@@ -87,6 +87,7 @@ public:
 private:
   ReferenceCountedArray<Input> _inputs;
   ReferenceCountedArray<Output> _outputs;
+  HashMap<String, Input::Ptr> _identifier_to_input;
   Array<Trigger *> _triggers;
   Array<SetList *> _set_lists; // all set lists, including all_songs
   Cursor *_cursor;
