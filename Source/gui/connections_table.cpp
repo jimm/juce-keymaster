@@ -44,7 +44,6 @@ void ConnectionsTableListBoxModel::paintCell(
       str = String("Input");
     else
       str = String(c->output_chan());
-    g.drawText(str, 2, 0, width - 4, height, Justification::centredLeft, true);
     break;
   case 5:                       // zone
     if (c->zone_low() != 0 || c->zone_high() != 127)

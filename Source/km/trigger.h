@@ -40,7 +40,7 @@ public:
 
 private:
   String _trigger_input_identifier;
-  int _trigger_key_code;
+  int _trigger_key_code;        // might be UNDEFINED
   MidiMessage _trigger_message; // might be EMPTY_MESSAGE
   TriggerAction _action;
   MessageBlock *_output_message;

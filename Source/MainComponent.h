@@ -8,7 +8,7 @@
 #include "gui/set_lists_list_box.h"
 #include "gui/song_notes_label.h"
 #include "gui/song_patches_list_box.h"
-#include "gui/triggers_list_box.h"
+#include "gui/triggers_table.h"
 
 class KeyMaster;
 
@@ -79,6 +79,9 @@ private:
   Label song_notes_label;
   SongNotesLabel song_notes;
 
+  Label connections_table_label;
+  ConnectionsTableListBox connections_table;
+
   Label set_lists_label;
   SetListsListBox set_lists;
 
@@ -86,10 +89,7 @@ private:
   MessagesListBox messages;
 
   Label triggers_label;
-  TriggersListBox triggers;
-
-  Label connections_table_label;
-  ConnectionsTableListBox connections_table;
+  TriggersTableListBox triggers;
 
   void make_menu_bar();
 
@@ -99,7 +99,6 @@ private:
     const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model);
   void config_table_list_box(
     const char *label_text, Label &label, KmTableListBox &list_box, KmTableListBoxModel *model);
-
 
   void make_set_list_songs_pane();
   void make_song_patches_pane();

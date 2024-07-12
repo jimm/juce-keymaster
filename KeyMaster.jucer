@@ -26,8 +26,10 @@
             file="Source/gui/song_notes_label.h"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"
             file="Source/gui/song_patches_list_box.h"/>
-      <FILE id="uOmhHq" name="triggers_list_box.h" compile="0" resource="0"
-            file="Source/gui/triggers_list_box.h"/>
+      <FILE id="rf9LwO" name="triggers_table.cpp" compile="1" resource="0"
+            file="Source/gui/triggers_table.cpp"/>
+      <FILE id="XyyIwU" name="triggers_table.h" compile="0" resource="0"
+            file="Source/gui/triggers_table.h"/>
     </GROUP>
     <GROUP id="{8AD29ABF-EE30-7F4D-E2E2-47E01378E3CF}" name="km">
       <FILE id="ESbA9m" name="clock.cpp" compile="1" resource="0" file="Source/km/clock.cpp"/>

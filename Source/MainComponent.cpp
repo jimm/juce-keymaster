@@ -1,8 +1,8 @@
 #include "MainComponent.h"
 #include "km/keymaster.h"
 
-#define DEFAULT_WINDOW_WIDTH 800
-#define DEFAULT_WINDOW_HEIGHT 600
+#define DEFAULT_WINDOW_WIDTH 900
+#define DEFAULT_WINDOW_HEIGHT 700
 
 MainComponent::MainComponent(juce::ApplicationProperties &props)
 {
@@ -258,6 +258,6 @@ void MainComponent::make_messages_pane() {
 }
 
 void MainComponent::make_triggers_pane() {
-  auto model = new TriggersListBoxModel();
-  config_list_box("Triggers", triggers_label, triggers, model);
+  auto model = new TriggersTableListBoxModel();
+  config_table_list_box("Triggers", triggers_label, triggers, model);
 }
