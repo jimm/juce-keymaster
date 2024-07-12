@@ -1,9 +1,9 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "gui/connections_table.h"
 #include "gui/menu_manager.h"
 #include "gui/messages_list_box.h"
-#include "gui/patch_table.h"
 #include "gui/set_list_songs_list_box.h"
 #include "gui/set_lists_list_box.h"
 #include "gui/song_notes_label.h"
@@ -68,7 +68,7 @@ private:
   MenuManager menu_manager;
 
   OwnedArray<ListBoxModel> box_models;
-  OwnedArray<PatchTableListBoxModel> table_box_models;
+  OwnedArray<TableListBoxModel> table_box_models;
 
   Label set_list_songs_label;
   SetListSongsListBox set_list_songs;
@@ -88,21 +88,26 @@ private:
   Label triggers_label;
   TriggersListBox triggers;
 
-  Label patch_table_label;
-  PatchTableListBoxModel *patch_table;
+  Label connections_table_label;
+  ConnectionsTableListBox connections_table;
 
   void make_menu_bar();
 
   void config_label(Label &label, const char *text);
-  void config_list_box(const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model);
+  void config_lbox(const char *label_text, Label &label, ListBox &list_box);
+  void config_list_box(
+    const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model);
+  void config_table_list_box(
+    const char *label_text, Label &label, KmTableListBox &list_box, KmTableListBoxModel *model);
+
 
   void make_set_list_songs_pane();
   void make_song_patches_pane();
   void make_song_notes_pane();
+  void make_connections_pane();
   void make_set_lists_pane();
   void make_messages_pane();
   void make_triggers_pane();
-  void make_patch_pane();
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

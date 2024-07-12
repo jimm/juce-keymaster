@@ -1,40 +1,24 @@
 #include "../km/consts.h"
 #include "../km/connection.h"
 #include "../km/patch.h"
-#include "patch_table.h"
+#include "connections_table.h"
 
-PatchTableListBoxModel::PatchTableListBoxModel() {
-  addAndMakeVisible(_table);
-  _table.setModel(this);
-  _table.setColour(ListBox::outlineColourId, Colours::grey);
-  _table.setOutlineThickness(1);
-
-  auto &h = _table.getHeader();
-  h.addColumn("Input", 1, 75);
-  h.addColumn("Chan", 2, 30);
-  h.addColumn("Output", 3, 75);
-  h.addColumn("Chan", 4, 20);
-  h.addColumn("Zone", 5, 30);
-  h.addColumn("Xpose", 6, 20);
-  h.addColumn("Prog", 7, 60);
-  h.addColumn("CC Filts/Maps", 8, 200);
-  h.setStretchToFitActive(true);
+void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
+  header.addColumn("Input", 1, 75);
+  header.addColumn("Chan", 2, 30);
+  header.addColumn("Output", 3, 75);
+  header.addColumn("Chan", 4, 20);
+  header.addColumn("Zone", 5, 30);
+  header.addColumn("Xpose", 6, 20);
+  header.addColumn("Prog", 7, 60);
+  header.addColumn("CC Filts/Maps", 8, 200);
+  header.setStretchToFitActive(true);
 }
 
-void PatchTableListBoxModel::paintRowBackground(
-  Graphics& g, int rowNumber, int _width, int _height, bool rowIsSelected)
+void ConnectionsTableListBoxModel::paintCell(
+  Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
-  auto alternateColour = getLookAndFeel().findColour(ListBox::backgroundColourId)
-    .interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f);
-  if (rowNumber % 2)
-    g.fillAll(alternateColour);
-}
-
-void PatchTableListBoxModel::paintCell(
-  Graphics& g, int rowNumber, int columnId, int width, int height, bool _rowIsSelected)
-{
-  g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
-  g.setFont(FontOptions(14.0f));
+  KmTableListBoxModel::paintCell(g, rowNumber, columnId, width, height, rowIsSelected);
 
   Patch *p = patch();
   if (p == nullptr)
@@ -79,15 +63,11 @@ void PatchTableListBoxModel::paintCell(
   }
 
   g.drawText(str, 2, 0, width - 4, height, Justification::centredLeft, true);
-  g.setColour(getLookAndFeel().findColour(ListBox::backgroundColourId));
+  g.setColour(_lf.findColour(ListBox::backgroundColourId));
   g.fillRect(width - 1, 0, 1, height);
 }
 
-void PatchTableListBoxModel::resized() {
-  _table.setBoundsInset(BorderSize<int>(2));
-}
-
-String PatchTableListBoxModel::program_str(Connection *c) {
+String ConnectionsTableListBoxModel::program_str(Connection *c) {
   String str;
   int has_msb = c->program_bank_msb() != UNDEFINED;
   int has_lsb = c->program_bank_lsb() != UNDEFINED;
@@ -116,7 +96,7 @@ String PatchTableListBoxModel::program_str(Connection *c) {
   return str;
 }
 
-String PatchTableListBoxModel::controllers_str(Connection *c) {
+String ConnectionsTableListBoxModel::controllers_str(Connection *c) {
   StringArray arr;
 
   for (int i = 0; i < 128; ++i) {

@@ -18,8 +18,8 @@ public:
     return set_list()->songs()[row]->name();
   }
 
-  virtual void listBoxItemClicked(int row, const MouseEvent &_) override {
-    cursor()->jump_to_song_index(row);
+  virtual void selectedRowsChanged(int lastRowSelected) override {
+    cursor()->jump_to_song_index(lastRowSelected);
   }
 
   int selected_row_num() override { return cursor()->song_index; }

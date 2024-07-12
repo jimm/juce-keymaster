@@ -17,7 +17,7 @@ MainComponent::MainComponent(juce::ApplicationProperties &props)
   make_set_lists_pane();
   make_messages_pane();
   make_triggers_pane();
-  make_patch_pane();
+  make_connections_pane();
 
   auto settings = props.getUserSettings();
   auto width = settings->getIntValue("window.width", DEFAULT_WINDOW_WIDTH);
@@ -66,7 +66,7 @@ void MainComponent::resized()
   Grid middle_grid;
   middle_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
   middle_grid.templateColumns = { Track(Fr(1)) };
-  middle_grid.items = { GridItem(patch_table_label), GridItem(patch_table) };
+  middle_grid.items = { GridItem(connections_table_label), GridItem(connections_table) };
   middle_grid.performLayout(middle_area);
 
   Grid bottom_grid;
@@ -192,11 +192,28 @@ void MainComponent::config_label(Label &label, const char *text) {
   label.setColour(Label::textColourId, Colours::lightgreen);
 }
 
-void MainComponent::config_list_box(const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model) {
+void MainComponent::config_lbox(const char *label_text, Label &label, ListBox &list_box) {
   config_label(label, label_text);
+  list_box.setColour(ListBox::outlineColourId, Colours::grey);
+  list_box.setOutlineThickness(1);
+  addAndMakeVisible(list_box);
+}
+
+void MainComponent::config_list_box(
+  const char *label_text, Label &label, KmListBox &list_box, KmListBoxModel *model)
+{
   box_models.add(model);
   list_box.setModel(model);
-  addAndMakeVisible(list_box);
+  config_lbox(label_text, label, list_box);
+}
+
+void MainComponent::config_table_list_box(
+  const char *label_text, Label &label, KmTableListBox &list_box, KmTableListBoxModel *model)
+{
+  table_box_models.add(model);
+  list_box.setModel(model);
+  model->make_columns(list_box.getHeader());
+  config_lbox(label_text, label, list_box);
 }
 
 void MainComponent::make_set_list_songs_pane() {
@@ -222,6 +239,12 @@ void MainComponent::make_song_notes_pane() {
   addAndMakeVisible(song_notes);
 }
 
+void MainComponent::make_connections_pane() {
+  auto model = new ConnectionsTableListBoxModel();
+  config_table_list_box("Patch Connections", connections_table_label, connections_table, model);
+  KeyMaster_instance()->cursor()->addActionListener(&connections_table);
+}
+
 void MainComponent::make_set_lists_pane() {
   auto model = new SetListsListBoxModel();
   config_list_box("Set Lists", set_lists_label, set_lists, model);
@@ -237,11 +260,4 @@ void MainComponent::make_messages_pane() {
 void MainComponent::make_triggers_pane() {
   auto model = new TriggersListBoxModel();
   config_list_box("Triggers", triggers_label, triggers, model);
-}
-
-void MainComponent::make_patch_pane() {
-  patch_table = new PatchTableListBoxModel();
-  table_box_models.add(patch_table);
-  config_label(patch_table_label, "Patch Connections");
-  addAndMakeVisible(patch_table);
 }

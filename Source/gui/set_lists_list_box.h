@@ -17,8 +17,8 @@ public:
     return set_lists()[row]->name();
   }
 
-  virtual void listBoxItemClicked(int row, const MouseEvent &_) override {
-    cursor()->jump_to_set_list_index(row);
+  virtual void selectedRowsChanged(int lastRowSelected) override {
+    cursor()->jump_to_set_list_index(lastRowSelected);
   }
 
   int selected_row_num() override {

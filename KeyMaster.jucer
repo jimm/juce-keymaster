@@ -6,14 +6,18 @@
               bundleIdentifier="jimm.KeyMaster" cppLanguageStandard="20">
   <MAINGROUP id="vDaUrm" name="KeyMaster">
     <GROUP id="{9BE1D933-937C-5CFF-F347-C7F459F49700}" name="gui">
+      <FILE id="VlgiOB" name="connections_table.cpp" compile="1" resource="0"
+            file="Source/gui/connections_table.cpp"/>
+      <FILE id="UrMJqx" name="connections_table.h" compile="0" resource="0"
+            file="Source/gui/connections_table.h"/>
       <FILE id="BgxL3U" name="km_list_box.h" compile="0" resource="0" file="Source/gui/km_list_box.h"/>
+      <FILE id="ziJXOh" name="km_table_list_box.h" compile="0" resource="0"
+            file="Source/gui/km_table_list_box.h"/>
       <FILE id="q3dOAr" name="menu_manager.cpp" compile="1" resource="0"
             file="Source/gui/menu_manager.cpp"/>
       <FILE id="XLb80c" name="menu_manager.h" compile="0" resource="0" file="Source/gui/menu_manager.h"/>
       <FILE id="ibUera" name="messages_list_box.h" compile="0" resource="0"
             file="Source/gui/messages_list_box.h"/>
-      <FILE id="aqlAwx" name="patch_table.cpp" compile="1" resource="0" file="Source/gui/patch_table.cpp"/>
-      <FILE id="WEHvst" name="patch_table.h" compile="0" resource="0" file="Source/gui/patch_table.h"/>
       <FILE id="QLqr8Z" name="set_list_songs_list_box.h" compile="0" resource="0"
             file="Source/gui/set_list_songs_list_box.h"/>
       <FILE id="mB2Jwz" name="set_lists_list_box.h" compile="0" resource="0"
