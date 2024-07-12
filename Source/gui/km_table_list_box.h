@@ -37,9 +37,10 @@ public:
 
   // void resized() override { setBoundsInset(BorderSize<int>(2)); }
 
-  void actionListenerCallback(const String &_message) override {
-    Logger::writeToLog("table list box listener callback"); // DEBUG
-    updateContent();
-    repaint();
+  void actionListenerCallback(const String &message) override {
+    if (message == "moved") {
+      updateContent();
+      repaint();
+    }
   }
 };

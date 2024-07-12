@@ -35,9 +35,11 @@ protected:
 
 class KmListBox : public ListBox, public ActionListener {
 public:
-  void actionListenerCallback(const String &_message) override {
-    updateContent();
-    selectRow(((KmListBoxModel *)getListBoxModel())->selected_row_num());
-    repaint();
+  void actionListenerCallback(const String &message) override {
+    if (message == "moved") {
+      updateContent();
+      selectRow(((KmListBoxModel *)getListBoxModel())->selected_row_num());
+      repaint();
+    }
   }
 };

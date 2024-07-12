@@ -25,8 +25,10 @@ private:
 
 class TriggersTableListBox : public KmTableListBox {
 public:
-  void actionListenerCallback(const String &_message) override {
-    updateContent();
-    repaint();
+  void actionListenerCallback(const String &message) override {
+    if (message == "moved") {
+      updateContent();
+      repaint();
+    }
   }
 };

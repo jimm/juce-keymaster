@@ -10,7 +10,9 @@ public:
     }
   }
 
-  void actionListenerCallback(const String &_message) override {
-    update_contents();
+  void actionListenerCallback(const String &message) override {
+    if (message == "moved") {
+      update_contents();
+    }
   }
 };
