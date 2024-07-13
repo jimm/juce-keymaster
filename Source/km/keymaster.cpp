@@ -127,6 +127,7 @@ void KeyMaster::stop() {
     return;
 
   stop_clock();
+  send_pending_offs();
   PATCH_STOP;
   _running = false;
 }
@@ -147,10 +148,15 @@ void KeyMaster::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& 
   // that to the same patch as that used by the corresponding note on or
   // sustain on.
   Patch *p = _identifier_to_input.contains(source->getIdentifier())
-    ? _identifier_to_input[source->getIdentifier()]->patch_for_message(message)
+    ? _identifier_to_input[source->getIdentifier()]->patch_for_message(source, message)
     : _cursor->patch();
 
   p->midi_in(source, message);
+}
+
+void KeyMaster::send_pending_offs() {
+  for (auto input : _inputs)
+    input->send_pending_offs();
 }
 
 // ================ clock ================

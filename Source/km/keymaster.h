@@ -47,6 +47,7 @@ public:
   void start();
   void stop();
   void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
+  void send_pending_offs();
 
   // ================ clock ================
   void start_clock() { _clock.start(); }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <JuceHeader.h>
 #include "consts.h"
 #include "instrument.h"
 
@@ -14,7 +15,8 @@ public:
 
   Input(MidiDeviceInfo info, MidiInputCallback *listener);
 
-  Patch *patch_for_message(const MidiMessage &msg);
+  Patch *patch_for_message(MidiInput *source, const MidiMessage &msg);
+  void send_pending_offs();
 
 private:
   std::unique_ptr<MidiInput> device;

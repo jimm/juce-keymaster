@@ -24,7 +24,7 @@ Input::Ptr Input::find_by_id(String identifier) {
 // store the current patch and for off messages we return it.
 //
 // We return the current patch for all other messages.
-Patch * Input::patch_for_message(const MidiMessage &msg) {
+Patch * Input::patch_for_message(MidiInput *source, const MidiMessage &msg) {
   Patch *curr_patch = KeyMaster_instance()->cursor()->patch();
   int channel = msg.getChannel(); // 1-16 or 0 if not a channel message
 
@@ -63,5 +63,20 @@ Patch * Input::patch_for_message(const MidiMessage &msg) {
   }
 
   return curr_patch;
+}
+
+void Input::send_pending_offs() {
+  for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
+    if (sustain_off_patches[chan] != nullptr) {
+      sustain_off_patches[chan]->midi_in(device.get(), MidiMessage::controllerEvent(chan, CC_SUSTAIN, 0));
+      sustain_off_patches[chan] = nullptr;
+    }
+    for (int note = 0; note < NOTES_PER_CHANNEL; ++note) {
+      if (note_off_patches[chan][note] != nullptr) {
+        note_off_patches[chan][note]->midi_in(device.get(), MidiMessage::noteOff(chan, note, (uint8)64));
+        note_off_patches[chan][note] = nullptr;
+      }
+    }
+  }
 }
 
