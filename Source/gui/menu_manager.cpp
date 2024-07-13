@@ -15,18 +15,18 @@ enum CommandIDs {
   cut,
   copy,
   paste,
-  new_message,
-  new_trigger,
   new_song,
   new_patch,
   new_connection,
   new_set_list,
-  delete_message,
-  delete_trigger,
+  new_message,
+  new_trigger,
   delete_song,
   delete_patch,
   delete_connection,
   delete_set_list,
+  delete_message,
+  delete_trigger,
   // Go
   next_song,
   prev_song,
@@ -168,7 +168,7 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     break;
   case CommandIDs::new_patch:
     result.setInfo("New Patch", "Quits KeyMaster", "Edit", 0);
-    result.addDefaultKeypress('h', ModifierKeys::commandModifier);
+    result.addDefaultKeypress('a', ModifierKeys::commandModifier);
     break;
   case CommandIDs::new_connection:
     result.setInfo("New Connection", "Quits KeyMaster", "Edit", 0);
@@ -199,21 +199,31 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
   // ==== Go
   case CommandIDs::next_song:
     result.setInfo("Next Song", "Quits KeyMaster", "Go", 0);
+    result.addDefaultKeypress('n', 0);
+    result.addDefaultKeypress(KeyPress::rightKey, 0);
     break;
   case CommandIDs::prev_song:
     result.setInfo("Prev Song", "Quits KeyMaster", "Go", 0);
+    result.addDefaultKeypress('p', 0);
+    result.addDefaultKeypress(KeyPress::leftKey, 0);
     break;
   case CommandIDs::next_patch:
     result.setInfo("Next Patch", "Quits KeyMaster", "Go", 0);
+    result.addDefaultKeypress('j', 0);
+    result.addDefaultKeypress(KeyPress::downKey, 0);
     break;
   case CommandIDs::prev_patch:
     result.setInfo("Prev Patch", "Quits KeyMaster", "Go", 0);
+    result.addDefaultKeypress('k', 0);
+    result.addDefaultKeypress(KeyPress::upKey, 0);
     break;
   case CommandIDs::find_song:
     result.setInfo("Find a Song", "Quits KeyMaster", "Go", 0);
+    result.addDefaultKeypress('f', ModifierKeys::commandModifier);
     break;
   case CommandIDs::find_set_list:
     result.setInfo("Find a Set List", "Quits KeyMaster", "Go", 0);
+    result.addDefaultKeypress('t', ModifierKeys::commandModifier);
     break;
   // ==== MIDI
   case CommandIDs::toggle_clock:
@@ -230,6 +240,7 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     break;
   case CommandIDs::midi_monitor:
     result.setInfo("Midi Monitor", "Quits KeyMaster", "MIDI", 0);
+    result.addDefaultKeypress('i', ModifierKeys::commandModifier);
     break;
   default:
     // error

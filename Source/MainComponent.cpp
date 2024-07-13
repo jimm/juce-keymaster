@@ -182,15 +182,19 @@ void MainComponent::delete_set_list() {
 }
 
 void MainComponent::next_song() {
+  KeyMaster_instance()->cursor()->next_song();
 }
 
 void MainComponent::prev_song() {
+  KeyMaster_instance()->cursor()->next_song();
 }
 
 void MainComponent::next_patch() {
+  KeyMaster_instance()->cursor()->next_patch();
 }
 
 void MainComponent::prev_patch() {
+  KeyMaster_instance()->cursor()->prev_patch();
 }
 
 void MainComponent::find_song() {
@@ -200,12 +204,15 @@ void MainComponent::find_set_list() {
 }
 
 void MainComponent::toggle_clock() {
+  KeyMaster_instance()->toggle_clock();
 }
 
 void MainComponent::all_notes_off() {
+  KeyMaster_instance()->panic(false);
 }
 
 void MainComponent::super_panic() {
+  KeyMaster_instance()->panic(true);
 }
 
 void MainComponent::midi_monitor() {
