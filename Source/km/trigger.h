@@ -29,11 +29,11 @@ public:
   inline TriggerAction action() { return _action; }
   inline MessageBlock *output_message() { return _output_message; }
 
-  inline void set_trigger_key_code(int key_code) { _trigger_key_code = key_code; }
+  void set_trigger_key_code(int key_code);
   // To erase trigger message, make input == nullptr
-         void set_trigger_message(String input_identifier, MidiMessage message);
-  inline void set_action(TriggerAction action) { _action = action; }
-  inline void set_output_message(MessageBlock *msg) { _output_message = msg; }
+  void set_trigger_message(String input_identifier, MidiMessage message);
+  void set_action(TriggerAction action);
+  void set_output_message(MessageBlock *msg);
 
   bool signal_message(MidiInput* source, const MidiMessage& message);
   bool signal_key(int key_code);

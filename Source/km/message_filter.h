@@ -20,19 +20,19 @@ public:
   bool start_continue_stop() { return _start_continue_stop; }
   bool system_reset() { return _system_reset; }
 
-  inline void set_note(bool val) { _note = val; } // both on and off
-  inline void set_poly_pressure(bool val) { _poly_pressure = val; }
-  inline void set_chan_pressure(bool val) { _chan_pressure = val; }
-  inline void set_program_change(bool val) { _program_change = val; }
-  inline void set_pitch_bend(bool val) { _pitch_bend = val; }
-  inline void set_controller(bool val) { _controller = val; }
-  inline void set_song_pointer(bool val) { _song_pointer = val; }
-  inline void set_song_select(bool val) { _song_select = val; }
-  inline void set_tune_request(bool val) { _tune_request = val; }
-  inline void set_sysex(bool val) { _sysex = val; }
-  inline void set_clock(bool val) { _clock = val; }
-  inline void set_start_continue_stop(bool val) { _start_continue_stop = val; }
-  inline void set_system_reset(bool val) { _system_reset = val; }
+  void set_note(bool val);
+  void set_poly_pressure(bool val);
+  void set_chan_pressure(bool val);
+  void set_program_change(bool val);
+  void set_pitch_bend(bool val);
+  void set_controller(bool val);
+  void set_song_pointer(bool val);
+  void set_song_select(bool val);
+  void set_tune_request(bool val);
+  void set_sysex(bool val);
+  void set_clock(bool val);
+  void set_start_continue_stop(bool val);
+  void set_system_reset(bool val);
 
   bool filter_out(int status, int data1);
 

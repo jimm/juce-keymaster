@@ -41,20 +41,20 @@ public:
   inline bool changing_was_running() { return _changing_was_running; }
   inline Controller *cc_map(int i) { return _cc_maps[i]; }
 
-  inline void set_input(Input::Ptr val) { _input = val; }
-  inline void set_output(Output::Ptr val) { _output = val; }
-  inline void set_input_chan(int val) { _input_chan = val; }
-  inline void set_output_chan(int val) { _output_chan = val; }
-  inline void set_program_bank_msb(int val) { _prog.bank_msb = val; }
-  inline void set_program_bank_lsb(int val) { _prog.bank_lsb = val; }
-  inline void set_program_prog(int val) { _prog.prog = val; }
-  inline void set_zone_low(int val) { _zone.low = val; }
-  inline void set_zone_high(int val) { _zone.high = val; }
-  inline void set_xpose(int val) { _xpose = val; }
-  inline void set_velocity_curve(Curve *val) { _velocity_curve = val; }
-  inline void set_processing_sysex(bool val) { _processing_sysex = val; }
-  inline void set_running(bool val) { _running = val; }
-  inline void set_cc_map(int cc_num, Controller *val) { _cc_maps[cc_num] = val; }
+  void set_input(Input::Ptr val);
+  void set_output(Output::Ptr val);
+  void set_input_chan(int val);
+  void set_output_chan(int val);
+  void set_program_bank_msb(int val);
+  void set_program_bank_lsb(int val);
+  void set_program_prog(int val);
+  void set_zone_low(int val);
+  void set_zone_high(int val);
+  void set_xpose(int val);
+  void set_velocity_curve(Curve *val);
+  void set_processing_sysex(bool val);
+  void set_running(bool val);
+  void set_cc_map(int cc_num, Controller *val);
 
   void start();
   bool is_running();

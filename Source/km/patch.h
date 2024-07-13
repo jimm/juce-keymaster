@@ -20,8 +20,8 @@ public:
   inline MessageBlock *start_message() { return _start_message; }
   inline MessageBlock *stop_message() { return _stop_message; }
 
-  inline void set_start_message(MessageBlock *msg) { _start_message = msg; }
-  inline void set_stop_message(MessageBlock *msg) { _stop_message = msg; }
+  void set_start_message(MessageBlock *msg);
+  void set_stop_message(MessageBlock *msg);
 
   void add_connection(Connection *conn);
   void remove_connection(Connection *conn);

@@ -12,16 +12,21 @@ KeyMaster *KeyMaster_instance() {
   return km_instance;
 }
 
+// Does not stop existing instance or delete it or anything.
+void set_KeyMaster_instance(KeyMaster *km) {
+  km_instance = km;
+}
+
 // ================ allocation ================
 
 KeyMaster::KeyMaster(bool testing)
-  : _cursor(0), _clock(), _running(false), _testing(testing)
+  : _doc(nullptr), _cursor(0), _clock(), _running(false), _testing(testing)
 {
   initialiseWithDefaultDevices(0, 0); // AudioDeviceManager
   load_instruments();
   _set_lists.add(new SetList(UNDEFINED_ID, "All Songs"));
   _cursor = new Cursor(this);
-  km_instance = this;
+  set_KeyMaster_instance(this);
 }
 
 KeyMaster::~KeyMaster() {
@@ -50,20 +55,24 @@ KeyMaster::~KeyMaster() {
 
 void KeyMaster::add_message(MessageBlock *message) {
   _messages.add(message);
+  changed();
 }
 
 void KeyMaster::remove_message(MessageBlock *message) {
   _messages.removeFirstMatchingValue(message);
   delete message;
+  changed();
 }
 
 void KeyMaster::add_curve(Curve *curve) {
   _curves.add(curve);
+  changed();
 }
 
 void KeyMaster::remove_curve(Curve *curve) {
   _curves.removeFirstMatchingValue(curve);
   delete curve;
+  changed();
 }
 
 Curve * KeyMaster::curve_with_name(const String &name) {
@@ -82,20 +91,24 @@ Curve * KeyMaster::curve_with_id(DBObjID id) {
 
 void KeyMaster::add_trigger(Trigger *trigger) {
   _triggers.add(trigger);
+  changed();
 }
 
 void KeyMaster::remove_trigger(Trigger *trigger) {
   _triggers.removeFirstMatchingValue(trigger);
   delete trigger;
+  changed();
 }
 
 void KeyMaster::add_set_list(SetList *set_list) {
   _set_lists.add(set_list);
+  changed();
 }
 
 void KeyMaster::remove_set_list(SetList *set_list) {
   _set_lists.removeFirstMatchingValue(set_list);
   delete set_list;
+  changed();
 }
 
 // ================ running ================

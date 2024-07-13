@@ -14,9 +14,9 @@ public:
   inline float bpm() { return _bpm; }
   inline bool clock_on_at_start() { return _clock_on_at_start; }
 
-  inline void set_notes(const String &notes) { _notes = notes; }
-  inline void set_bpm(float bpm) { _bpm = bpm; }
-  inline void set_clock_on_at_start(bool val) { _clock_on_at_start = val; }
+  void set_notes(const String &notes);
+  void set_bpm(float bpm);
+  void set_clock_on_at_start(bool val);
 
   void add_patch(Patch *patch);
   void remove_patch(Patch *patch);

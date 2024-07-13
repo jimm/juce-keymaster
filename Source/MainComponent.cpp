@@ -1,13 +1,18 @@
+#include <JuceHeader.h>
 #include "MainComponent.h"
 #include "km/keymaster.h"
+#include "km/storage.h"
 
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
 
 MainComponent::MainComponent(juce::ApplicationProperties &props)
+  : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project")
 {
   KeyMaster *km = new KeyMaster(); // side-effect: KeyMaster static instance set
+  km->set_file_based_document(this);
   km->initialize();        // generate default curves and initial song/patch
+  setChangedFlag(false);   // initialize will set it to true
   km->start();
 
   make_menu_bar();
@@ -88,18 +93,41 @@ void MainComponent::make_menu_bar() {
 }
 
 void MainComponent::new_project() {
+  saveIfNeededAndUserAgreesAsync([] (SaveResult result) { });
+
+  KeyMaster *old_km = KeyMaster_instance();
+  KeyMaster *new_km = new KeyMaster();
+  new_km->set_file_based_document(this);
+  new_km->initialize();
+  setChangedFlag(false);   // initialize will set it to true
+
+  if (old_km != nullptr) {
+    old_km->stop();
+    delete old_km;
+  }
+  new_km->start();
+
+  // FIXME?
+  repaint();
 }
 
 void MainComponent::open_project() {
+  saveIfNeededAndUserAgreesAsync([] (FileBasedDocument::SaveResult _) { });
+  loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
+    if ((bool)result)
+      repaint();
+  });
 }
 
 void MainComponent::close_project() {
 }
 
 void MainComponent::save_project() {
+  saveAsync(true, true, [this] (FileBasedDocument::SaveResult _) { } );
 }
 
 void MainComponent::save_project_as() {
+  saveAsInteractiveAsync(true, [this] (FileBasedDocument::SaveResult _) { } );
 }
 
 void MainComponent::undo() {
@@ -181,6 +209,40 @@ void MainComponent::super_panic() {
 }
 
 void MainComponent::midi_monitor() {
+}
+
+// ================ loading and saving ================
+
+Result MainComponent::loadDocument(const File &file) {
+  KeyMaster *old_km = KeyMaster_instance();
+  Storage s(file);
+
+  KeyMaster *new_km = s.load();
+  if (s.has_error()) {
+    delete new_km;
+    set_KeyMaster_instance(old_km);
+    return Result::fail(s.error());
+  }
+
+  new_km->set_file_based_document(this);
+  if (old_km != nullptr) {
+    old_km->stop();
+    delete old_km;
+  }
+  new_km->start();
+
+  // FIXME?
+  repaint();
+
+  return Result::ok();
+}
+
+Result MainComponent::saveDocument(const File &file) {
+  Storage s(file);
+  s.save(KeyMaster_instance());
+  if (s.has_error())
+    return Result::fail(s.error());
+  return Result::ok();
 }
 
 // ================ components ================

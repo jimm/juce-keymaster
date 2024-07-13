@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "consts.h"
 #include "connection.h"
+#include "keymaster.h"
 
 #define is_status(b) (((b) & 0x80) == 0x80)
 #define is_system(b) ((b) >= SYSEX)
@@ -54,6 +55,104 @@ bool Connection::is_running() {
 
 void Connection::stop() {
   _running = false;
+}
+
+void Connection::set_input(Input::Ptr val) {
+  if (_input != val) {
+    _input = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_output(Output::Ptr val) {
+  if (_output != val) {
+    _output = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_input_chan(int val) {
+  if (_input_chan != val) {
+    _input_chan = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_output_chan(int val) {
+  if (_output_chan != val) {
+    _output_chan = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_program_bank_msb(int val) {
+  if (_prog.bank_msb != val) {
+    _prog.bank_msb = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_program_bank_lsb(int val) {
+  if (_prog.bank_lsb != val) {
+    _prog.bank_lsb = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_program_prog(int val) {
+  if (_prog.prog != val) {
+    _prog.prog = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_zone_low(int val) {
+  if (_zone.low != val) {
+    _zone.low = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_zone_high(int val) {
+  if (_zone.high != val) {
+    _zone.high = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_xpose(int val) {
+  if (_xpose != val) {
+    _xpose = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_velocity_curve(Curve *val) {
+  if (_velocity_curve != val) {
+    _velocity_curve = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_processing_sysex(bool val) {
+  if (_processing_sysex != val) {
+    _processing_sysex = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_running(bool val) {
+  if (_running != val) {
+    _running = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Connection::set_cc_map(int cc_num, Controller *val) {
+  if (_cc_maps[cc_num] != val) {
+    _cc_maps[cc_num] = val;
+    KeyMaster_instance()->changed();
+  }
 }
 
 // Returns the channel that we should send the initial bank/program change
@@ -181,15 +280,19 @@ void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
 
 void Connection::set_controller(Controller *controller) {
   int cc_num = controller->cc_num();
-  if (_cc_maps[cc_num] != nullptr && _cc_maps[cc_num] != controller)
-    remove_cc_num(cc_num);
-  _cc_maps[cc_num] = controller;
+  if (_cc_maps[cc_num] != controller) {
+    if (_cc_maps[cc_num] != nullptr)
+      remove_cc_num(cc_num);
+    _cc_maps[cc_num] = controller;
+    KeyMaster_instance()->changed();
+  }
 }
 
 void Connection::remove_cc_num(int cc_num) {
   if (_cc_maps[cc_num] != nullptr) {
     delete _cc_maps[cc_num];
     _cc_maps[cc_num] = nullptr;
+    KeyMaster_instance()->changed();
   }
 }
 

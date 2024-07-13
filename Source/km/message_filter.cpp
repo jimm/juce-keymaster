@@ -1,5 +1,6 @@
 #include "consts.h"
 #include "message_filter.h"
+#include "keymaster.h"
 
 // true means allow, false means filter out
 
@@ -19,6 +20,98 @@ MessageFilter::MessageFilter()
   _start_continue_stop(true),
   _system_reset(true)
 {
+}
+
+void MessageFilter::set_note(bool val) {
+  // both on and off
+  if (_note != val) {
+    _note = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_poly_pressure(bool val) {
+  if (_poly_pressure != val) {
+    _poly_pressure = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_chan_pressure(bool val) {
+  if (_chan_pressure != val) {
+    _chan_pressure = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_program_change(bool val) {
+  if (_program_change != val) {
+    _program_change = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_pitch_bend(bool val) {
+  if (_pitch_bend != val) {
+    _pitch_bend = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_controller(bool val) {
+  if (_controller != val) {
+    _controller = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_song_pointer(bool val) {
+  if (_song_pointer != val) {
+    _song_pointer = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_song_select(bool val) {
+  if (_song_select != val) {
+    _song_select = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_tune_request(bool val) {
+  if (_tune_request != val) {
+    _tune_request = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_sysex(bool val) {
+  if (_sysex != val) {
+    _sysex = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_clock(bool val) {
+  if (_clock != val) {
+    _clock = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_start_continue_stop(bool val) {
+  if (_start_continue_stop != val) {
+    _start_continue_stop = val;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void MessageFilter::set_system_reset(bool val) {
+  if (_system_reset != val) {
+    _system_reset = val;
+    KeyMaster_instance()->changed();
+  }
 }
 
 // Return true if the message for this status should be filtered out.

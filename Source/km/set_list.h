@@ -13,7 +13,7 @@ public:
   void add_song(Song *song);
   void remove_song(Song *song);
 
-  inline void set_songs(Array<Song *>&other_songs) { _songs = other_songs; }
+  void set_songs(Array<Song *>&other_songs);
 
 private:
   Array<Song *> _songs;

@@ -82,9 +82,12 @@ public:
   void panic(bool send_notes_off);
 
   // ================ helpers ================
+  void set_file_based_document(FileBasedDocument *doc) { _doc = doc; }
   void sort_all_songs();
+  void changed() { if (_doc != nullptr) _doc->changed(); }
 
 private:
+  FileBasedDocument *_doc;
   ReferenceCountedArray<Input> _inputs;
   ReferenceCountedArray<Output> _outputs;
   HashMap<String, Input::Ptr> _identifier_to_input;
@@ -101,6 +104,5 @@ private:
   void create_songs();
 };
 
-
-
 KeyMaster *KeyMaster_instance();
+void set_KeyMaster_instance(KeyMaster *);

@@ -8,7 +8,7 @@ public:
   virtual ~Nameable() {}
 
   inline String &name() { return _name; }
-  void set_name(const String &str) { _name = str; }
+  void set_name(const String &str);
 
 private:
   String _name;

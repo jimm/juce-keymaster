@@ -27,6 +27,8 @@ void MessageBlock::from_hex_string(const String &str) {
 
   MidiDataConcatenator concatenator(1024);
   concatenator.pushMidiData((const void *)data, (int)str.length(), (double)0, (MidiInput *)nullptr, *this);
+
+  KeyMaster_instance()->changed();
 }
 
 // Returns a string consisting of space-separated two-digit hex bytes.

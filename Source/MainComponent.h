@@ -17,7 +17,7 @@ class KeyMaster;
   This component lives inside our window, and this is where you should put all
   your controls and content.
 */
-class MainComponent : public Component
+class MainComponent : public Component, public FileBasedDocument
 {
 public:
   //==============================================================================
@@ -62,8 +62,16 @@ public:
   void super_panic();
   void midi_monitor();
 
+  // ================ loading and saving ================
+  String getDocumentTitle() override { return "KeyMaster"; }
+  Result loadDocument(const File &file) override;
+  Result saveDocument(const File &file) override;
+  File getLastDocumentOpened() override { return _file; }
+  void setLastDocumentOpened(const File &file) override { _file = file; }
+
 private:
   //==============================================================================
+  File _file;
 
   MenuManager menu_manager;
 

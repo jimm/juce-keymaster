@@ -38,10 +38,25 @@ void Patch::stop() {
   _running = false;
 }
 
+void Patch::set_start_message(MessageBlock *msg) {
+  if (_start_message != msg) {
+    _start_message = msg;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Patch::set_stop_message(MessageBlock *msg) {
+  if (_stop_message != msg) {
+    _stop_message = msg;
+    KeyMaster_instance()->changed();
+  }
+}
+
 void Patch::add_connection(Connection *conn) {
   _connections.add(conn);
   if (is_running())
     conn->start();
+  KeyMaster_instance()->changed();
 }
 
 void Patch::remove_connection(Connection *conn) {
@@ -49,6 +64,7 @@ void Patch::remove_connection(Connection *conn) {
     conn->stop();
   _connections.removeFirstMatchingValue(conn);
   delete conn;
+  KeyMaster_instance()->changed();
 }
 
 void Patch::midi_in(MidiInput* source, const MidiMessage& message) {

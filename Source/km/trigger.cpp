@@ -17,11 +17,34 @@ Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock 
 {
 }
 
+void Trigger::set_trigger_key_code(int key_code) {
+  if (_trigger_key_code != key_code) {
+    _trigger_key_code = key_code;
+    KeyMaster_instance()->changed();
+  }
+}
+
+// To erase trigger message, make input == nullptr
 // `message` might be EMPTY_MESSAGE, which will always be ignored.
 void Trigger::set_trigger_message(String input_identifier, MidiMessage message) {
   _trigger_input_identifier = input_identifier;
   _trigger_message = message;
   _trigger_message_num_bytes = message.getRawDataSize();
+  KeyMaster_instance()->changed();
+}
+
+void Trigger::set_action(TriggerAction action) {
+  if (_action != action) {
+    _action = action;
+    KeyMaster_instance()->changed();
+  }
+}
+
+void Trigger::set_output_message(MessageBlock *msg) {
+  if (_output_message != msg) {
+    _output_message = msg;
+    KeyMaster_instance()->changed();
+  }
 }
 
 bool Trigger::signal_message(MidiInput* source, const MidiMessage& message) {
