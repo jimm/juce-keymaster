@@ -17,9 +17,20 @@ Storage::~Storage() {
 
 // Does not stop or delete the old instance or start the new one.
 KeyMaster *Storage::load(bool testing) {
+  KeyMaster *curr_km = KeyMaster_instance();
+
   km = new KeyMaster(testing); // side-effect: KeyMaster static instance set
 
-  var data = JSON::parse(file);
+  var data;
+  auto result = JSON::parse(file.loadFileAsString(), data);
+  if (result.failed()) {
+    error_str <<  "error loading file " << file.getFileName() << ": "
+              << result.getErrorMessage();
+    delete km;
+    set_KeyMaster_instance(curr_km);
+    return curr_km;
+  }
+
   auto nullish = var();
   Array<var> arr { nullish };
   auto nullish_arr = var(arr);
