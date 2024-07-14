@@ -92,10 +92,12 @@ void Cursor::next_patch(bool send_changed) {
   if (s == nullptr)
     return;
 
-  if (patch_index == s->patches().size()-1)
-    next_song(false);
-  else
-    ++patch_index;
+  if (patch_index == s->patches().size()-1) {
+    next_song(send_changed);
+    return;
+  }
+
+  ++patch_index;
   if (send_changed)
     sendActionMessage(moved);
 }
@@ -104,10 +106,12 @@ void Cursor::prev_patch(bool send_changed) {
   if (song() == nullptr)
     return;
 
-  if (patch_index == 0)
-    prev_song(false);
-  else
-    --patch_index;
+  if (patch_index == 0) {
+    prev_song(send_changed);
+    return;
+  }
+
+  --patch_index;
   if (send_changed)
     sendActionMessage(moved);
 }

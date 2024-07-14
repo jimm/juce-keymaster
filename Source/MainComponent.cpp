@@ -186,7 +186,7 @@ void MainComponent::next_song() {
 }
 
 void MainComponent::prev_song() {
-  KeyMaster_instance()->cursor()->next_song();
+  KeyMaster_instance()->cursor()->prev_song();
 }
 
 void MainComponent::next_patch() {

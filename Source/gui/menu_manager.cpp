@@ -1,5 +1,6 @@
 #include "menu_manager.h"
 #include "../MainComponent.h"
+#include "../km/keymaster.h"
 
 enum CommandIDs {
   __separator__ = 1,
@@ -113,6 +114,8 @@ void MenuManager::getAllCommands (Array<CommandID>& c) {
 }
 
 void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) {
+  KeyMaster *km = KeyMaster_instance();
+
   switch (commandID) {
   // ==== File
   case CommandIDs::new_project:
@@ -129,6 +132,7 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
   case CommandIDs::save_project:
     result.setInfo("Save", "Saves the project", "File", 0);
     result.addDefaultKeypress('s', ModifierKeys::commandModifier);
+    // TODO only active if km is modified
     break;
   case CommandIDs::save_project_as:
     result.setInfo("Save As...", "Saves the project into a different file", "File", 0);
@@ -186,36 +190,44 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     break;
   case CommandIDs::delete_song:
     result.setInfo("Delete Song", "Quits KeyMaster", "Edit", 0);
+    result.setActive(km->all_songs()->songs().size() > 1);
     break;
   case CommandIDs::delete_patch:
     result.setInfo("Delete Patch", "Quits KeyMaster", "Edit", 0);
+    result.setActive(km->cursor()->song()->patches().size() > 0);
     break;
   case CommandIDs::delete_connection:
     result.setInfo("Delete Connection", "Quits KeyMaster", "Edit", 0);
+    result.setActive(km->cursor()->patch()->connections().size() > 0);
     break;
   case CommandIDs::delete_set_list:
     result.setInfo("Delete Set List", "Quits KeyMaster", "Edit", 0);
+    result.setActive(km->cursor()->set_list() != km->all_songs());
     break;
   // ==== Go
   case CommandIDs::next_song:
     result.setInfo("Next Song", "Quits KeyMaster", "Go", 0);
     result.addDefaultKeypress('n', 0);
     result.addDefaultKeypress(KeyPress::rightKey, 0);
+    result.setActive(km->cursor()->has_next_song());
     break;
   case CommandIDs::prev_song:
     result.setInfo("Prev Song", "Quits KeyMaster", "Go", 0);
     result.addDefaultKeypress('p', 0);
     result.addDefaultKeypress(KeyPress::leftKey, 0);
+    result.setActive(km->cursor()->has_prev_song());
     break;
   case CommandIDs::next_patch:
     result.setInfo("Next Patch", "Quits KeyMaster", "Go", 0);
     result.addDefaultKeypress('j', 0);
     result.addDefaultKeypress(KeyPress::downKey, 0);
+    result.setActive(km->cursor()->has_next_patch());
     break;
   case CommandIDs::prev_patch:
     result.setInfo("Prev Patch", "Quits KeyMaster", "Go", 0);
     result.addDefaultKeypress('k', 0);
     result.addDefaultKeypress(KeyPress::upKey, 0);
+    result.setActive(km->cursor()->has_prev_patch());
     break;
   case CommandIDs::find_song:
     result.setInfo("Find a Song", "Quits KeyMaster", "Go", 0);
