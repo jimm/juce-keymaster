@@ -130,6 +130,7 @@ void MainComponent::open_project() {
 }
 
 void MainComponent::close_project() {
+  // TODO
 }
 
 void MainComponent::save_project() {
@@ -141,18 +142,23 @@ void MainComponent::save_project_as() {
 }
 
 void MainComponent::undo() {
+  // TODO
 }
 
 void MainComponent::redo() {
+  // TODO
 }
 
 void MainComponent::cut() {
+  // TODO
 }
 
 void MainComponent::copy() {
+  // TODO
 }
 
 void MainComponent::paste() {
+  // TODO
 }
 
 void MainComponent::new_message() {
@@ -217,8 +223,6 @@ void MainComponent::delete_message() {
   int row = messages.getSelectedRow();
   if (row == -1)
     return;
-
-  
 
   // TODO
   messages.updateContent();
@@ -297,11 +301,8 @@ Result MainComponent::loadDocument(const File &file) {
   Storage s(device_manager, file);
 
   KeyMaster *new_km = s.load();
-  if (s.has_error()) {
-    delete new_km;
-    set_KeyMaster_instance(old_km);
+  if (s.has_error())            // new_km == old_km, instance already reset
     return Result::fail(s.error());
-  }
 
   new_km->set_file_based_document(this);
   if (old_km != nullptr) {
