@@ -5,7 +5,6 @@
 #include "../km/set_list.h"
 
 class SetListSongsListBox : public KmListBox {
-protected:
 };
 
 class SetListSongsListBoxModel : public KmListBoxModel {

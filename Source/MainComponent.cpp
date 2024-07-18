@@ -87,6 +87,15 @@ void MainComponent::resized()
   bottom_grid.performLayout(bottom_area);
 }
 
+void MainComponent::update() {
+  set_list_songs.updateContent();
+  song_patches.updateContent();
+  connections_table.updateContent();
+  set_lists.updateContent();
+  messages.updateContent();
+  triggers.updateContent();
+}
+
 // ================ menu ================
 
 void MainComponent::make_menu_bar() {
@@ -108,15 +117,14 @@ void MainComponent::new_project() {
   }
   new_km->start();
 
-  // FIXME?
-  repaint();
+  update();
 }
 
 void MainComponent::open_project() {
   saveIfNeededAndUserAgreesAsync([] (FileBasedDocument::SaveResult _) { });
   loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
     if ((bool)result)
-      repaint();
+      update();
   });
 }
 
@@ -239,9 +247,7 @@ Result MainComponent::loadDocument(const File &file) {
   }
   new_km->start();
 
-  // FIXME?
-  repaint();
-
+  update();
   return Result::ok();
 }
 
