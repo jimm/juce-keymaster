@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 #include "MainComponent.h"
+#include "km/editor.h"
 #include "km/keymaster.h"
 #include "km/storage.h"
 
@@ -155,39 +156,101 @@ void MainComponent::paste() {
 }
 
 void MainComponent::new_message() {
+  Editor e;
+  MessageBlock *m = e.create_message();
+  // TODO open editor
+  e.add_message(m);
+
+  messages.updateContent();
 }
 
 void MainComponent::new_trigger() {
+  Editor e;
+  Trigger *t = e.create_trigger();
+  // TODO open editor
+  e.add_trigger(t);
+
+  triggers.updateContent();
 }
 
 void MainComponent::new_song() {
+  Editor e;
+  Song *s = e.create_song();
+  // TODO open editor
+  e.add_song(s);
+
+  set_list_songs.updateContent();
+  song_patches.updateContent();
+  connections_table.updateContent();
 }
 
 void MainComponent::new_patch() {
+  Editor e;
+  Patch *p = e.create_patch();
+  // TODO open editor
+  e.add_patch(p);
+
+  song_patches.updateContent();
+  connections_table.updateContent();
 }
 
 void MainComponent::new_connection() {
+  Editor e;
+  Patch *p = KeyMaster_instance()->cursor()->patch();
+  Connection *c = e.create_connection(nullptr, nullptr);
+  e.add_connection(c, p);
+  // TODO open editor
+
+  connections_table.updateContent();
 }
 
 void MainComponent::new_set_list() {
+  Editor e;
+  SetList *set_list = e.create_set_list();
+  e.add_set_list(set_list);
+  // TODO open editor
+
+  set_lists.updateContent();
 }
 
 void MainComponent::delete_message() {
+  int row = messages.getSelectedRow();
+  if (row == -1)
+    return;
+
+  
+
+  // TODO
+  messages.updateContent();
 }
 
 void MainComponent::delete_trigger() {
+  // TODO
+  triggers.updateContent();
 }
 
 void MainComponent::delete_song() {
+  // TODO
+  set_list_songs.updateContent();
+  song_patches.updateContent();
+  connections_table.updateContent();
 }
 
 void MainComponent::delete_patch() {
+  // TODO
+  song_patches.updateContent();
+  connections_table.updateContent();
 }
 
 void MainComponent::delete_connection() {
+  // TODO
+  connections_table.updateContent();
 }
 
 void MainComponent::delete_set_list() {
+  // TODO
+  set_lists.updateContent();
+  set_list_songs.updateContent();
 }
 
 void MainComponent::next_song() {

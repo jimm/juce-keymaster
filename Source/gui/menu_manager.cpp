@@ -165,99 +165,99 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     result.addDefaultKeypress('m', ModifierKeys::commandModifier);
     break;
   case CommandIDs::new_trigger:
-    result.setInfo("New Trigger", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("New Trigger", "New Trigger", "Edit", 0);
     result.addDefaultKeypress('t', ModifierKeys::commandModifier);
     break;
   case CommandIDs::new_song:
-    result.setInfo("New Song", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("New Song", "New Song", "Edit", 0);
     result.addDefaultKeypress('g', ModifierKeys::commandModifier);
     break;
   case CommandIDs::new_patch:
-    result.setInfo("New Patch", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("New Patch", "New Patch", "Edit", 0);
     result.addDefaultKeypress('a', ModifierKeys::commandModifier);
     break;
   case CommandIDs::new_connection:
-    result.setInfo("New Connection", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("New Connection", "New Connection", "Edit", 0);
     result.addDefaultKeypress('e', ModifierKeys::commandModifier);
     break;
   case CommandIDs::new_set_list:
-    result.setInfo("New Set List", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("New Set List", "New Set List", "Edit", 0);
     result.addDefaultKeypress('l', ModifierKeys::commandModifier);
     break;
   case CommandIDs::delete_message:
-    result.setInfo("Delete Message", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("Delete Message", "Delete Message", "Edit", 0);
     result.setActive(km->messages().size() > 0);
     break;
   case CommandIDs::delete_trigger:
-    result.setInfo("Delete Trigger", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("Delete Trigger", "Delete Trigger", "Edit", 0);
     result.setActive(km->triggers().size() > 0);
     break;
   case CommandIDs::delete_song:
-    result.setInfo("Delete Song", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("Delete Song", "Delete Song", "Edit", 0);
     result.setActive(km->all_songs()->songs().size() > 1);
     break;
   case CommandIDs::delete_patch:
-    result.setInfo("Delete Patch", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("Delete Patch", "Delete Patch", "Edit", 0);
     song = km->cursor()->song();
     result.setActive(song != nullptr && song->patches().size() > 0);
     break;
   case CommandIDs::delete_connection:
-    result.setInfo("Delete Connection", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("Delete Connection", "Delete Connection", "Edit", 0);
     patch = km->cursor()->patch();
     result.setActive(patch != nullptr && patch->connections().size() > 0);
     break;
   case CommandIDs::delete_set_list:
-    result.setInfo("Delete Set List", "Quits KeyMaster", "Edit", 0);
+    result.setInfo("Delete Set List", "Delete Set List", "Edit", 0);
     result.setActive(km->cursor()->set_list() != km->all_songs());
     break;
   // ==== Go
   case CommandIDs::next_song:
-    result.setInfo("Next Song", "Quits KeyMaster", "Go", 0);
+    result.setInfo("Next Song", "Next Song", "Go", 0);
     result.addDefaultKeypress('n', 0);
     result.addDefaultKeypress(KeyPress::rightKey, 0);
     result.setActive(km->cursor()->has_next_song());
     break;
   case CommandIDs::prev_song:
-    result.setInfo("Prev Song", "Quits KeyMaster", "Go", 0);
+    result.setInfo("Prev Song", "Prev Song", "Go", 0);
     result.addDefaultKeypress('p', 0);
     result.addDefaultKeypress(KeyPress::leftKey, 0);
     result.setActive(km->cursor()->has_prev_song());
     break;
   case CommandIDs::next_patch:
-    result.setInfo("Next Patch", "Quits KeyMaster", "Go", 0);
+    result.setInfo("Next Patch", "Next Patch", "Go", 0);
     result.addDefaultKeypress('j', 0);
     result.addDefaultKeypress(KeyPress::downKey, 0);
     result.setActive(km->cursor()->has_next_patch());
     break;
   case CommandIDs::prev_patch:
-    result.setInfo("Prev Patch", "Quits KeyMaster", "Go", 0);
+    result.setInfo("Prev Patch", "Prev Patch", "Go", 0);
     result.addDefaultKeypress('k', 0);
     result.addDefaultKeypress(KeyPress::upKey, 0);
     result.setActive(km->cursor()->has_prev_patch());
     break;
   case CommandIDs::find_song:
-    result.setInfo("Find a Song", "Quits KeyMaster", "Go", 0);
+    result.setInfo("Find a Song", "Find a Song", "Go", 0);
     result.addDefaultKeypress('f', ModifierKeys::commandModifier);
     break;
   case CommandIDs::find_set_list:
-    result.setInfo("Find a Set List", "Quits KeyMaster", "Go", 0);
+    result.setInfo("Find a Set List", "Find a Set List", "Go", 0);
     result.addDefaultKeypress('t', ModifierKeys::commandModifier);
     break;
   // ==== MIDI
   case CommandIDs::toggle_clock:
-    result.setInfo("Toggle MIDI Clock", "Quits KeyMaster", "MIDI", 0);
+    result.setInfo("Toggle MIDI Clock", "Toggle MIDI Clock", "MIDI", 0);
     result.addDefaultKeypress('k', ModifierKeys::commandModifier);
     break;
   case CommandIDs::all_notes_off:
-    result.setInfo("All Notes Off", "Quits KeyMaster", "MIDI", 0);
-    result.addDefaultKeypress('a', ModifierKeys::commandModifier);
+    result.setInfo("All Notes Off", "All Notes Off", "MIDI", 0);
+    result.addDefaultKeypress(KeyPress::F1Key, 0);
     break;
   case CommandIDs::super_panic:
-    result.setInfo("Super Panic!", "Quits KeyMaster", "MIDI", 0);
-    result.addDefaultKeypress('q', ModifierKeys::commandModifier);
+    result.setInfo("Super Panic!", "Super Panic!", "MIDI", 0);
+    result.addDefaultKeypress(KeyPress::F2Key, 0);
     break;
   case CommandIDs::midi_monitor:
-    result.setInfo("Midi Monitor", "Quits KeyMaster", "MIDI", 0);
+    result.setInfo("Midi Monitor", "Midi Monitor", "MIDI", 0);
     result.addDefaultKeypress('i', ModifierKeys::commandModifier);
     break;
   default:

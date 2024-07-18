@@ -8,7 +8,7 @@ public:
   Editor(KeyMaster *km = nullptr); // defaults to KeyMaster_instance()
 
   MessageBlock *create_message();
-  Trigger *create_trigger(MidiInput *input);
+  Trigger *create_trigger();
   Song *create_song();
   Patch *create_patch();
   Connection *create_connection(Input::Ptr input, Output::Ptr output);

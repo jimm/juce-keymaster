@@ -17,6 +17,12 @@ public:
     return messages()[row]->name();
   }
 
+  virtual void selectedRowsChanged(int lastRowSelected) override {
+    cursor()->jump_to_message_index(lastRowSelected);
+  }
+
+  int selected_row_num() override { return cursor()->message_index; }
+
 private:
   Array<MessageBlock *> &messages() { return KeyMaster_instance()->messages(); }
 };

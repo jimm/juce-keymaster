@@ -88,7 +88,7 @@ private:
   bool _changing_was_running;
   Controller *_cc_maps[128];
 
-  int input_channel_ok(int status);
+  int input_channel_ok(const MidiMessage &message);
   int inside_zone(int note);
 
   void midi_out(MidiMessage *);

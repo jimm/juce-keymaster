@@ -23,6 +23,7 @@ Cursor::~Cursor() {
 
 void Cursor::clear() {
   set_list_index = song_index = patch_index = UNDEFINED;
+  connection_index = message_index = trigger_index = UNDEFINED;
 }
 
 /*
@@ -62,6 +63,25 @@ Patch *Cursor::patch() {
   if (s == nullptr || patch_index == UNDEFINED)
     return nullptr;
   return s->patches()[patch_index];
+}
+
+Connection *Cursor::connection() {
+  Patch *p = patch();
+  if (p == nullptr || connection_index == UNDEFINED)
+    return nullptr;
+  return p->connections()[connection_index];
+}
+
+MessageBlock *Cursor::message() {
+  if (message_index == UNDEFINED)
+    return nullptr;
+  return km->messages()[message_index];
+}
+
+Trigger *Cursor::trigger() {
+  if (trigger_index == UNDEFINED)
+    return nullptr;
+  return km->triggers()[trigger_index];
 }
 
 void Cursor::next_song(bool send_changed) {
@@ -170,15 +190,40 @@ void Cursor::jump_to_patch_index(int i) {
   sendActionMessage(moved);
 }
 
+void Cursor::jump_to_connection_index(int i) {
+  if (i != connection_index) {
+    connection_index = i;
+    sendActionMessage(moved);
+  }
+}
+
+void Cursor::jump_to_message_index(int i) {
+  if (i != message_index) {
+    message_index = i;
+    sendActionMessage(moved);
+  }
+}
+
+void Cursor::jump_to_trigger_index(int i) {
+  if (i != trigger_index) {
+    trigger_index = i;
+    sendActionMessage(moved);
+  }
+}
+
 // If `song` is in current set list, make it the current song. If not, don't
 // do anything.
-void Cursor::goto_song(Song *song) {
+void Cursor::goto_song(Song *s) {
+  if (s == song())
+    return;
+
   SetList *sl = set_list();
   int i = 0;
   for (auto &sl_song : sl->songs()) {
-    if (sl_song == song) {
+    if (sl_song == s) {
       song_index = i;
       patch_index = 0;
+      sendActionMessage(moved);
       return;
     }
     ++i;
@@ -187,15 +232,16 @@ void Cursor::goto_song(Song *song) {
 
 // If `patch` is in current song, make it the current patch. If not, don't
 // do anything.
-void Cursor::goto_patch(Patch *patch) {
+void Cursor::goto_patch(Patch *p) {
   Song *curr_song = song();
-  if (curr_song == nullptr)
+  if (curr_song == nullptr || p == patch())
     return;
 
   int i = 0;
   for (auto &s_patch : curr_song->patches()) {
-    if (s_patch == patch) {
+    if (s_patch == p) {
       patch_index = i;
+      sendActionMessage(moved);
       return;
     }
     ++i;
@@ -217,6 +263,7 @@ void Cursor::goto_song(const String &name_regex) {
       if (regexec(&re, song->name().getCharPointer(), 1, &match, 0) == 0) {
         song_index = i;
         patch_index = 0;
+        sendActionMessage(moved);
         return;
       }
       ++i;
@@ -229,6 +276,7 @@ void Cursor::goto_song(const String &name_regex) {
       set_list_index = 0;
       song_index = i;
       patch_index = 0;
+        sendActionMessage(moved);
       return;
     }
     ++i;
@@ -248,6 +296,7 @@ void Cursor::goto_set_list(const String &name_regex) {
       set_list_index = i;
       song_index = 0;
       patch_index = 0;
+      sendActionMessage(moved);
       return;
     }
     ++i;

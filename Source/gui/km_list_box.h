@@ -26,7 +26,7 @@ public:
     g.fillRect(width - 1, 0, 1, height);
   }
 
-  virtual int selected_row_num() { return 0; }
+  virtual int selected_row_num() { return -1; }
 
 protected:
   Cursor *cursor() { return KeyMaster_instance()->cursor(); }

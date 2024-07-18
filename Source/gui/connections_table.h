@@ -20,6 +20,12 @@ public:
   void paintCell(Graphics& g, int rowNumber, int columnId,
                  int width, int height, bool rowIsSelected) override;
 
+  virtual void selectedRowsChanged(int lastRowSelected) override {
+    cursor()->jump_to_connection_index(lastRowSelected);
+  }
+
+  int selected_row_num() override { return cursor()->connection_index; }
+
 private:
   Patch *patch() { return cursor()->patch(); }
   String program_str(Connection *c);

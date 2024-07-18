@@ -12,16 +12,12 @@ MessageBlock *Editor::create_message() {
   return new MessageBlock(UNDEFINED_ID, "New Message");
 }
 
-Trigger *Editor::create_trigger(MidiInput *input) {
+Trigger *Editor::create_trigger() {
   return new Trigger(UNDEFINED_ID, "New Trigger", TriggerAction::NEXT_PATCH, nullptr);
 }
 
 Song *Editor::create_song() {
-  Song *song = new Song(UNDEFINED_ID, "New Song");
-  // TODO consolidate with Storage::create_default_patch
-  Patch *patch = create_patch();
-  add_patch(patch, song);
-  return song;
+  return new Song(UNDEFINED_ID, "New Song");
 }
 
 Patch *Editor::create_patch() {
@@ -39,10 +35,12 @@ SetList *Editor::create_set_list() {
 
 void Editor::add_message(MessageBlock *message) {
   km->add_message(message);
+  km->cursor()->message_index = km->messages().size() - 1;
 }
 
 void Editor::add_trigger(Trigger *trigger) {
   km->add_trigger(trigger);
+  km->cursor()->trigger_index = km->messages().size() - 1;
 }
 
 void Editor::add_song(Song *song) {
@@ -80,20 +78,31 @@ void Editor::add_patch(Patch *patch, Song *song) {
 
 void Editor::add_connection(Connection *connection, Patch *patch)
 {
-  if (patch != nullptr)
-    patch->add_connection(connection);
+  if (patch == nullptr)
+    return;
+
+  patch->add_connection(connection);
+  km->cursor()->connection_index = patch->connections().size() - 1;
 }
 
 void Editor::add_set_list(SetList *set_list) {
   km->add_set_list(set_list);
+  km->cursor()->set_list_index = km->set_lists().size() - 1;
+  km->cursor()->init();
 }
 
 void Editor::destroy_message(MessageBlock *message) {
+  int index = km->messages().indexOf(message);
   km->remove_message(message);
+  if (index >= km->messages().size())
+    km->cursor()->message_index = km->messages().size() - 1;
 }
 
 void Editor::destroy_trigger(Trigger *trigger) {
+  int index = km->triggers().indexOf(trigger);
   km->remove_trigger(trigger);
+  if (index >= km->triggers().size())
+    km->cursor()->message_index = km->triggers().size() - 1;
 }
 
 // Returns true if `message` is not used anywhere.
@@ -122,14 +131,11 @@ bool Editor::ok_to_destroy_song(Song *song) {
 }
 
 bool Editor::ok_to_destroy_patch(Song *song, Patch *patch) {
-  return song != nullptr
-    && song->patches().size() >= 1;
+  return song != nullptr;
 }
 
 bool Editor::ok_to_destroy_connection(Patch *patch, Connection *connection) {
-  return patch != nullptr
-    && connection != nullptr
-    && patch->connections().size() >= 1;
+  return patch != nullptr && connection != nullptr;
 }
 
 bool Editor::ok_to_destroy_set_list(SetList *set_list) {
@@ -167,7 +173,10 @@ void Editor::destroy_patch(Song *song, Patch *patch) {
 }
 
 void Editor::destroy_connection(Patch *patch, Connection *connection) {
+  int index = km->cursor()->connection_index;
   patch->remove_connection(connection);
+  if (index >= patch->connections().size())
+    km->cursor()->connection_index = patch->connections().size() - 1;
 }
 
 void Editor::destroy_set_list(SetList *set_list) {
@@ -199,7 +208,7 @@ void Editor::move_away_from_song(Song *song) {
     return;
   }
 
-  // Nowhere to move. Reini the cursor;
+  // Nowhere to move. Reinit the cursor.
   cursor->init();
 }
 

@@ -11,9 +11,13 @@ public:
   void paintRowBackground(
     Graphics& g, int rowNumber, int _width, int _height, bool rowIsSelected) override
     {
-      if (rowNumber % 2) {
+      if (rowIsSelected) {
+        g.fillAll(Colours::lightblue);
+        g.setColour(Colours::black);
+      }
+      else if (rowNumber % 2) {
         auto alternateColour = _lf.findColour(ListBox::backgroundColourId)
-          .interpolatedWith(_lf.findColour(ListBox::textColourId), 0.03f);
+          .interpolatedWith(_lf.findColour(ListBox::textColourId), 0.1f);
         g.fillAll(alternateColour);
       }
     }
@@ -24,6 +28,8 @@ public:
       g.setColour(_lf.findColour(ListBox::textColourId));
       g.setFont(FontOptions(14.0f));
     }
+
+  virtual int selected_row_num() { return -1; }
 
 protected:
   LookAndFeel &_lf { LookAndFeel::getDefaultLookAndFeel() };
@@ -40,6 +46,9 @@ public:
   void actionListenerCallback(const String &message) override {
     if (message == "moved") {
       updateContent();
+      int selected_row_num = ((KmTableListBoxModel *)getListBoxModel())->selected_row_num();
+      if (selected_row_num >= 0 && selected_row_num <= getListBoxModel()->getNumRows())
+        selectRow(selected_row_num);
       repaint();
     }
   }

@@ -28,7 +28,10 @@ void ConnectionsTableListBoxModel::paintCell(
   String str;
   switch (columnId) {
   case 1:                       // input name
-    str = c->input()->info.name;
+    if (c->input())
+      str = c->input()->info.name;
+    else
+      str = "<not connected>";
     break;
   case 2:                       // input chan
     if (c->input_chan() == CONNECTION_ALL_CHANNELS)
@@ -37,7 +40,10 @@ void ConnectionsTableListBoxModel::paintCell(
       str = String(c->input_chan());
     break;
   case 3:                       // output name
-    str = c->output()->info.name;
+    if (c->output())
+      str = c->output()->info.name;
+    else
+      str = "<not connected>";
     break;
   case 4:                       // output chan
     if (c->output_chan() == CONNECTION_ALL_CHANNELS)

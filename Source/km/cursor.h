@@ -3,6 +3,9 @@
 #include "set_list.h"
 #include "song.h"
 #include "patch.h"
+#include "connection.h"
+#include "message_block.h"
+#include "trigger.h"
 
 class KeyMaster;
 
@@ -13,6 +16,11 @@ public:
   int song_index;
   int patch_index;
 
+  // These are needed for editing though not for MIDI processing
+  int connection_index;
+  int message_index;
+  int trigger_index;
+
   Cursor(KeyMaster *km);
   ~Cursor();
 
@@ -22,6 +30,11 @@ public:
   SetList *set_list();
   Song *song();
   Patch *patch();
+
+  // For editing
+  Connection *connection();
+  MessageBlock *message();
+  Trigger *trigger();
 
   void next_song(bool send_changed = true);
   void prev_song(bool send_changed = true);
@@ -39,9 +52,15 @@ public:
   void jump_to_set_list_index(int i);
   void jump_to_song_index(int i);
   void jump_to_patch_index(int i);
+  void jump_to_connection_index(int i);
+  void jump_to_message_index(int i);
+  void jump_to_trigger_index(int i);
 
   void goto_song(Song *song);
   void goto_patch(Patch *patch);
+  void goto_connection(Connection *connection);
+  void goto_message(MessageBlock *trigger);
+  void goto_trigger(Trigger *trigger);
 
   void goto_song(const String &name_regex);
   void goto_set_list(const String &name_regex);

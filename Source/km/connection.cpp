@@ -184,17 +184,15 @@ void Connection::end_changes() {
 // Takes a MIDI message `msg` from an input, processes it, and sends it to
 // an output (unless it's been filtered out).
 void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
-  if (_input == nullptr || _input != input)
+  if (_input == nullptr || _input != input || _output == nullptr)
     return;
 
   const juce::uint8 *data = msg.getRawData();
   juce::uint8 status = data[0];
 
   // See if the message should even be processed, or if we should stop here.
-  if (!input_channel_ok(status))
+  if (!input_channel_ok(msg))
     return;
-
-  int high_nibble = status & 0xf0;
 
   if (msg.isSysEx())
     _processing_sysex = true;
@@ -237,8 +235,7 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
   MidiMessage cc_msg;
   Controller *cc;
 
-  // TODO use MidiMessage methods like isNoteOn()
-
+  int high_nibble = status & 0xf0;
   switch (high_nibble) {
   case NOTE_ON: case NOTE_OFF: case POLY_PRESSURE:
     if (inside_zone(data[1])) {
@@ -299,11 +296,14 @@ void Connection::remove_cc_num(int cc_num) {
 // - we accept any input channel
 // - it's a system message, not a channel message
 // - the input channel matches our selected `input_chan`
-int Connection::input_channel_ok(int status) {
+int Connection::input_channel_ok(const MidiMessage &msg) {
   if (_input_chan == CONNECTION_ALL_CHANNELS || _processing_sysex)
     return true;
 
-  return is_system(status) || _input_chan == (status & 0x0f);
+  int channel = msg.getChannel();
+  if (channel == 0)             // not a channel message
+    return true;
+  return _input_chan == channel - 1;
 }
 
 int Connection::inside_zone(int note) {

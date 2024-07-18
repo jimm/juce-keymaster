@@ -17,6 +17,12 @@ public:
   void paintCell(Graphics& g, int rowNumber, int columnId,
                  int width, int height, bool rowIsSelected) override;
 
+  virtual void selectedRowsChanged(int lastRowSelected) override {
+    cursor()->jump_to_trigger_index(lastRowSelected);
+  }
+
+  int selected_row_num() override { return cursor()->trigger_index; }
+
 private:
   String input_string(Trigger *t);
   String action_string(Trigger *t);
