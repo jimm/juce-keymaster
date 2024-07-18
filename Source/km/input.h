@@ -11,11 +11,14 @@ public:
 
   using Ptr = ReferenceCountedObjectPtr<Input>;
 
-  static Ptr find_by_id(String identifier);
-
   Input(MidiDeviceInfo info, MidiInputCallback *listener);
+  ~Input();
 
-  Patch *patch_for_message(MidiInput *source, const MidiMessage &msg);
+  void start() override;
+  void stop() override;
+  bool is_running() override { return (bool)device; }
+
+  Patch *patch_for_message(const MidiMessage &msg);
   void send_pending_offs();
 
 private:

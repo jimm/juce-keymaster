@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "consts.h"
+#include "device_manager.h"
 #include "keymaster.h"
 #include "cursor.h"
 
@@ -19,11 +20,14 @@ void set_KeyMaster_instance(KeyMaster *km) {
 
 // ================ allocation ================
 
-KeyMaster::KeyMaster(bool testing)
-  : _doc(nullptr), _cursor(0), _clock(), _running(false), _testing(testing)
+KeyMaster::KeyMaster(DeviceManager &dev_mgr, bool testing)
+  : _device_manager(dev_mgr),
+    _doc(nullptr),
+    _cursor(0),
+    _clock(),
+    _running(false),
+    _testing(testing)
 {
-  initialiseWithDefaultDevices(0, 0); // AudioDeviceManager
-  load_instruments();
   _set_lists.add(new SetList(UNDEFINED_ID, "All Songs"));
   _cursor = new Cursor(this);
   set_KeyMaster_instance(this);
@@ -45,10 +49,6 @@ KeyMaster::~KeyMaster() {
     delete msg;
   for (auto& curve : _curves)
     delete curve;
-
-  _identifier_to_input.clear();
-  _inputs.clear();
-  _outputs.clear();
 }
 
 // ================ accessors ================
@@ -132,30 +132,27 @@ void KeyMaster::stop() {
   _running = false;
 }
 
-void KeyMaster::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) {
+void KeyMaster::midi_in(Input::Ptr input, const MidiMessage& message) {
   if (message.isActiveSense())
+    return;
+
+  if (_cursor == nullptr) // we might get MIDI before we're fully constructed
     return;
 
   // TODO listen for program changes and jump to song
   for (auto &trigger : _triggers)
-    trigger->signal_message(source, message);
-
-  if (_cursor == nullptr) // we might get MIDI before we're fully constructed
-    return;
+    trigger->signal_message(input, message);
 
   // Let the input tell us which patch to use. By default it's the current
   // patch, but if this is a note off or sustain off then we need to send
   // that to the same patch as that used by the corresponding note on or
   // sustain on.
-  Patch *p = _identifier_to_input.contains(source->getIdentifier())
-    ? _identifier_to_input[source->getIdentifier()]->patch_for_message(source, message)
-    : _cursor->patch();
-
-  p->midi_in(source, message);
+  Patch *p = input->patch_for_message(message);
+  p->midi_in(input, message);
 }
 
 void KeyMaster::send_pending_offs() {
-  for (auto input : _inputs)
+  for (auto input : _device_manager.inputs())
     input->send_pending_offs();
 }
 
@@ -173,34 +170,18 @@ void KeyMaster::update_clock() {
 
 // ================ initialization ================
 
+// Call this when you've created a KeyMaster instance that will not then
+// read its data from a file.
 void KeyMaster::initialize() {
   generate_default_curves(this->_curves);
   create_songs();
 }
 
-void KeyMaster::load_instruments() {
-  if (_testing)
-    return;
-
-  _inputs.clear();
-  _identifier_to_input.clear();
-  for (auto info : MidiInput::getAvailableDevices()) {
-    Input::Ptr input = new Input(info, this);
-    _inputs.add(input);
-    _identifier_to_input.set(input->identifier(), input);
-  }
-
-  _outputs.clear();
-  for (auto info : MidiOutput::getAvailableDevices())
-    _outputs.add(new Output(info));
-}
-
 void KeyMaster::create_songs() {
-  for (auto& input : _inputs) {
-
+  for (auto& input : _device_manager.inputs()) {
     // this input to each individual output
-    for (auto& output : _outputs) {
-      String name = input->name() + " -> " + output->name();
+    for (auto& output : _device_manager.outputs()) {
+      String name = input->info.name + " -> " + output->info.name;
       Song *song = new Song(UNDEFINED_ID, name);
       all_songs()->add_song(song);
 
@@ -215,16 +196,16 @@ void KeyMaster::create_songs() {
 
     }
 
-    if (_outputs.size() > 1) {
-      // one more song: this input to all _outputs at once
-      String name = input->name() + " -> all outputs";
+    if (_device_manager.outputs().size() > 1) {
+      // one more song: this input to all outputs at once
+      String name = input->info.name + " -> all outputs";
       Song *song = new Song(UNDEFINED_ID, name);
       all_songs()->add_song(song);
 
       Patch *patch = new Patch(UNDEFINED_ID, name);
       song->add_patch(patch);
 
-      for (auto& output : _outputs) {
+      for (auto& output : _device_manager.outputs()) {
         Connection *conn = new Connection(
           UNDEFINED,
           input, CONNECTION_ALL_CHANNELS,
@@ -321,18 +302,18 @@ void KeyMaster::panic(bool send_notes_off) {
 
   if (send_notes_off) {
     MidiMessageSequence buf;
-    for (int i = 0; i < 16; ++i) {
-      for (int j = 0; j < 128; ++j)
-        buf.addEvent(MidiMessage::noteOff(i, j), 0);
+    for (int chan = 1; chan <= MIDI_CHANNELS; ++chan) { // MidiMessage chans 1-16
+      for (int note = 0; note < 128; ++note)
+        buf.addEvent(MidiMessage::noteOff(chan, note), 0);
     }
   }
   else {
-    for (int i = 0; i < 16; ++i)
-      buf.addEvent(MidiMessage::controllerEvent(i, CM_ALL_NOTES_OFF, 0), 0);
+    for (int chan = 1; chan <= MIDI_CHANNELS; ++chan)
+      buf.addEvent(MidiMessage::controllerEvent(chan, CM_ALL_NOTES_OFF, 0), 0);
   }
 
   for (auto &msg : buf)
-    for (auto &out : _outputs)
+    for (auto &out : _device_manager.outputs())
       out->midi_out(msg->message);
 }
 

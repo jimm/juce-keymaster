@@ -1,4 +1,5 @@
 #include "../km/consts.h"
+#include "../km/device_manager.h"
 #include "../km/keymaster.h"
 #include "../km/trigger.h"
 #include "triggers_table.h"
@@ -42,12 +43,8 @@ void TriggersTableListBoxModel::paintCell(
 }
 
 String TriggersTableListBoxModel::input_string(Trigger *t) {
-  String id = t->trigger_input_identifier();
-  if (id.isEmpty())
-    return "";
-
-  Input::Ptr input = Input::find_by_id(t->trigger_input_identifier());
-  return input ? input->name() : "<not connected>";
+  Input::Ptr input = t->trigger_input();
+  return input ? input->info.name : "<not connected>";
 }
 
 String TriggersTableListBoxModel::action_string(Trigger *t) {

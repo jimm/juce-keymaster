@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "db_obj.h"
+#include "input.h"
 #include "message_block.h"
 #include "nameable.h"
 
@@ -23,7 +24,7 @@ public:
   Trigger(DBObjID id, const String &name, TriggerAction action, MessageBlock *output);
   ~Trigger() {}
 
-  inline String trigger_input_identifier() { return _trigger_input_identifier; }
+  inline Input::Ptr trigger_input() { return _trigger_input; }
   inline int trigger_key_code() { return _trigger_key_code; }
   inline MidiMessage trigger_message() { return _trigger_message; }
   inline TriggerAction action() { return _action; }
@@ -31,15 +32,15 @@ public:
 
   void set_trigger_key_code(int key_code);
   // To erase trigger message, make input == nullptr
-  void set_trigger_message(String input_identifier, MidiMessage message);
+  void set_trigger_message(Input::Ptr input, MidiMessage message);
   void set_action(TriggerAction action);
   void set_output_message(MessageBlock *msg);
 
-  bool signal_message(MidiInput* source, const MidiMessage& message);
+  bool signal_message(Input::Ptr input, const MidiMessage& message);
   bool signal_key(int key_code);
 
 private:
-  String _trigger_input_identifier;
+  Input::Ptr _trigger_input;    // might be nullptr
   int _trigger_key_code;        // might be UNDEFINED
   MidiMessage _trigger_message; // might be EMPTY_MESSAGE
   TriggerAction _action;

@@ -7,14 +7,12 @@ public:
 
   using Ptr = ReferenceCountedObjectPtr<Output>;
 
-  static Ptr find_by_id(String identifier);
+  Output(MidiDeviceInfo info);
+  ~Output();
 
-  Output(MidiDeviceInfo info)
-    : Instrument(info), device(MidiOutput::openDevice(info.identifier))
-    {
-    }
+  bool is_running() override { return (bool)device; }
 
-  void midi_out(MidiMessage &msg) { device->sendMessageNow(msg); }
+  inline void midi_out(MidiMessage &msg) { if (device) device->sendMessageNow(msg); }
 
 private:
   std::unique_ptr<MidiOutput> device;

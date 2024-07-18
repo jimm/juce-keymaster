@@ -1,22 +1,23 @@
 #include <JuceHeader.h>
 #include "MainComponent.h"
+#include "km/device_manager.h"
 
 #define DEFAULT_WINDOW_X (-1)
 #define DEFAULT_WINDOW_Y (-1)
 
 //==============================================================================
-class KeyMasterApplication  : public juce::JUCEApplication
+class KeyMasterApplication  : public JUCEApplication
 {
 public:
   //==============================================================================
   KeyMasterApplication() {}
 
-  const juce::String getApplicationName() override       { return ProjectInfo::projectName; }
-  const juce::String getApplicationVersion() override    { return ProjectInfo::versionString; }
+  const String getApplicationName() override       { return ProjectInfo::projectName; }
+  const String getApplicationVersion() override    { return ProjectInfo::versionString; }
   bool moreThanOneInstanceAllowed() override             { return true; }
 
   //==============================================================================
-  void initialise(const juce::String& commandLine) override
+  void initialise(const String& commandLine) override
     {
       // This method is where you should put your application's initialisation code..
 
@@ -32,8 +33,8 @@ public:
           opt.osxLibrarySubFolder = "Application Support";
           return opt;
         }());
-      
-      mainWindow.reset(new MainWindow(getApplicationName(), app_properties));
+      device_manager.update_devices();
+      mainWindow.reset(new MainWindow(getApplicationName(), device_manager, app_properties));
     }
 
   void shutdown() override
@@ -60,7 +61,7 @@ public:
       quit();
     }
 
-  void anotherInstanceStarted(const juce::String& commandLine) override
+  void anotherInstanceStarted(const String& commandLine) override
     {
       // When another instance of the app is launched while this one is running,
       // this method is invoked, and the commandLine parameter tells you what
@@ -72,18 +73,18 @@ public:
     This class implements the desktop window that contains an instance of
     our MainComponent class.
   */
-  class MainWindow    : public juce::DocumentWindow
+  class MainWindow    : public DocumentWindow
   {
   public:
-    MainWindow(juce::String name, juce::ApplicationProperties &props)
+    MainWindow(String name, DeviceManager &device_manager, ApplicationProperties &props)
       : DocumentWindow(name,
-                       juce::Desktop::getInstance().getDefaultLookAndFeel()
-                       .findColour(juce::ResizableWindow::backgroundColourId),
+                       Desktop::getInstance().getDefaultLookAndFeel()
+                       .findColour(ResizableWindow::backgroundColourId),
                        DocumentWindow::allButtons),
         app_properties(props)
       {
         setUsingNativeTitleBar(true);
-        setContentOwned(new MainComponent(app_properties), true);
+        setContentOwned(new MainComponent(device_manager, app_properties), true);
 
 #if JUCE_IOS || JUCE_ANDROID
         setFullScreen(true);
@@ -118,14 +119,15 @@ public:
     */
 
   private:
-    juce::ApplicationProperties &app_properties;
+    ApplicationProperties &app_properties;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
   };
 
 private:
   std::unique_ptr<MainWindow> mainWindow;
-  juce::ApplicationProperties app_properties;
+  ApplicationProperties app_properties;
+  DeviceManager device_manager;
 };
 
 //==============================================================================

@@ -8,7 +8,7 @@ const MidiMessage EMPTY_MESSAGE = MidiMessage(ACTIVE_SENSE);
 
 Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock *out_msg)
   : DBObj(id), Nameable(name),
-    _trigger_input_identifier(""),
+    _trigger_input(nullptr),
     _trigger_key_code(UNDEFINED),
     _trigger_message(ACTIVE_SENSE),
     _action(ta),
@@ -26,8 +26,10 @@ void Trigger::set_trigger_key_code(int key_code) {
 
 // To erase trigger message, make input == nullptr
 // `message` might be EMPTY_MESSAGE, which will always be ignored.
-void Trigger::set_trigger_message(String input_identifier, MidiMessage message) {
-  _trigger_input_identifier = input_identifier;
+//
+// Reemember that MidiMessage channels go from 1-16
+void Trigger::set_trigger_message(Input::Ptr input, MidiMessage message) {
+  _trigger_input = input;
   _trigger_message = message;
   _trigger_message_num_bytes = message.getRawDataSize();
   KeyMaster_instance()->changed();
@@ -47,8 +49,9 @@ void Trigger::set_output_message(MessageBlock *msg) {
   }
 }
 
-bool Trigger::signal_message(MidiInput* source, const MidiMessage& message) {
-  if (source->getIdentifier() != _trigger_input_identifier
+bool Trigger::signal_message(Input::Ptr input, const MidiMessage& message) {
+  if (input != _trigger_input
+      || !input->is_running()
       || message.getRawDataSize() != _trigger_message_num_bytes
       || memcmp(message.getRawData(), _trigger_message.getRawData(), _trigger_message_num_bytes) != 0)
     return false;

@@ -4,20 +4,20 @@
 #include "clock.h"
 #include "cursor.h"
 #include "curve.h"
+#include "device_manager.h"
 #include "message_block.h"
 #include "set_list.h"
 #include "trigger.h"
 #include "input.h"
 #include "output.h"
 
-class KeyMaster : private AudioDeviceManager, MidiInputCallback {
+class KeyMaster {
 public:
-  KeyMaster(bool testing=false);
+  KeyMaster(DeviceManager &device_manager, bool testing=false);
   ~KeyMaster();
 
   // ================ accessors ================
-  inline ReferenceCountedArray<Input> &inputs() { return _inputs; }
-  inline ReferenceCountedArray<Output> &outputs() { return _outputs; }
+  inline DeviceManager &device_manager() { return _device_manager; }
   inline SetList *all_songs() { return _set_lists[0]; }
   inline Array<SetList *> &set_lists() { return _set_lists; }
   inline Array<Trigger *> &triggers() { return _triggers; }
@@ -46,7 +46,7 @@ public:
   // ================ running ================
   void start();
   void stop();
-  void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
+  void midi_in(Input::Ptr input, const MidiMessage& message);
   void send_pending_offs();
 
   // ================ clock ================
@@ -60,7 +60,6 @@ public:
 
   // ================ initialization ================
   void initialize();
-  void load_instruments();
 
   // ================ movement ================
   void next_patch();
@@ -88,10 +87,8 @@ public:
   void changed() { if (_doc != nullptr) _doc->changed(); }
 
 private:
+  DeviceManager &_device_manager;
   FileBasedDocument *_doc;
-  ReferenceCountedArray<Input> _inputs;
-  ReferenceCountedArray<Output> _outputs;
-  HashMap<String, Input::Ptr> _identifier_to_input;
   Array<Trigger *> _triggers;
   Array<SetList *> _set_lists; // all set lists, including all_songs
   Cursor *_cursor;

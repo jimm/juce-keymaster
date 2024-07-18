@@ -19,7 +19,8 @@ public:
   void send_to_all_outputs();
   void send_to(Output::Ptr);
 
-  // MidiInputCallback method only used when parsing a block of MIDI bytes
+  // This MidiInputCallback method is only called when parsing a block of
+  // MIDI bytes. It will never be called by actual incoming MIDI data.
   void handleIncomingMidiMessage(MidiInput *source, const MidiMessage &message) override;
 
 private:

@@ -2,11 +2,11 @@
 
 class Instrument : public ReferenceCountedObject {
 public:
-  Instrument(MidiDeviceInfo info) : _info(info) {}
+  MidiDeviceInfo info;
 
-  String identifier() { return _info.identifier; }
-  String name() { return _info.name; }
+  Instrument(MidiDeviceInfo mdi) : info(mdi) {}
 
-protected:
-  MidiDeviceInfo _info;
+  virtual void start() {}
+  virtual void stop() {}
+  virtual bool is_running() = 0;
 };

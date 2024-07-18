@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "db_obj.h"
+#include "input.h"
 #include "nameable.h"
 #include "connection.h"
 #include "message_block.h"
@@ -26,7 +27,7 @@ public:
   void add_connection(Connection *conn);
   void remove_connection(Connection *conn);
 
-  void midi_in(MidiInput* source, const MidiMessage& message);
+  void midi_in(Input::Ptr input, const MidiMessage& message);
 
 private:
   Array<Connection *> _connections;

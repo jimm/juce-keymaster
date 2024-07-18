@@ -6,10 +6,11 @@
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
 
-MainComponent::MainComponent(juce::ApplicationProperties &props)
-  : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project")
+MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &props)
+  : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
+    device_manager(dev_mgr)
 {
-  KeyMaster *km = new KeyMaster(); // side-effect: KeyMaster static instance set
+  KeyMaster *km = new KeyMaster(device_manager); // side-effect: KeyMaster static instance set
   km->set_file_based_document(this);
   km->initialize();        // generate default curves and initial song/patch
   setChangedFlag(false);   // initialize will set it to true
@@ -96,7 +97,7 @@ void MainComponent::new_project() {
   saveIfNeededAndUserAgreesAsync([] (SaveResult result) { });
 
   KeyMaster *old_km = KeyMaster_instance();
-  KeyMaster *new_km = new KeyMaster();
+  KeyMaster *new_km = new KeyMaster(device_manager);
   new_km->set_file_based_document(this);
   new_km->initialize();
   setChangedFlag(false);   // initialize will set it to true
@@ -222,7 +223,7 @@ void MainComponent::midi_monitor() {
 
 Result MainComponent::loadDocument(const File &file) {
   KeyMaster *old_km = KeyMaster_instance();
-  Storage s(file);
+  Storage s(device_manager, file);
 
   KeyMaster *new_km = s.load();
   if (s.has_error()) {
@@ -245,7 +246,7 @@ Result MainComponent::loadDocument(const File &file) {
 }
 
 Result MainComponent::saveDocument(const File &file) {
-  Storage s(file);
+  Storage s(device_manager, file);
   s.save(KeyMaster_instance());
   if (s.has_error())
     return Result::fail(s.error());

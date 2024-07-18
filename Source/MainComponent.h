@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "km/device_manager.h"
 #include "gui/connections_table.h"
 #include "gui/menu_manager.h"
 #include "gui/messages_list_box.h"
@@ -21,7 +22,7 @@ class MainComponent : public Component, public FileBasedDocument
 {
 public:
   //==============================================================================
-  MainComponent(ApplicationProperties &app_properties);
+  MainComponent(DeviceManager &device_manager, ApplicationProperties &app_properties);
   ~MainComponent() override;
 
   //==============================================================================
@@ -71,6 +72,7 @@ public:
 
 private:
   //==============================================================================
+  DeviceManager &device_manager;
   File _file;
 
   MenuManager menu_manager;

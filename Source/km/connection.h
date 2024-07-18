@@ -68,7 +68,7 @@ public:
   void begin_changes();
   void end_changes();
 
-  void midi_in(MidiInput* source, const MidiMessage& message);
+  void midi_in(Input::Ptr input, const MidiMessage& message);
 
   void set_controller(Controller *controller);
   void remove_cc_num(int cc_num);

@@ -37,11 +37,11 @@ void Connection::start() {
     int chan = program_change_send_channel();
     if (chan != CONNECTION_ALL_CHANNELS) {
       if (_prog.bank_msb >= 0)
-        midi_out(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_MSB, _prog.bank_msb));
+        midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_MSB, _prog.bank_msb));
       if (_prog.bank_lsb >= 0)
-        midi_out(MidiMessage::controllerEvent(chan, CC_BANK_SELECT_LSB, _prog.bank_lsb));
+        midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_LSB, _prog.bank_lsb));
       if (_prog.prog >= 0)
-        midi_out(MidiMessage::programChange(chan, _prog.prog));
+        midi_out(MidiMessage::programChange(chan+1, _prog.prog));
     }
   }
 
@@ -183,8 +183,8 @@ void Connection::end_changes() {
 
 // Takes a MIDI message `msg` from an input, processes it, and sends it to
 // an output (unless it's been filtered out).
-void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
-  if (_input == nullptr || source->getIdentifier() != _input->identifier())
+void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
+  if (_input == nullptr || _input != input)
     return;
 
   const juce::uint8 *data = msg.getRawData();
@@ -228,17 +228,16 @@ void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
     if (is_realtime(status) && !_message_filter.filter_out(status, 0)) {
       midi_out(MidiMessage(status));
     }
-    if (is_realtime(data[1]) && !_message_filter.filter_out(data[1], 0))
-      midi_out(MidiMessage(data[1]));
-    if (is_realtime(data[2]) && !_message_filter.filter_out(data[2], 0))
-      midi_out(MidiMessage(data[2]));
-    if (is_realtime(data[3]) && !_message_filter.filter_out(data[3], 0))
-      midi_out(MidiMessage(data[3]));
+    for (int i = 1; i <= 3; ++i)
+      if (is_realtime(data[i]) && !_message_filter.filter_out(data[i], 0))
+        midi_out(MidiMessage(data[i]));
     return;
   }
 
   MidiMessage cc_msg;
   Controller *cc;
+
+  // TODO use MidiMessage methods like isNoteOn()
 
   switch (high_nibble) {
   case NOTE_ON: case NOTE_OFF: case POLY_PRESSURE:
@@ -249,7 +248,7 @@ void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
         buf[2] = _velocity_curve->curve[data[2]];
       if (data[1] >= 0 && data[1] <= 127) {
         if (_output_chan != CONNECTION_ALL_CHANNELS)
-          status = high_nibble + _output_chan;
+          status = high_nibble + _output_chan + 1; // MidiMessage chans 1-16
         midi_out(MidiMessage(status, buf[1], buf[2]));
       }
     }
@@ -263,13 +262,13 @@ void Connection::midi_in(MidiInput* source, const MidiMessage& msg) {
     }
     else {
       if (_output_chan != CONNECTION_ALL_CHANNELS)
-        status = high_nibble + _output_chan;
+        status = high_nibble + _output_chan + 1; // MidiMessage chans 1-16
       midi_out(MidiMessage(status, data[1], data[2]));
     }
     break;
   case PROGRAM_CHANGE: case CHANNEL_PRESSURE: case PITCH_BEND:
     if (_output_chan != CONNECTION_ALL_CHANNELS)
-      status = high_nibble + _output_chan;
+      status = high_nibble + _output_chan + 1; // MidiMessage chans 1-16
     midi_out(MidiMessage(status, data[1], data[2]));
     break;
   default:

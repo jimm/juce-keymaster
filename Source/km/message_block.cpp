@@ -51,7 +51,7 @@ String MessageBlock::to_hex(String message_separator) {
 }
 
 void MessageBlock::send_to_all_outputs() {
-  for (auto &out : KeyMaster_instance()->outputs())
+  for (auto &out : KeyMaster_instance()->device_manager().outputs())
     send_to(out);
 }
 
@@ -60,7 +60,8 @@ void MessageBlock::send_to(Output::Ptr out) {
     out->midi_out(msg->message);
 }
 
-// MidiInputCallback method only used when parsing a block of MIDI bytes
+// This MidiInputCallback method is only called when parsing a block of MIDI
+// bytes. It will never be called by actual incoming MIDI data.
 void MessageBlock::handleIncomingMidiMessage(MidiInput *_source, const MidiMessage &message) {
   _midi_messages.addEvent(message, 0);
 }

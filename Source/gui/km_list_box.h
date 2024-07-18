@@ -38,7 +38,9 @@ public:
   void actionListenerCallback(const String &message) override {
     if (message == "moved") {
       updateContent();
-      selectRow(((KmListBoxModel *)getListBoxModel())->selected_row_num());
+      int selected_row_num = ((KmListBoxModel *)getListBoxModel())->selected_row_num();
+      if (selected_row_num >= 0 && selected_row_num <= getListBoxModel()->getNumRows())
+        selectRow(selected_row_num);
       repaint();
     }
   }

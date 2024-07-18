@@ -67,9 +67,9 @@ void Patch::remove_connection(Connection *conn) {
   KeyMaster_instance()->changed();
 }
 
-void Patch::midi_in(MidiInput* source, const MidiMessage& message) {
+void Patch::midi_in(Input::Ptr input, const MidiMessage& message) {
   for (auto conn : _connections)
-    conn->midi_in(source, message);
+    conn->midi_in(input, message);
 }
 
 void Patch::send_message_to_outputs(MessageBlock *message) {

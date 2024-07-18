@@ -6,17 +6,27 @@ Input::Input(MidiDeviceInfo info, MidiInputCallback *listener)
 {
   for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
     sustain_off_patches[chan] = nullptr;
-    for (int note = 0; note < NOTES_PER_CHANNEL; ++note)
+    for (int note = 0; note < 128; ++note)
       note_off_patches[chan][note] = nullptr;
   }
-  device->start();
+  start();
 }
 
-Input::Ptr Input::find_by_id(String identifier) {
-  for (auto &input : KeyMaster_instance()->inputs())
-    if (input->identifier() == identifier)
-      return input;
-  return nullptr;
+Input::~Input() {
+  stop();
+  device.reset();
+}
+
+void Input::start() {
+  if (device)
+    device->start();
+}
+
+void Input::stop() {
+  if (device) {
+    send_pending_offs();
+    device->stop();
+  }
 }
 
 // Note off and sustain off messages must be sent to the same patch as the
@@ -24,7 +34,7 @@ Input::Ptr Input::find_by_id(String identifier) {
 // store the current patch and for off messages we return it.
 //
 // We return the current patch for all other messages.
-Patch * Input::patch_for_message(MidiInput *source, const MidiMessage &msg) {
+Patch * Input::patch_for_message(const MidiMessage &msg) {
   Patch *curr_patch = KeyMaster_instance()->cursor()->patch();
   int channel = msg.getChannel(); // 1-16 or 0 if not a channel message
 
@@ -32,11 +42,13 @@ Patch * Input::patch_for_message(MidiInput *source, const MidiMessage &msg) {
   if (channel == 0)
     return curr_patch;
 
+  --channel;
+
   if (msg.isNoteOff(true)) {    // also checks if note on but velocity zero
     int note_num = msg.getNoteNumber();
-    Patch *p = note_off_patches[channel-1][note_num];
+    Patch *p = note_off_patches[channel][note_num];
     if (p) {
-      note_off_patches[channel-1][note_num] = nullptr;
+      note_off_patches[channel][note_num] = nullptr;
       return p;
     }
     return curr_patch;
@@ -44,21 +56,21 @@ Patch * Input::patch_for_message(MidiInput *source, const MidiMessage &msg) {
 
   if (msg.isNoteOn()) {
     int note_num = msg.getNoteNumber();
-    note_off_patches[channel-1][note_num] = curr_patch;
+    note_off_patches[channel][note_num] = curr_patch;
     return curr_patch;
   }
 
   if (msg.isSustainPedalOff()) {
-    Patch *p = sustain_off_patches[channel-1];
+    Patch *p = sustain_off_patches[channel];
     if (p) {
-      sustain_off_patches[channel-1] = nullptr;
+      sustain_off_patches[channel] = nullptr;
       return p;
     }
     return curr_patch;
   }
 
   if (msg.isSustainPedalOn()) {
-    sustain_off_patches[channel-1] = curr_patch;
+    sustain_off_patches[channel] = curr_patch;
     return curr_patch;
   }
 
@@ -67,13 +79,14 @@ Patch * Input::patch_for_message(MidiInput *source, const MidiMessage &msg) {
 
 void Input::send_pending_offs() {
   for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
+    // MidiMessage chans 1-16
     if (sustain_off_patches[chan] != nullptr) {
-      sustain_off_patches[chan]->midi_in(device.get(), MidiMessage::controllerEvent(chan, CC_SUSTAIN, 0));
+      sustain_off_patches[chan]->midi_in(this, MidiMessage::controllerEvent(chan+1, CC_SUSTAIN, 0));
       sustain_off_patches[chan] = nullptr;
     }
     for (int note = 0; note < NOTES_PER_CHANNEL; ++note) {
       if (note_off_patches[chan][note] != nullptr) {
-        note_off_patches[chan][note]->midi_in(device.get(), MidiMessage::noteOff(chan, note, (uint8)64));
+        note_off_patches[chan][note]->midi_in(this, MidiMessage::noteOff(chan+1, note, (uint8)64));
         note_off_patches[chan][note] = nullptr;
       }
     }

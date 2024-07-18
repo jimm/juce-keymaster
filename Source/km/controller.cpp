@@ -98,7 +98,7 @@ MidiMessage Controller::process(const MidiMessage &msg, int output_chan) {
     return EMPTY_MESSAGE;
 
   int chan = (output_chan != CONNECTION_ALL_CHANNELS)
-    ? output_chan
+    ? output_chan + 1           // MidiMessage chans 1-16
     : msg.getChannel();
   int data2 = msg.getRawData()[2];
 

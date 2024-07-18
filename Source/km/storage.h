@@ -2,13 +2,14 @@
 
 #include <string>
 #include <JuceHeader.h>
+#include "device_manager.h"
 #include "keymaster.h"
 #include "input.h"
 #include "output.h"
 
 class Storage {
 public:
-  Storage(const File &f);
+  Storage(DeviceManager &device_manager, const File &f);
   ~Storage();
 
   KeyMaster *load(bool testing = false);
@@ -17,6 +18,7 @@ public:
   String error();
 
 private:
+  DeviceManager &device_manager;
   KeyMaster *km;
   const File &file;
   int loading_version;
@@ -51,8 +53,8 @@ private:
   void create_default_patches();
   void create_default_patch(Song *);
 
-  Input::Ptr find_input_by_id(const char * const, DBObjID, const String &);
-  Output::Ptr find_output_by_id(const char * const, DBObjID, const String &);
+  Input::Ptr find_input(const String &, const String &);
+  Output::Ptr find_output(const String &, const String &);
   MessageBlock *find_message_by_id(const char * const, DBObjID, DBObjID);
   Song *find_song_by_id(const char * const, DBObjID, DBObjID);
   void set_find_error_message(const char * const, DBObjID,

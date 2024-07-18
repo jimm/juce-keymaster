@@ -44,6 +44,10 @@
       <FILE id="RQZMY5" name="curve.cpp" compile="1" resource="0" file="Source/km/curve.cpp"/>
       <FILE id="xEnEXe" name="curve.h" compile="0" resource="0" file="Source/km/curve.h"/>
       <FILE id="zConXR" name="db_obj.h" compile="0" resource="0" file="Source/km/db_obj.h"/>
+      <FILE id="NcbsfT" name="device_manager.cpp" compile="1" resource="0"
+            file="Source/km/device_manager.cpp"/>
+      <FILE id="RnLMDD" name="device_manager.h" compile="0" resource="0"
+            file="Source/km/device_manager.h"/>
       <FILE id="GNNYht" name="editor.cpp" compile="1" resource="0" file="Source/km/editor.cpp"/>
       <FILE id="WZkXMj" name="editor.h" compile="0" resource="0" file="Source/km/editor.h"/>
       <FILE id="trzsny" name="error.cpp" compile="1" resource="0" file="Source/km/error.cpp"/>
@@ -64,7 +68,7 @@
             file="Source/km/message_filter.h"/>
       <FILE id="bV5W6P" name="nameable.cpp" compile="1" resource="0" file="Source/km/nameable.cpp"/>
       <FILE id="ekPF4B" name="nameable.h" compile="0" resource="0" file="Source/km/nameable.h"/>
-      <FILE id="fQBZsc" name="output.cpp" compile="1" resource="0" file="Source/km/output.cpp"/>
+      <FILE id="zEbbRN" name="output.cpp" compile="1" resource="0" file="Source/km/output.cpp"/>
       <FILE id="SVOY67" name="output.h" compile="0" resource="0" file="Source/km/output.h"/>
       <FILE id="rLm8bY" name="patch.cpp" compile="1" resource="0" file="Source/km/patch.cpp"/>
       <FILE id="Pe5kri" name="patch.h" compile="0" resource="0" file="Source/km/patch.h"/>

@@ -1,7 +1,7 @@
 #include <JuceHeader.h>
 #include "keymaster.h"
 #include "consts.h"
-#include "cursor.h"
+#include "device_manager.h"
 #include "storage.h"
 #include "formatter.h"
 #include "input.h"
@@ -9,7 +9,9 @@
 
 #define SCHEMA_VERSION 1
 
-Storage::Storage(const File &f) : file(f), loading_version(0) {
+Storage::Storage(DeviceManager &dev_mgr, const File &f)
+  : device_manager(dev_mgr), file(f), loading_version(0)
+{
 }
 
 Storage::~Storage() {
@@ -19,7 +21,7 @@ Storage::~Storage() {
 KeyMaster *Storage::load(bool testing) {
   KeyMaster *curr_km = KeyMaster_instance();
 
-  km = new KeyMaster(testing); // side-effect: KeyMaster static instance set
+  km = new KeyMaster(device_manager, testing); // side-effect: KeyMaster static instance set
 
   var data;
   auto result = JSON::parse(file.loadFileAsString(), data);
@@ -125,10 +127,12 @@ void Storage::load_triggers(var triggers) {
 
     auto bytes_str = (String)vmsg.getProperty("bytes", v);
     if (vmsg.hasProperty("input_identifier")) {
+      Input::Ptr input = find_input(
+        (String)vmsg.getProperty("input_identifier", v),
+        (String)vmsg.getProperty("input_name", v));
       MessageBlock mblock(UNDEFINED_ID, "");
       mblock.from_hex_string((String)vmsg.getProperty("trigger_message_bytes", v));
-      t->set_trigger_message((String)vmsg.getProperty("input_identifier", v),
-                             mblock.midi_messages().getEventPointer(0)->message);
+      t->set_trigger_message(input, mblock.midi_messages().getEventPointer(0)->message);
     }
     if (vmsg.hasProperty("key_code"))
       t->set_trigger_key_code((int)vmsg.getProperty("key_code", v));
@@ -182,13 +186,13 @@ void Storage::create_default_patches() {
 void Storage::create_default_patch(Song *s) {
   Patch *p = new Patch(UNDEFINED_ID, s->name());
   s->add_patch(p);
-  if (km->inputs().isEmpty() || km->outputs().isEmpty())
+  if (device_manager.inputs().isEmpty() || device_manager.outputs().isEmpty())
     return;
   Connection *conn =
     new Connection(UNDEFINED_ID,
-                   km->inputs().size() > 0 ? km->inputs()[0] : nullptr,
+                   device_manager.inputs().size() > 0 ? device_manager.inputs()[0] : nullptr,
                    CONNECTION_ALL_CHANNELS,
-                   km->outputs().size() > 0 ? km->outputs()[0] : nullptr,
+                   device_manager.outputs().size() > 0 ? device_manager.outputs()[0] : nullptr,
                    CONNECTION_ALL_CHANNELS);
   p->add_connection(conn);
 }
@@ -199,11 +203,13 @@ void Storage::load_connections(Patch *patch, var connections) {
   for (int i = 0; i < connections.size(); ++i) {
     var vconn = connections[i];
     String input_identifier = (String)vconn.getProperty("input_id", v);
+    String input_name = (String)vconn.getProperty("input_name", v);
     String output_identifier = (String)vconn.getProperty("output_id", v);
+    String output_name = (String)vconn.getProperty("output_name", v);
     Connection *c = new Connection(UNDEFINED_ID,
-                                   find_input_by_id("conn", UNDEFINED_ID, input_identifier),
+                                   find_input(input_identifier, input_name),
                                    (int)vconn.getProperty("input_chan", undef),
-                                   find_output_by_id("conn", UNDEFINED_ID, output_identifier),
+                                   find_output(output_identifier, output_name),
                                    (int)vconn.getProperty("output_chan", undef));
 
     c->set_program_bank_msb((int)vconn.getProperty("bank_msb", undef));
@@ -356,8 +362,9 @@ var Storage::triggers() {
     int action_int = (int)trigger->action();
     t->setProperty("action", var(action_int));
 
-    if (trigger->trigger_input_identifier().isNotEmpty()) {
-      t->setProperty("input_identifier", var(trigger->trigger_input_identifier()));
+    if (trigger->trigger_input()) {
+      t->setProperty("input_identifier", var(trigger->trigger_input()->info.identifier));
+      t->setProperty("input_name", var(trigger->trigger_input()->info.name));
       t->setProperty("trigger_message_bytes",
                      var(String::toHexString(trigger->trigger_message().getRawData(),
                                              trigger->trigger_message().getRawDataSize())));
@@ -405,8 +412,10 @@ var Storage::connections(Array<Connection *> &connections) {
   Array<var> cs;
   for (auto conn : connections) {
     DynamicObject::Ptr c(new DynamicObject());
-    c->setProperty("input_id", conn->input()->identifier());
-    c->setProperty("output_id", conn->output()->identifier());
+    c->setProperty("input_id", conn->input()->info.identifier);
+    c->setProperty("input_name", conn->input()->info.name);
+    c->setProperty("output_id", conn->output()->info.identifier);
+    c->setProperty("output_name", conn->output()->info.name);
     if (conn->input_chan() != UNDEFINED)
       c->setProperty("input_chan", conn->input_chan());
     if (conn->output_chan() != UNDEFINED)
@@ -501,26 +510,12 @@ var Storage::set_lists() {
 // find by id
 // ================================================================
 
-Input::Ptr Storage::find_input_by_id(
-  const char * const searcher_name, DBObjID searcher_id, const String &id
-) {
-  Input::Ptr input = Input::find_by_id(id);
-  if (input)
-    return input;
-
-  set_find_error_message(searcher_name, searcher_id, "input", id);
-  return nullptr;
+Input::Ptr Storage::find_input(const String &id, const String &name) {
+  return device_manager.find_or_create_input(id, name);
 }
 
-Output::Ptr Storage::find_output_by_id(
-  const char * const searcher_name, DBObjID searcher_id, const String &id
-) {
-  Output::Ptr output = Output::find_by_id(id);
-  if (output)
-    return output;
-
-  set_find_error_message(searcher_name, searcher_id, "output", id);
-  return nullptr;
+Output::Ptr Storage::find_output(const String &id, const String &name) {
+  return device_manager.find_or_create_output(id, name);
 }
 
 MessageBlock *Storage::find_message_by_id(
@@ -558,75 +553,3 @@ void Storage::set_find_error_message(
   error_str = String::formatted("%s (%lld) can't find %s with id ");
   error_str += find_id;
 }
-
-// ================================================================
-
-// int Storage::int_or_null(sqlite3_stmt *stmt, int col_num, int null_val) {
-//   return sqlite3_column_type(stmt, col_num) == SQLITE_NULL
-//     ? null_val
-//     : sqlite3_column_int(stmt, col_num);
-// }
-
-// sqlite3_int64 Storage::id_or_null(sqlite3_stmt *stmt, int col_num, sqlite3_int64 null_val) {
-//   return sqlite3_column_type(stmt, col_num) == SQLITE_NULL
-//     ? null_val
-//     : sqlite3_column_int64(stmt, col_num);
-// }
-
-// const char *Storage::text_or_null(sqlite3_stmt *stmt, int col_num, const char *null_val) {
-//   return sqlite3_column_type(stmt, col_num) == SQLITE_NULL
-//     ? null_val
-//     : (const char *)sqlite3_column_text(stmt, col_num);
-// }
-
-// void Storage::bind_obj_id_or_null(sqlite3_stmt *stmt, int col_num, DBObj *obj_ptr) {
-//   if (obj_ptr == nullptr || obj_ptr->id() == UNDEFINED_ID)
-//     sqlite3_bind_null(stmt, col_num);
-//   else
-//     sqlite3_bind_int64(stmt, col_num, obj_ptr->id());
-// }
-
-// void Storage::bind_int_or_null(sqlite3_stmt *stmt, int col_num, int val, int nullval) {
-//   if (val == nullval)
-//     sqlite3_bind_null(stmt, col_num);
-//   else
-//     sqlite3_bind_int(stmt, col_num, val);
-// }
-
-// void Storage::extract_id(DBObj *db_obj) {
-//   db_obj->set_id(sqlite3_last_insert_rowid(db));
-// }
-
-// // FIXME use standard Message output format 007f35b0
-// //
-// // Parses a single array of chars of length <= 6 representing a single
-// // non-separated MIDI messages like 'b0357f'. Returns a MidiMessage. If
-// // `bytes` is null, returns a message containing all zeroes.
-// MidiMessage Storage::single_message_from_hex_bytes(char *bytes) {
-//   if (bytes == nullptr)
-//     return Pm_Message(0, 0, 0);
-
-//   // FIXME same as inner loop of messages_from_chars in message.cpp
-//   unsigned char byte;
-//   MidiMessage msg = 0;
-
-//   for (int i = 0; i < 4; ++i) {
-//     msg <<= 8;
-//     msg += hex_to_byte(bytes);
-//     bytes += 2;
-//   }
-
-//   return msg;
-// }
-
-// // FIXME use standard Message format 007f35b0
-// String Storage::single_message_to_hex_bytes(MidiMessage msg) {
-//   char buf[16], *p = buf;
-
-//   for (int i = 0; i < 4; ++i) {
-//     snprintf(p, 3, "%02x", (unsigned char)(msg & 0xff));
-//     msg >>= 8;
-//     p += 2;
-//   }
-//   return string(buf);
-// }

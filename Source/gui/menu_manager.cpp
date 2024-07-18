@@ -115,6 +115,8 @@ void MenuManager::getAllCommands (Array<CommandID>& c) {
 
 void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) {
   KeyMaster *km = KeyMaster_instance();
+  Song *song;
+  Patch *patch;
 
   switch (commandID) {
   // ==== File
@@ -184,9 +186,11 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     break;
   case CommandIDs::delete_message:
     result.setInfo("Delete Message", "Quits KeyMaster", "Edit", 0);
+    result.setActive(km->messages().size() > 0);
     break;
   case CommandIDs::delete_trigger:
     result.setInfo("Delete Trigger", "Quits KeyMaster", "Edit", 0);
+    result.setActive(km->triggers().size() > 0);
     break;
   case CommandIDs::delete_song:
     result.setInfo("Delete Song", "Quits KeyMaster", "Edit", 0);
@@ -194,11 +198,13 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     break;
   case CommandIDs::delete_patch:
     result.setInfo("Delete Patch", "Quits KeyMaster", "Edit", 0);
-    result.setActive(km->cursor()->song()->patches().size() > 0);
+    song = km->cursor()->song();
+    result.setActive(song != nullptr && song->patches().size() > 0);
     break;
   case CommandIDs::delete_connection:
     result.setInfo("Delete Connection", "Quits KeyMaster", "Edit", 0);
-    result.setActive(km->cursor()->patch()->connections().size() > 0);
+    patch = km->cursor()->patch();
+    result.setActive(patch != nullptr && patch->connections().size() > 0);
     break;
   case CommandIDs::delete_set_list:
     result.setInfo("Delete Set List", "Quits KeyMaster", "Edit", 0);
