@@ -21,6 +21,20 @@ Connection::Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr ou
     _cc_maps[i] = nullptr;
 }
 
+Connection::Connection(const Connection &other) noexcept
+  : DBObj(0),                   // don't need to worry about this; not saving/loading
+    _input(other._input), _output(other._output),
+    _input_chan(other._input_chan), _output_chan(other._output_chan),
+    _prog(other._prog),
+    _zone(other._zone),
+    _xpose(other._xpose), _velocity_curve(other._velocity_curve),
+    _processing_sysex(false),
+    _running(false), _changing_was_running(false)
+{
+    for (int i = 0; i < 128; ++i)
+    _cc_maps[i] = other._cc_maps[i];
+}
+
 Connection::~Connection() {
   _input = nullptr;
   _output = nullptr;

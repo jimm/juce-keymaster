@@ -22,6 +22,7 @@ typedef struct zone {
 class Connection : public DBObj {
 public:
   Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr output, int out_chan);
+  Connection(const Connection &other) noexcept;
   ~Connection();
 
   inline Input::Ptr input() { return _input; }

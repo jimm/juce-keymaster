@@ -3,6 +3,7 @@
 #include "km/editor.h"
 #include "km/keymaster.h"
 #include "km/storage.h"
+#include "gui/connection_dialog_component.h"
 
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
@@ -204,8 +205,36 @@ void MainComponent::new_connection() {
   Editor e;
   Patch *p = KeyMaster_instance()->cursor()->patch();
   Connection *c = e.create_connection(nullptr, nullptr);
-  e.add_connection(c, p);
-  // TODO open editor
+
+  // open editor
+
+  auto *alert_window = new AlertWindow("New Connection", "Create a new connection", MessageBoxIconType::NoIcon);
+  enum NewConnResult { cancel, ok };
+  alert_window->addButton("Cancel", NewConnResult::cancel);
+  alert_window->addButton("Ok", NewConnResult::ok);
+
+  alert_window->enterModalState(true, ModalCallbackFunction::create([ref = SafePointer{this}, e, c, p] (int result) {
+    if (ref == nullptr)
+      return;
+    if (result == NewConnResult::ok) {
+      e.add_connection(c, p);
+      ref->update();
+    }
+    else
+      delete c;
+  }), true);
+
+  // DialogWindow::LaunchOptions opts;
+  // opts.dialogTitle = "Connection";
+  // opts.dialogBackgroundColour = getLookAndFeel().findColour(ResizableWindow::backgroundColourId);
+  // opts.escapeKeyTriggersCloseButton = false;
+  // opts.resizable = false;
+  // opts.content.setOwned(new ConnectionDialogComponent(p, c));
+  // opts.content->setSize(300, 200);
+  // auto dialog_win = opts.launchAsync();
+  // if (dialog_win != nullptr)
+  //   dialog_win->centreWithSize(300, 200);
+  // // TODO wait for it to close and then update content if anything changed
 
   connections_table.updateContent();
 }

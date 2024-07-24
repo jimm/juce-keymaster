@@ -33,17 +33,17 @@ SetList *Editor::create_set_list() {
   return new SetList(UNDEFINED_ID, "New Set List");
 }
 
-void Editor::add_message(MessageBlock *message) {
+void Editor::add_message(MessageBlock *message) const {
   km->add_message(message);
   km->cursor()->message_index = km->messages().size() - 1;
 }
 
-void Editor::add_trigger(Trigger *trigger) {
+void Editor::add_trigger(Trigger *trigger) const {
   km->add_trigger(trigger);
   km->cursor()->trigger_index = km->messages().size() - 1;
 }
 
-void Editor::add_song(Song *song) {
+void Editor::add_song(Song *song) const {
   km->all_songs()->add_song(song);
   km->sort_all_songs();
 
@@ -67,17 +67,17 @@ void Editor::add_song(Song *song) {
   km->goto_song(song);
 }
 
-void Editor::add_patch(Patch *patch) {
+void Editor::add_patch(Patch *patch) const {
   add_patch(patch, km->cursor()->song());
 }
 
-void Editor::add_patch(Patch *patch, Song *song) {
+void Editor::add_patch(Patch *patch, Song *song) const {
   song->patches().add(patch);
   km->goto_patch(patch);
 }
 
 void Editor::add_connection(Connection *connection, Patch *patch)
-{
+const {
   if (patch == nullptr)
     return;
 
@@ -85,7 +85,7 @@ void Editor::add_connection(Connection *connection, Patch *patch)
   km->cursor()->connection_index = patch->connections().size() - 1;
 }
 
-void Editor::add_set_list(SetList *set_list) {
+void Editor::add_set_list(SetList *set_list) const {
   km->add_set_list(set_list);
   km->cursor()->set_list_index = km->set_lists().size() - 1;
   km->cursor()->init();

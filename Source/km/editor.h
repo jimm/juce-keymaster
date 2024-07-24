@@ -14,13 +14,13 @@ public:
   Connection *create_connection(Input::Ptr input, Output::Ptr output);
   SetList *create_set_list();
 
-  void add_message(MessageBlock *message);
-  void add_trigger(Trigger *trigger);
-  void add_song(Song *song);
-  void add_patch(Patch *patch);
-  void add_patch(Patch *patch, Song *song);
-  void add_connection(Connection *connection, Patch *patch);
-  void add_set_list(SetList *set_list);
+  void add_message(MessageBlock *message) const;
+  void add_trigger(Trigger *trigger) const;
+  void add_song(Song *song) const;
+  void add_patch(Patch *patch) const;
+  void add_patch(Patch *patch, Song *song) const;
+  void add_connection(Connection *connection, Patch *patch) const;
+  void add_set_list(SetList *set_list) const;
 
   bool ok_to_destroy_message(MessageBlock *message);
   bool ok_to_destroy_trigger(Trigger *trigger);
