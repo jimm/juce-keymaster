@@ -1,14 +1,15 @@
 PROJ_DIR = Builds/MacOSX
 APP_DIR = $(PROJ_DIR)/build/Debug
 SCHEME = 'KeyMaster - App'
+DESTINATION = 'platform=macOS,name=Any Mac'
 
 .PHONY: build
 build:
-	cd $(PROJ_DIR) && xcodebuild -scheme $(SCHEME) build
+	cd $(PROJ_DIR) && xcodebuild -scheme $(SCHEME) -destination $(DESTINATION) build
 
 .PHONY: test
 test:
-	cd $(PROJ_DIR) && xcodebuild -scheme $(SCHEME) build-for-testing
+	cd $(PROJ_DIR) && xcodebuild -scheme $(SCHEME) -destination $(DESTINATION) -quiet build-for-testing
 
 .PHONY: run
 run:
