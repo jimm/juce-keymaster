@@ -6,10 +6,6 @@
               bundleIdentifier="jimm.KeyMaster" cppLanguageStandard="20">
   <MAINGROUP id="vDaUrm" name="KeyMaster">
     <GROUP id="{9BE1D933-937C-5CFF-F347-C7F459F49700}" name="gui">
-      <FILE id="ehotZS" name="connection_dialog_component.cpp" compile="1"
-            resource="0" file="Source/gui/connection_dialog_component.cpp"/>
-      <FILE id="gwRK2H" name="connection_dialog_component.h" compile="0"
-            resource="0" file="Source/gui/connection_dialog_component.h"/>
       <FILE id="VlgiOB" name="connections_table.cpp" compile="1" resource="0"
             file="Source/gui/connections_table.cpp"/>
       <FILE id="UrMJqx" name="connections_table.h" compile="0" resource="0"
@@ -109,8 +105,11 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="KeyMaster"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="KeyMaster"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="KeyMaster" osxCompatibility="10.13 SDK"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="KeyMaster" osxCompatibility="10.13 SDK"/>
+        <CONFIGURATION isDebug="1" name="Test" targetName="KeyMaster" extraLinkerFlags="-lCatch2Main -lCatch2"
+                       libraryPath="/opt/homebrew/lib" defines="KM_TEST=1" headerPath="/opt/homebrew/include"
+                       macOSDeploymentTarget="14.0" osxCompatibility="14.0 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
@@ -128,7 +127,7 @@
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="1" name="Debug" defines="KM_TEST=1"/>
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

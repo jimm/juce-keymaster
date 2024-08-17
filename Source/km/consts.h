@@ -1,6 +1,6 @@
 #pragma once
 
-// KeyMaster constants
+// KeyMaster constants and enums
 
 #define UNDEFINED (-1)
 #define UNDEFINED_ID (-1L)
@@ -8,6 +8,11 @@
 #define CONTROLLER_BLOCK (-1)
 #define INSTRUMENT_TYPE_INPUT 0
 #define INSTRUMENT_TYPE_OUTPUT 1
+
+enum DialogResult {
+  cancel,
+  ok
+};
 
 // MIDI constants
 

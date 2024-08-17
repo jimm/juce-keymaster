@@ -132,4 +132,6 @@ private:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
+#ifndef KM_TEST
 START_JUCE_APPLICATION(KeyMasterApplication)
+#endif
