@@ -46,7 +46,6 @@ public:
   // ================ running ================
   void start();
   void stop();
-  void midi_in(Input::Ptr input, const MidiMessage& message);
   void send_pending_offs();
 
   // ================ clock ================

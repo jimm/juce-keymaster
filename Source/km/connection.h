@@ -74,6 +74,10 @@ public:
   void set_controller(Controller *controller);
   void remove_cc_num(int cc_num);
 
+protected:
+  void midi_out(MidiMessage *);
+  void midi_out(MidiMessage);
+
 private:
   Input::Ptr _input;
   Output::Ptr _output;
@@ -91,7 +95,4 @@ private:
 
   int input_channel_ok(const MidiMessage &message);
   int inside_zone(int note);
-
-  void midi_out(MidiMessage *);
-  void midi_out(MidiMessage);
 };

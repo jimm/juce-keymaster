@@ -7,6 +7,7 @@ public:
 
   using Ptr = ReferenceCountedObjectPtr<Output>;
 
+  Output() {}                   // for testing
   Output(MidiDeviceInfo info);
   ~Output();
 

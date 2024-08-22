@@ -132,25 +132,6 @@ void KeyMaster::stop() {
   _running = false;
 }
 
-void KeyMaster::midi_in(Input::Ptr input, const MidiMessage& message) {
-  if (message.isActiveSense())
-    return;
-
-  if (_cursor == nullptr) // we might get MIDI before we're fully constructed
-    return;
-
-  // TODO listen for program changes and jump to song
-  for (auto &trigger : _triggers)
-    trigger->signal_message(input, message);
-
-  // Let the input tell us which patch to use. By default it's the current
-  // patch, but if this is a note off or sustain off then we need to send
-  // that to the same patch as that used by the corresponding note on or
-  // sustain on.
-  Patch *p = input->patch_for_message(message);
-  p->midi_in(input, message);
-}
-
 void KeyMaster::send_pending_offs() {
   for (auto input : _device_manager.inputs())
     input->send_pending_offs();

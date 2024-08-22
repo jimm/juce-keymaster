@@ -8,7 +8,7 @@ DeviceManager::~DeviceManager() {
 
 void DeviceManager::handleIncomingMidiMessage (MidiInput *source, const MidiMessage &message) {
   Input::Ptr input = find_input(source->getIdentifier());
-  KeyMaster_instance()->midi_in(input, message);
+  input->midi_in(message);
 }
 
 void DeviceManager::update_devices() {

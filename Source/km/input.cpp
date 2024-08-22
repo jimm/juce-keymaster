@@ -1,20 +1,28 @@
 #include "keymaster.h"
 #include "input.h"
 
+Input::Input() {
+  initialize();
+}
+
 Input::Input(MidiDeviceInfo info, MidiInputCallback *listener)
   : Instrument(info), device(MidiInput::openDevice(info.identifier, listener))
 {
+  initialize();
+}
+
+Input::~Input() {
+  stop();
+  device.reset();
+}
+
+void Input::initialize() {
   for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
     sustain_off_patches[chan] = nullptr;
     for (int note = 0; note < 128; ++note)
       note_off_patches[chan][note] = nullptr;
   }
   start();
-}
-
-Input::~Input() {
-  stop();
-  device.reset();
 }
 
 void Input::start() {
@@ -27,6 +35,26 @@ void Input::stop() {
     send_pending_offs();
     device->stop();
   }
+}
+
+void Input::midi_in(const MidiMessage &message) {
+  if (message.isActiveSense())
+    return;
+
+  KeyMaster *km = KeyMaster_instance();
+  if (km->cursor() == nullptr) // we might get MIDI before we're fully constructed
+    return;
+
+  // TODO listen for program changes and jump to song
+  for (auto &trigger : km->triggers())
+    trigger->signal_message(this, message);
+
+  // Let the input tell us which patch to use. By default it's the current
+  // patch, but if this is a note off or sustain off then we need to send
+  // that to the same patch as that used by the corresponding note on or
+  // sustain on.
+  Patch *p = patch_for_message(message);
+  p->midi_in(this, message);
 }
 
 // Note off and sustain off messages must be sent to the same patch as the

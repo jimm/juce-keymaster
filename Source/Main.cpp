@@ -1,6 +1,9 @@
 #include <JuceHeader.h>
 #include "MainComponent.h"
 #include "km/device_manager.h"
+#ifdef JUCE_DEBUG
+#include "test/connection_test.h"
+#endif
 
 #define DEFAULT_WINDOW_X (-1)
 #define DEFAULT_WINDOW_Y (-1)
@@ -19,7 +22,22 @@ public:
   //==============================================================================
   void initialise(const String& commandLine) override
     {
-      // This method is where you should put your application's initialisation code..
+#ifdef JUCE_DEBUG
+      int failures = 0;
+
+      DBG("DEBUG BUILD, Running tests first");
+      UnitTestRunner unitTestRunner;
+      unitTestRunner.setPassesAreLogged(true);
+      unitTestRunner.runAllTests();
+      DBG("unitTestRunner.getNumResults() = " << unitTestRunner.getNumResults());
+      for (int i = 0; i < unitTestRunner.getNumResults(); ++i) {
+        failures += unitTestRunner.getResult(i)->failures;
+      }
+      if (failures > 0)
+        exit(3);
+#endif
+
+      // This method is where you should put your application's initialisation code.
 
       app_properties.setStorageParameters ([&]
         {
@@ -132,6 +150,4 @@ private:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-#ifndef KM_TEST
 START_JUCE_APPLICATION(KeyMasterApplication)
-#endif
