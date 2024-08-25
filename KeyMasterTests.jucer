@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="Z2Xzcp" name="KeyMasterTests" projectType="consoleapp" bundleIdentifier="jimm.KeyMasterTests"
+              defines="JUCE_UNIT_TESTS=1" useAppConfig="0" addUsingNamespaceToJuceHeader="1"
+              jucerFormatVersion="1" projectLineFeed="&#10;" companyWebsite="jimmenard.com"
+              companyEmail="jim@jimmenard.com" cppLanguageStandard="20">
+  <MAINGROUP id="GZdWCU" name="KeyMasterTests">
+    <GROUP id="{2D13EFE9-20B2-3366-E377-7969F828231B}" name="test">
+      <FILE id="kpaZjR" name="connection_test.cpp" compile="1" resource="0"
+            file="Source/test/connection_test.cpp"/>
+      <FILE id="WKtadL" name="connection_test.h" compile="0" resource="0"
+            file="Source/test/connection_test.h"/>
+      <FILE id="sIRprU" name="testdata.kmst" compile="0" resource="1" file="Source/test/testdata.kmst"/>
+    </GROUP>
+    <GROUP id="{6B97B8E9-F772-9A2A-7F62-28BEC2B37207}" name="km">
+      <FILE id="fwkLY5" name="clock.cpp" compile="1" resource="0" file="Source/km/clock.cpp"/>
+      <FILE id="VpQhz9" name="clock.h" compile="0" resource="0" file="Source/km/clock.h"/>
+      <FILE id="wQ984a" name="connection.cpp" compile="1" resource="0" file="Source/km/connection.cpp"/>
+      <FILE id="UtmM2l" name="connection.h" compile="0" resource="0" file="Source/km/connection.h"/>
+      <FILE id="NJ1mVu" name="consts.h" compile="0" resource="0" file="Source/km/consts.h"/>
+      <FILE id="ic2Mlz" name="controller.cpp" compile="1" resource="0" file="Source/km/controller.cpp"/>
+      <FILE id="reuJKC" name="controller.h" compile="0" resource="0" file="Source/km/controller.h"/>
+      <FILE id="es2Ctw" name="cursor.cpp" compile="1" resource="0" file="Source/km/cursor.cpp"/>
+      <FILE id="SqKtfi" name="cursor.h" compile="0" resource="0" file="Source/km/cursor.h"/>
+      <FILE id="XqmSrc" name="curve.cpp" compile="1" resource="0" file="Source/km/curve.cpp"/>
+      <FILE id="L0zyKI" name="curve.h" compile="0" resource="0" file="Source/km/curve.h"/>
+      <FILE id="rUhnt0" name="db_obj.h" compile="0" resource="0" file="Source/km/db_obj.h"/>
+      <FILE id="PBkddu" name="device_manager.cpp" compile="1" resource="0"
+            file="Source/km/device_manager.cpp"/>
+      <FILE id="JP3ck8" name="device_manager.h" compile="0" resource="0"
+            file="Source/km/device_manager.h"/>
+      <FILE id="Dc69SX" name="editor.cpp" compile="1" resource="0" file="Source/km/editor.cpp"/>
+      <FILE id="xmkOxF" name="editor.h" compile="0" resource="0" file="Source/km/editor.h"/>
+      <FILE id="S8zCp7" name="error.cpp" compile="1" resource="0" file="Source/km/error.cpp"/>
+      <FILE id="fQ1yUc" name="error.h" compile="0" resource="0" file="Source/km/error.h"/>
+      <FILE id="fR0rda" name="formatter.cpp" compile="1" resource="0" file="Source/km/formatter.cpp"/>
+      <FILE id="gfGGh8" name="formatter.h" compile="0" resource="0" file="Source/km/formatter.h"/>
+      <FILE id="hKkCIX" name="input.cpp" compile="1" resource="0" file="Source/km/input.cpp"/>
+      <FILE id="p6oowB" name="input.h" compile="0" resource="0" file="Source/km/input.h"/>
+      <FILE id="CxMRHk" name="instrument.h" compile="0" resource="0" file="Source/km/instrument.h"/>
+      <FILE id="ZZMlum" name="keymaster.cpp" compile="1" resource="0" file="Source/km/keymaster.cpp"/>
+      <FILE id="lDql5H" name="keymaster.h" compile="0" resource="0" file="Source/km/keymaster.h"/>
+      <FILE id="TzTZ2D" name="message_block.cpp" compile="1" resource="0"
+            file="Source/km/message_block.cpp"/>
+      <FILE id="EChBcd" name="message_block.h" compile="0" resource="0" file="Source/km/message_block.h"/>
+      <FILE id="sTnSiV" name="message_filter.cpp" compile="1" resource="0"
+            file="Source/km/message_filter.cpp"/>
+      <FILE id="sCvROu" name="message_filter.h" compile="0" resource="0"
+            file="Source/km/message_filter.h"/>
+      <FILE id="diJeso" name="nameable.cpp" compile="1" resource="0" file="Source/km/nameable.cpp"/>
+      <FILE id="iEPOus" name="nameable.h" compile="0" resource="0" file="Source/km/nameable.h"/>
+      <FILE id="JZZOPO" name="output.cpp" compile="1" resource="0" file="Source/km/output.cpp"/>
+      <FILE id="AIIcwY" name="output.h" compile="0" resource="0" file="Source/km/output.h"/>
+      <FILE id="Vg94cA" name="patch.cpp" compile="1" resource="0" file="Source/km/patch.cpp"/>
+      <FILE id="Ez6c3P" name="patch.h" compile="0" resource="0" file="Source/km/patch.h"/>
+      <FILE id="qxf129" name="set_list.cpp" compile="1" resource="0" file="Source/km/set_list.cpp"/>
+      <FILE id="RrDC63" name="set_list.h" compile="0" resource="0" file="Source/km/set_list.h"/>
+      <FILE id="gua9bk" name="song.cpp" compile="1" resource="0" file="Source/km/song.cpp"/>
+      <FILE id="AqqqKv" name="song.h" compile="0" resource="0" file="Source/km/song.h"/>
+      <FILE id="Z5dVVg" name="storage.cpp" compile="1" resource="0" file="Source/km/storage.cpp"/>
+      <FILE id="JLOzNr" name="storage.h" compile="0" resource="0" file="Source/km/storage.h"/>
+      <FILE id="ZaBrOz" name="trigger.cpp" compile="1" resource="0" file="Source/km/trigger.cpp"/>
+      <FILE id="TIrQAP" name="trigger.h" compile="0" resource="0" file="Source/km/trigger.h"/>
+    </GROUP>
+    <GROUP id="{22894462-E1A9-036F-ED94-B51A50C87552}" name="Source">
+      <FILE id="aTZqrU" name="TestMain.cpp" compile="1" resource="0" file="Source/TestMain.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX" applicationCategory="public.app-category.developer-tools"
+               extraDefs="JUCE_SILENCE_XCODE_15_LINKER_WARNING=1" extraLinkerFlags="-Wl,-weak_reference_mismatches,weak">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" targetName="UnitTestRunner" recommendedWarnings="LLVM"/>
+        <CONFIGURATION name="Release" isDebug="0" targetName="UnitTestRunner" recommendedWarnings="LLVM"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../miscellaneous/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" targetName="UnitTestRunner"/>
+        <CONFIGURATION name="Release" isDebug="0" targetName="UnitTestRunner"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../miscellaneous/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2019 targetFolder="Builds/VisualStudio2019" extraCompilerFlags="/w44265 /w45038 /w44062">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" targetName="UnitTestRunner" warningsAreErrors="1"/>
+        <CONFIGURATION name="Release" isDebug="0" targetName="UnitTestRunner" debugInformationFormat="None"
+                       warningsAreErrors="1"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_graphics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../miscellaneous/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2019>
+    <VS2022 targetFolder="Builds/VisualStudio2022" extraCompilerFlags="/w44265 /w45038 /w44062">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" targetName="UnitTestRunner" warningsAreErrors="1"/>
+        <CONFIGURATION name="Release" isDebug="0" targetName="UnitTestRunner" debugInformationFormat="None"
+                       warningsAreErrors="1"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_graphics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../miscellaneous/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_analytics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_PLUGINHOST_LV2="1" JUCE_PLUGINHOST_VST3="1"/>
+  <LIVE_SETTINGS>
+    <OSX enableCxx11="1"/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>

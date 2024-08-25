@@ -5,8 +5,8 @@ Input::Input() {
   initialize();
 }
 
-Input::Input(MidiDeviceInfo info, MidiInputCallback *listener)
-  : Instrument(info), device(MidiInput::openDevice(info.identifier, listener))
+Input::Input(MidiDeviceInfo device_info, MidiInputCallback *listener)
+  : Instrument(device_info), device(MidiInput::openDevice(info.identifier, listener))
 {
   initialize();
 }

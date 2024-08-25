@@ -85,7 +85,7 @@ void Controller::set_range(bool pass_0, bool pass_127,
   }
 
   float new_slope = ((float)_max_out - (float)_min_out) / ((float)_max_in - (float)_min_in);
-  if (_slope != new_slope) {
+  if (std::abs(_slope - new_slope) > 0.000001) {
     _slope = new_slope;
     modified = true;
   }
@@ -124,5 +124,5 @@ int Controller::process_data_byte(int val) {
   if (val < _min_in || val > _max_in)
     return CONTROLLER_BLOCK;
 
-  return _min_out + floor((_slope * (val - _min_in)) + 0.5);
+  return _min_out + int(floor((_slope * (val - _min_in)) + 0.5));
 }

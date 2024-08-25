@@ -53,7 +53,7 @@ bool Trigger::signal_message(Input::Ptr input, const MidiMessage& message) {
   if (input != _trigger_input
       || !input->is_running()
       || message.getRawDataSize() != _trigger_message_num_bytes
-      || memcmp(message.getRawData(), _trigger_message.getRawData(), _trigger_message_num_bytes) != 0)
+      || memcmp(message.getRawData(), _trigger_message.getRawData(), (size_t)_trigger_message_num_bytes) != 0)
     return false;
 
   perform_action();

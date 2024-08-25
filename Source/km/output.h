@@ -8,8 +8,8 @@ public:
   using Ptr = ReferenceCountedObjectPtr<Output>;
 
   Output() {}                   // for testing
-  Output(MidiDeviceInfo info);
-  ~Output();
+  Output(MidiDeviceInfo device_info);
+  virtual ~Output() override;
 
   bool is_running() override { return (bool)device; }
 

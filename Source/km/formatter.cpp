@@ -20,7 +20,7 @@ int note_name_to_num(String &str) {
   if (isdigit(ch))
     return str.getIntValue();
 
-  ch = tolower(ch);
+  ch = char(tolower(ch));
   if (ch < 'a' || ch > 'g')
     return 0;
 
@@ -40,34 +40,4 @@ int note_name_to_num(String &str) {
 
   int octave = (str.substring(num_start).getIntValue() + 1) * 12;
   return octave + from_c + accidental;
-}
-
-String format_program(int bank_msb, int bank_lsb, int prog) {
-  String str;
-  int has_msb = bank_msb != UNDEFINED;
-  int has_lsb = bank_lsb != UNDEFINED;
-  int has_bank = has_msb || has_lsb;
-
-  str += String::formatted(" %c", has_bank ? '[' : ' ');
-
-  if (has_msb)
-    str += String::formatted("%3d", bank_msb);
-  else
-    str += "   ";
-
-  str += String::formatted("%c ", has_bank ? ',' : ' ');
-
-  if (has_lsb)
-    str += String::formatted("%3d", bank_lsb);
-  else
-    str += "   ";
-
-  str += String::formatted("%c ", has_bank ? ']' : ' ');
-
-  if (prog != UNDEFINED)
-    str += String::formatted(" %3d", prog);
-  else
-    str += "    ";
-
-  return str;
 }

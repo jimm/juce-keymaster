@@ -20,13 +20,14 @@ void MessageBlock::from_hex_string(const String &str) {
   StringArray tokens;
   tokens.addTokens(str, false);
 
-  uint8 data[str.length()];
+  uint8 *data = (uint8 *)malloc(size_t(str.length()));
   int i = 0;
-  for (auto str : tokens)
-    data[i++] = (uint8)str.getHexValue32();
+  for (auto s : tokens)
+    data[i++] = (uint8)s.getHexValue32();
 
   MidiDataConcatenator concatenator(1024);
   concatenator.pushMidiData((const void *)data, (int)str.length(), (double)0, (MidiInput *)nullptr, *this);
+  free(data);
 
   KeyMaster_instance()->changed();
 }

@@ -21,7 +21,7 @@ void Song::set_notes(const String &notes) {
 }
 
 void Song::set_bpm(float bpm) {
-  if (_bpm != bpm) {
+  if (std::abs(_bpm - bpm) > 0.001) {
     _bpm = bpm;
     KeyMaster_instance()->changed();
   }

@@ -12,8 +12,8 @@ public:
   using Ptr = ReferenceCountedObjectPtr<Input>;
 
   Input();                      // for testing
-  Input(MidiDeviceInfo info, MidiInputCallback *listener);
-  ~Input();
+  Input(MidiDeviceInfo device_info, MidiInputCallback *listener);
+  virtual ~Input() override;
 
   void start() override;
   void stop() override;

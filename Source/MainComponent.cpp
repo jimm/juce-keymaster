@@ -236,7 +236,7 @@ void MainComponent::new_connection() {
   //   dialog_win->centreWithSize(300, 200);
   // // TODO wait for it to close and then update content if anything changed
 
-  connections_table.updateContent();
+    connections_table.updateContent();
 }
 
 void MainComponent::new_set_list() {

@@ -7,7 +7,7 @@
 class DeviceManager : MidiInputCallback {
 public:
 
-  ~DeviceManager();
+  virtual ~DeviceManager() override;
 
   void update_devices();
 
@@ -27,8 +27,8 @@ private:
   std::map<String, Input::Ptr> _identifier_to_input;
   ReferenceCountedArray<Output> _outputs;
 
-  MidiDeviceListConnection connection = MidiDeviceListConnection::make(
-    [this] { update_devices(); });
+  // MidiDeviceListConnection connection = MidiDeviceListConnection::make(
+  //   [this] { update_devices(); });
 
   void handleIncomingMidiMessage (MidiInput *source, const MidiMessage &message) override;
 

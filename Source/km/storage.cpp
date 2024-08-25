@@ -95,7 +95,7 @@ void Storage::load_curves(var curves) {
       (String)vcurve.getProperty("short_name", "nc"));
     var vals = vcurve.getProperty("values", v);
     for (int j = 0; j < 128; ++j)
-      curve->curve[j] = (int)vals[j];
+      curve->curve[j] = (unsigned char)(int)vals[j];
     km->curves().add(curve);
   }
 }

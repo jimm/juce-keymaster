@@ -259,7 +259,7 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
         buf[2] = _velocity_curve->curve[data[2]];
       if (data[1] >= 0 && data[1] <= 127) {
         if (_output_chan != CONNECTION_ALL_CHANNELS)
-          status = high_nibble + _output_chan + 1; // MidiMessage chans 1-16
+          status = uint8(high_nibble + _output_chan + 1); // MidiMessage chans 1-16
         midi_out(MidiMessage(status, buf[1], buf[2]));
       }
     }
@@ -273,13 +273,13 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
     }
     else {
       if (_output_chan != CONNECTION_ALL_CHANNELS)
-        status = high_nibble + _output_chan + 1; // MidiMessage chans 1-16
+        status = uint8(high_nibble + _output_chan + 1); // MidiMessage chans 1-16
       midi_out(MidiMessage(status, data[1], data[2]));
     }
     break;
   case PROGRAM_CHANGE: case CHANNEL_PRESSURE: case PITCH_BEND:
     if (_output_chan != CONNECTION_ALL_CHANNELS)
-      status = high_nibble + _output_chan + 1; // MidiMessage chans 1-16
+      status = uint8(high_nibble + _output_chan + 1); // MidiMessage chans 1-16
     midi_out(MidiMessage(status, data[1], data[2]));
     break;
   default:

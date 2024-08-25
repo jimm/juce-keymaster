@@ -5,11 +5,6 @@
               companyWebsite="jimmenard.com" companyEmail="jim@jimmenard.com"
               bundleIdentifier="jimm.KeyMaster" cppLanguageStandard="20">
   <MAINGROUP id="vDaUrm" name="KeyMaster">
-    <GROUP id="{92D7AB5C-F627-3CFB-FACC-44BD9C66A549}" name="test">
-      <FILE id="J7ud75" name="connection_test.h" compile="0" resource="0"
-            file="Source/test/connection_test.h"/>
-      <FILE id="YnLXbL" name="testdata.kmst" compile="0" resource="1" file="Source/test/testdata.kmst"/>
-    </GROUP>
     <GROUP id="{9BE1D933-937C-5CFF-F347-C7F459F49700}" name="gui">
       <FILE id="VlgiOB" name="connections_table.cpp" compile="1" resource="0"
             file="Source/gui/connections_table.cpp"/>

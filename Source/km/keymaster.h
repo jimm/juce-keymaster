@@ -52,7 +52,7 @@ public:
   void start_clock() { _clock.start(); }
   void stop_clock() { _clock.stop(); }
   void toggle_clock() { if (is_clock_running()) _clock.stop(); else _clock.start(); }
-  void set_clock_bpm(int bpm) { _clock.set_bpm(bpm); }
+  void set_clock_bpm(float bpm) { _clock.set_bpm(bpm); }
   bool is_clock_running() { return _clock.is_running(); }
   // Get BPM and start/stop from current song and update state of the clock
   void update_clock();
@@ -81,13 +81,19 @@ public:
   void panic(bool send_notes_off);
 
   // ================ helpers ================
+#ifndef JUCE_UNIT_TESTS
   void set_file_based_document(FileBasedDocument *doc) { _doc = doc; }
-  void sort_all_songs();
   void changed() { if (_doc != nullptr) _doc->changed(); }
+#else
+  void changed() { }
+#endif
+  void sort_all_songs();
 
 private:
   DeviceManager &_device_manager;
+#ifndef JUCE_UNIT_TESTS
   FileBasedDocument *_doc;
+#endif
   Array<Trigger *> _triggers;
   Array<SetList *> _set_lists; // all set lists, including all_songs
   Cursor *_cursor;

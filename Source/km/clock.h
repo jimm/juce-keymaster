@@ -5,7 +5,7 @@
 class Clock : HighResolutionTimer {
 public:
   Clock();
-  ~Clock();
+  virtual ~Clock() override;
 
   float bpm() { return _bpm; }
   void set_bpm(float bpm);

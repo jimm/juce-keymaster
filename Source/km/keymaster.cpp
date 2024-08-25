@@ -22,8 +22,10 @@ void set_KeyMaster_instance(KeyMaster *km) {
 
 KeyMaster::KeyMaster(DeviceManager &dev_mgr, bool testing)
   : _device_manager(dev_mgr),
+#ifndef JUCE_UNIT_TESTS
     _doc(nullptr),
-    _cursor(0),
+#endif
+    _cursor(nullptr),
     _clock(),
     _running(false),
     _testing(testing)
@@ -282,7 +284,6 @@ void KeyMaster::panic(bool send_notes_off) {
   MidiMessageSequence buf;
 
   if (send_notes_off) {
-    MidiMessageSequence buf;
     for (int chan = 1; chan <= MIDI_CHANNELS; ++chan) { // MidiMessage chans 1-16
       for (int note = 0; note < 128; ++note)
         buf.addEvent(MidiMessage::noteOff(chan, note), 0);

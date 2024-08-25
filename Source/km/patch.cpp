@@ -4,7 +4,7 @@
 
 Patch::Patch(DBObjID id, const String &patch_name)
   : DBObj(id), Nameable(patch_name),
-    _start_message(0), _stop_message(0),
+    _start_message(nullptr), _stop_message(nullptr),
     _running(false)
 {
 }

@@ -37,7 +37,7 @@ void Cursor::init() {
   if (sl != nullptr && sl->songs().size() > 0) {
     song_index = 0;
     Song *s = song();
-    patch_index = (s != 0 && s->patches().size() > 0) ? 0 : UNDEFINED;
+    patch_index = (s != nullptr && s->patches().size() > 0) ? 0 : UNDEFINED;
   }
   else {
     song_index = UNDEFINED;

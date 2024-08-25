@@ -14,7 +14,7 @@ Clock::~Clock() {
 }
 
 void Clock::set_bpm(float new_val) {
-  if (_bpm != new_val) {
+  if (std::abs(_bpm - new_val) > 0.001) {
     _bpm = new_val;
     _millisecs_per_tick = (long)(2.5e6 / _bpm);
   }

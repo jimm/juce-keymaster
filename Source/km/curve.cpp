@@ -7,7 +7,7 @@ public:
 protected:
   virtual void generate() {
     for (int i = 0; i < 128; ++i)
-      curve[i] = i;
+      curve[i] = uint8(i);
   }
 };
 
@@ -20,7 +20,7 @@ protected:
       int val = i * i / 127;
       if (i > 0 && val == 0)
         val = 1;
-      curve[i] = val;
+      curve[i] = uint8(val);
     }
   }
 };
@@ -35,7 +35,7 @@ protected:
       int exponential = i * i / 127;
       if (i > 0 && exponential == 0)
         exponential = 1;
-      curve[i] = (linear + exponential) / 2;
+      curve[i] = uint8((linear + exponential) / 2);
     }
   }
 };
@@ -48,7 +48,7 @@ protected:
     for (int i = 0; i < 128; ++i) {
       int val = 127 - i;
       val = 127 - ((val * val) / 127);
-      curve[i] = val;
+      curve[i] = uint8(val);
     }
   }
 };
@@ -62,7 +62,7 @@ protected:
       int linear = i;
       int inv_exp = 127 - i;
       inv_exp = 127 - ((inv_exp * inv_exp) / 127);
-      curve[i] = (linear + inv_exp) / 2;
+      curve[i] = uint8((linear + inv_exp) / 2);
     }
   }
 };

@@ -1,8 +1,8 @@
 #include "keymaster.h"
 #include "output.h"
 
-Output::Output(MidiDeviceInfo info)
-    : Instrument(info), device(MidiOutput::openDevice(info.identifier))
+Output::Output(MidiDeviceInfo device_info)
+    : Instrument(device_info), device(MidiOutput::openDevice(info.identifier))
 {
 }
 
