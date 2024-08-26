@@ -91,6 +91,9 @@ int main(int argc, char **argv)
       return Random::getSystemRandom().nextInt64();
     }();
 
+  // We need an event loop running for the broadcasters and listeners
+  auto gui = juce::ScopedJuceInitialiser_GUI {};
+
   if (args.containsOption("--category"))
     runner.runTestsInCategory(args.getValueForOption("--category"), seed);
   else

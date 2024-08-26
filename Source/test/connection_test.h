@@ -24,7 +24,18 @@ class ConnectionTest : public UnitTest {
 public:
   ConnectionTest() : UnitTest("Connection Test", "km") {}
 
+  void initialise() override;
   void runTest() override;
+
+private:
+  DeviceManager dev_mgr;
+  KeyMaster *km;
+  Input *input;
+  Output *output;
+  Input::Ptr input_ptr;
+  Output::Ptr output_ptr;
+
+  void channels_test();
 };
 
 static ConnectionTest test;

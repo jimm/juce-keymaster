@@ -1,13 +1,18 @@
 #include "connection_test.h"
 
-Input *input = new Input();
-Output *output = new Output();
+void ConnectionTest::initialise() {
+  km = new KeyMaster(dev_mgr, true);
+  input = new Input();
+  output = new Output();
+  input_ptr = input;
+  output_ptr = output;
+}
 
 void ConnectionTest::runTest() {
-  DeviceManager dev_mgr;
-  KeyMaster km(dev_mgr, true);
-  Input::Ptr input_ptr(input);
-  Output::Ptr output_ptr(output);
+  channels_test();
+}
+
+void ConnectionTest::channels_test() {
   TestConnection conn(input_ptr, 0, output_ptr, 1);
 
   beginTest("channels");
