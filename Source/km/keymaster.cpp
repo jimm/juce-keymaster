@@ -8,6 +8,7 @@
 #define PATCH_START {update_clock(); if (_cursor->patch() != nullptr) _cursor->patch()->start();}
 
 static KeyMaster *km_instance = nullptr;
+const MidiMessage EMPTY_MESSAGE = MidiMessage(ACTIVE_SENSE);
 
 KeyMaster *KeyMaster_instance() {
   return km_instance;
@@ -284,7 +285,8 @@ void KeyMaster::panic(bool send_notes_off) {
   MidiMessageSequence buf;
 
   if (send_notes_off) {
-    for (int chan = 1; chan <= MIDI_CHANNELS; ++chan) { // MidiMessage chans 1-16
+    // MidiMessage static factory methods require chan 1-16
+    for (int chan = 1; chan <= MIDI_CHANNELS; ++chan) {
       for (int note = 0; note < 128; ++note)
         buf.addEvent(MidiMessage::noteOff(chan, note), 0);
     }

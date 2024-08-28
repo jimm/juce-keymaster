@@ -34,6 +34,8 @@
 
 #include <JuceHeader.h>
 #include "test/connection_test.h"
+#include "test/cursor_test.h"
+#include "test/storage_test.h"
 
 //==============================================================================
 class ConsoleLogger final : public Logger

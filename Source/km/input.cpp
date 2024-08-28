@@ -107,7 +107,7 @@ Patch * Input::patch_for_message(const MidiMessage &msg) {
 
 void Input::send_pending_offs() {
   for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
-    // MidiMessage chans 1-16
+    // MidiMessage static factory methods require chans 1-16
     if (sustain_off_patches[chan] != nullptr) {
       sustain_off_patches[chan]->midi_in(this, MidiMessage::controllerEvent(chan+1, CC_SUSTAIN, 0));
       sustain_off_patches[chan] = nullptr;

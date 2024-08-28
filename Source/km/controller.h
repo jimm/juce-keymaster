@@ -9,9 +9,9 @@ public:
 
   inline int cc_num() { return _cc_num; }
   inline int translated_cc_num() { return _translated_cc_num; }
-  inline int filtered() { return _filtered; }
-  inline int pass_through_0() { return _pass_through_0; }
-  inline int pass_through_127() { return _pass_through_127; }
+  inline bool filtered() { return _filtered; }
+  inline bool pass_through_0() { return _pass_through_0; }
+  inline bool pass_through_127() { return _pass_through_127; }
 
   // needed by formatter
   inline int min_in() { return _min_in; }

@@ -12,7 +12,6 @@ Connection::Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr ou
     _input(input), _output(output),
     _input_chan(in_chan), _output_chan(out_chan),
     _xpose(0), _velocity_curve(nullptr),
-    _processing_sysex(false),
     _running(false), _changing_was_running(false)
 {
   _prog.bank_msb = _prog.bank_lsb = _prog.prog = UNDEFINED;
@@ -28,7 +27,6 @@ Connection::Connection(const Connection &other) noexcept
     _prog(other._prog),
     _zone(other._zone),
     _xpose(other._xpose), _velocity_curve(other._velocity_curve),
-    _processing_sysex(false),
     _running(false), _changing_was_running(false)
 {
     for (int i = 0; i < 128; ++i)
@@ -47,20 +45,18 @@ void Connection::start() {
   if (_running)
     return;
 
-  if (_output != nullptr) {
-    int chan = program_change_send_channel();
-    if (chan != CONNECTION_ALL_CHANNELS) {
-      if (_prog.bank_msb >= 0)
-        midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_MSB, _prog.bank_msb));
-      if (_prog.bank_lsb >= 0)
-        midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_LSB, _prog.bank_lsb));
-      if (_prog.prog >= 0)
-        midi_out(MidiMessage::programChange(chan+1, _prog.prog));
-    }
-  }
-
-  _processing_sysex = false;
   _running = true;
+
+  int chan = program_change_send_channel();
+  if (chan != CONNECTION_ALL_CHANNELS) {
+    // The MidiMessage static factory methods require MIDI channels 1-16
+    if (_prog.bank_msb >= 0)
+      midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_MSB, _prog.bank_msb));
+    if (_prog.bank_lsb >= 0)
+      midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_LSB, _prog.bank_lsb));
+    if (_prog.prog >= 0)
+      midi_out(MidiMessage::programChange(chan+1, _prog.prog));
+  }
 }
 
 bool Connection::is_running() {
@@ -148,13 +144,6 @@ void Connection::set_velocity_curve(Curve *val) {
   }
 }
 
-void Connection::set_processing_sysex(bool val) {
-  if (_processing_sysex != val) {
-    _processing_sysex = val;
-    KeyMaster_instance()->changed();
-  }
-}
-
 void Connection::set_running(bool val) {
   if (_running != val) {
     _running = val;
@@ -207,42 +196,16 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
   // See if the message should even be processed, or if we should stop here.
   if (!input_channel_ok(msg))
     return;
-
-  if (msg.isSysEx())
-    _processing_sysex = true;
-
-  // Grab filter boolean for this status. If we're inside a sysex message,
-  // we need use SYSEX as the filter status, not the first byte of this
-  // message.
-  bool filter_this_status = _message_filter.filter_out(_processing_sysex ? SYSEX : status, data[1]);
-
-  // Return if we're filtering this message, exept if we're starting or in
-  // sysex. In that case we need to keep going because we need to process
-  // realtime bytes within the sysex.
-  if (!_processing_sysex && filter_this_status)
-    return;
-
-  // If this is a sysex message, we may or may not filter it out. In any
-  // case we pass through any realtime bytes in the sysex message.
-  if (_processing_sysex) {
-    if (status == EOX || data[1] == EOX || data[2] == EOX || data[3] == EOX ||
-        // non-realtime status byte
-        (is_status(status) && status < 0xf8 && status != SYSEX))
-      _processing_sysex = false;
-
-    if (!filter_this_status) {
-      midi_out(msg);
-      return;
+  if (_message_filter.filter_out(status, data[1])) {
+    // If this is a sysex, send any realtime bytes inside it
+    if (msg.isSysEx()) {
+      const uint8 *data = msg.getSysExData();
+      for (int i = 0; i < msg.getSysExDataSize(); ++i) {
+        uint8 byte = data[i];
+        if (is_realtime(byte))
+          midi_out(MidiMessage(byte));
+      }
     }
-
-    // If any of the bytes are realtime bytes AND if we are filtering out
-    // sysex, send them anyway.
-    if (is_realtime(status) && !_message_filter.filter_out(status, 0)) {
-      midi_out(MidiMessage(status));
-    }
-    for (int i = 1; i <= 3; ++i)
-      if (is_realtime(data[i]) && !_message_filter.filter_out(data[i], 0))
-        midi_out(MidiMessage(data[i]));
     return;
   }
 
@@ -253,14 +216,14 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
   switch (high_nibble) {
   case NOTE_ON: case NOTE_OFF: case POLY_PRESSURE:
     if (inside_zone(data[1])) {
-      juce::uint8 buf[3] = {data[0], data[1], data[2]};
-      buf[1] += _xpose;
+      int note_num = data[1] + _xpose;
+      int velocity = data[2];
       if (_velocity_curve != nullptr)
-        buf[2] = _velocity_curve->curve[data[2]];
-      if (data[1] >= 0 && data[1] <= 127) {
+        velocity = _velocity_curve->curve[velocity];
+      if (note_num >= 0 && note_num <= 127) {
         if (_output_chan != CONNECTION_ALL_CHANNELS)
-          status = uint8(high_nibble + _output_chan + 1); // MidiMessage chans 1-16
-        midi_out(MidiMessage(status, buf[1], buf[2]));
+          status = uint8(high_nibble + _output_chan);
+        midi_out(MidiMessage(status, note_num, velocity));
       }
     }
     break;
@@ -273,14 +236,14 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
     }
     else {
       if (_output_chan != CONNECTION_ALL_CHANNELS)
-        status = uint8(high_nibble + _output_chan + 1); // MidiMessage chans 1-16
+        status = uint8(high_nibble + _output_chan);
       midi_out(MidiMessage(status, data[1], data[2]));
     }
     break;
   case PROGRAM_CHANGE: case CHANNEL_PRESSURE: case PITCH_BEND:
     if (_output_chan != CONNECTION_ALL_CHANNELS)
-      status = uint8(high_nibble + _output_chan + 1); // MidiMessage chans 1-16
-    midi_out(MidiMessage(status, data[1], data[2]));
+      status = uint8(high_nibble + _output_chan);
+    midi_out(MidiMessage(status, data[1]));
     break;
   default:
     midi_out(msg);
@@ -311,7 +274,7 @@ void Connection::remove_cc_num(int cc_num) {
 // - it's a system message, not a channel message
 // - the input channel matches our selected `input_chan`
 int Connection::input_channel_ok(const MidiMessage &msg) {
-  if (_input_chan == CONNECTION_ALL_CHANNELS || _processing_sysex)
+  if (_input_chan == CONNECTION_ALL_CHANNELS || msg.isSysEx())
     return true;
 
   int channel = msg.getChannel();

@@ -9,7 +9,7 @@ MessageFilter::MessageFilter()
   _note(true),                  // both on and off
   _poly_pressure(true),
   _chan_pressure(true),
-  _program_change(false),       // filter out by default
+  _program_change(true),
   _pitch_bend(true),
   _controller(true),
   _song_pointer(true),

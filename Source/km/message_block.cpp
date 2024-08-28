@@ -3,9 +3,13 @@
 #include "consts.h"
 #include "keymaster.h"
 #include "message_block.h"
-// #include "error.h"
 
-#define NON_REALTIME_STATUS(b) ((b) >= NOTE_OFF && (b) <= EOX)
+#define is_channel(b) (((b) & 0xf0) < 0xf0)
+#define is_realtime(b) ((b) >= 0xf8)
+
+int CHANNEL_MESSAGE_LENGTHS[] = {
+  3, 3, 3, 3, 2, 2, 3           // note off - pitch bend
+};
 
 MessageBlock::MessageBlock(DBObjID id, const String &name)
   : DBObj(id), Nameable(name)
@@ -20,14 +24,51 @@ void MessageBlock::from_hex_string(const String &str) {
   StringArray tokens;
   tokens.addTokens(str, false);
 
-  uint8 *data = (uint8 *)malloc(size_t(str.length()));
+  int num_bytes = tokens.size();
+  uint8 *data = (uint8 *)malloc(size_t(num_bytes));
   int i = 0;
   for (auto s : tokens)
     data[i++] = (uint8)s.getHexValue32();
 
-  MidiDataConcatenator concatenator(1024);
-  concatenator.pushMidiData((const void *)data, (int)str.length(), (double)0, (MidiInput *)nullptr, *this);
-  free(data);
+  for (int i = 0; i < num_bytes; ++i) {
+    uint8 byte = data[i];
+    uint8 b2, b3;
+    if (is_realtime(byte))
+      _midi_messages.add(MidiMessage(byte));
+    else if (is_channel(byte)) {
+      switch (byte & 0xf0) {
+      case NOTE_OFF: case NOTE_ON: case POLY_PRESSURE: case CONTROLLER: case PITCH_BEND:
+        b2 = data[++i];
+        b3 = data[++i];
+        _midi_messages.add(MidiMessage(byte, b2, b3));
+        break;
+      default:
+        b2 = data[++i];
+        _midi_messages.add(MidiMessage(byte, b2));
+        break;
+      }
+    }
+    else {
+      switch (byte) {
+      case SONG_POINTER:
+        b2 = data[++i];
+        b3 = data[++i];
+        _midi_messages.add(MidiMessage(byte, b2, b3));
+        break;
+      case SONG_SELECT:
+        b2 = data[++i];
+        _midi_messages.add(MidiMessage(byte, b2));
+        break;
+      case TUNE_REQUEST:
+        _midi_messages.add(MidiMessage(byte));
+        break;
+      case SYSEX:
+        MidiMessage sysex = sysex_from_bytes(data, i, num_bytes);
+        i += sysex.getSysExDataSize();
+        break;
+      }
+    }
+  }
 
   KeyMaster_instance()->changed();
 }
@@ -47,7 +88,7 @@ String MessageBlock::to_editable_hex_string() {
 String MessageBlock::to_hex(String message_separator) {
   StringArray strs;
   for (auto &msg : _midi_messages)
-    strs.add(String::toHexString(msg->message.getRawData(), msg->message.getRawDataSize()));
+    strs.add(String::toHexString(msg.getRawData(), msg.getRawDataSize()));
   return strs.joinIntoString(message_separator);
 }
 
@@ -58,11 +99,12 @@ void MessageBlock::send_to_all_outputs() {
 
 void MessageBlock::send_to(Output::Ptr out) {
   for (auto &msg : _midi_messages)
-    out->midi_out(msg->message);
+    out->midi_out(msg);
 }
 
-// This MidiInputCallback method is only called when parsing a block of MIDI
-// bytes. It will never be called by actual incoming MIDI data.
-void MessageBlock::handleIncomingMidiMessage(MidiInput *_source, const MidiMessage &message) {
-  _midi_messages.addEvent(message, 0);
+MidiMessage MessageBlock::sysex_from_bytes(uint8 *data, int start, int num_bytes) {
+  for (int i = start + 1; i < num_bytes; ++i)
+    if (data[i] == EOX || is_channel(data[i]))
+      return MidiMessage::createSysExMessage(data + start + 1, i - start);
+  return MidiMessage::createSysExMessage(data, 0);
 }

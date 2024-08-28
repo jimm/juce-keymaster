@@ -132,7 +132,7 @@ void Storage::load_triggers(var triggers) {
         (String)vmsg.getProperty("input_name", v));
       MessageBlock mblock(UNDEFINED_ID, "");
       mblock.from_hex_string((String)vmsg.getProperty("trigger_message_bytes", v));
-      t->set_trigger_message(input, mblock.midi_messages().getEventPointer(0)->message);
+      t->set_trigger_message(input, mblock.midi_messages()[0]);
     }
     if (vmsg.hasProperty("key_code"))
       t->set_trigger_key_code((int)vmsg.getProperty("key_code", v));
@@ -200,6 +200,7 @@ void Storage::create_default_patch(Song *s) {
 void Storage::load_connections(Patch *patch, var connections) {
   var v;
   var undef(UNDEFINED);
+  var all_chans(CONNECTION_ALL_CHANNELS);
   for (int i = 0; i < connections.size(); ++i) {
     var vconn = connections[i];
     String input_identifier = (String)vconn.getProperty("input_id", v);
@@ -208,13 +209,15 @@ void Storage::load_connections(Patch *patch, var connections) {
     String output_name = (String)vconn.getProperty("output_name", v);
     Connection *c = new Connection(UNDEFINED_ID,
                                    find_input(input_identifier, input_name),
-                                   (int)vconn.getProperty("input_chan", undef),
+                                   (int)vconn.getProperty("input_chan", all_chans),
                                    find_output(output_identifier, output_name),
-                                   (int)vconn.getProperty("output_chan", undef));
+                                   (int)vconn.getProperty("output_chan", all_chans));
 
-    c->set_program_bank_msb((int)vconn.getProperty("bank_msb", undef));
-    c->set_program_bank_lsb((int)vconn.getProperty("bank_lsb", undef));
-    c->set_program_prog((int)vconn.getProperty("program", undef));
+    var prog = vconn.getProperty("program", v);
+    c->set_program_bank_msb((int)prog.getProperty("bank_msb", undef));
+    c->set_program_bank_lsb((int)prog.getProperty("bank_lsb", undef));
+    c->set_program_prog((int)prog.getProperty("program", undef));
+
     var zone_arr = vconn.getProperty("zone", v);
     c->set_zone_low((int)zone_arr[0]);
     c->set_zone_high((int)zone_arr[1]);
@@ -416,17 +419,17 @@ var Storage::connections(Array<Connection *> &connections) {
     c->setProperty("input_name", conn->input()->info.name);
     c->setProperty("output_id", conn->output()->info.identifier);
     c->setProperty("output_name", conn->output()->info.name);
-    if (conn->input_chan() != UNDEFINED)
+    if (conn->input_chan() != CONNECTION_ALL_CHANNELS)
       c->setProperty("input_chan", conn->input_chan());
-    if (conn->output_chan() != UNDEFINED)
+    if (conn->output_chan() != CONNECTION_ALL_CHANNELS)
       c->setProperty("output_chan", conn->output_chan());
 
     DynamicObject::Ptr prog(new DynamicObject());
     if (conn->program_bank_msb() != UNDEFINED)
       prog->setProperty("bank_msb", var(conn->program_bank_msb()));
     if (conn->program_bank_lsb() != UNDEFINED)
-      prog->setProperty("bank_msb", var(conn->program_bank_lsb()));
-    if (conn->program_bank_msb() != UNDEFINED)
+      prog->setProperty("bank_lsb", var(conn->program_bank_lsb()));
+    if (conn->program_prog() != UNDEFINED)
       prog->setProperty("program", var(conn->program_prog()));
     c->setProperty("program", var(prog.get()));
 

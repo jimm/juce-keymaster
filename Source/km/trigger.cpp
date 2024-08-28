@@ -4,8 +4,6 @@
 #include "trigger.h"
 #include "keymaster.h"
 
-const MidiMessage EMPTY_MESSAGE = MidiMessage(ACTIVE_SENSE);
-
 Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock *out_msg)
   : DBObj(id), Nameable(name),
     _trigger_input(nullptr),

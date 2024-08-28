@@ -37,7 +37,6 @@ public:
   inline int xpose() { return _xpose; }
   inline Curve *velocity_curve() { return _velocity_curve; }
   inline MessageFilter &message_filter() { return _message_filter; }
-  inline bool processing_sysex() { return _processing_sysex; }
   inline bool running() { return _running; }
   inline bool changing_was_running() { return _changing_was_running; }
   inline Controller *cc_map(int i) { return _cc_maps[i]; }
@@ -53,7 +52,6 @@ public:
   void set_zone_high(int val);
   void set_xpose(int val);
   void set_velocity_curve(Curve *val);
-  void set_processing_sysex(bool val);
   void set_running(bool val);
   void set_cc_map(int cc_num, Controller *val);
 
@@ -75,7 +73,14 @@ public:
   void remove_cc_num(int cc_num);
 
 protected:
+#ifdef JUCE_UNIT_TESTS
+  virtual
+#endif
   void midi_out(MidiMessage *);
+
+#ifdef JUCE_UNIT_TESTS
+  virtual
+#endif
   void midi_out(MidiMessage);
 
 private:
@@ -88,7 +93,6 @@ private:
   int _xpose;
   Curve *_velocity_curve;
   MessageFilter _message_filter;
-  bool _processing_sysex;
   bool _running;
   bool _changing_was_running;
   Controller *_cc_maps[128];

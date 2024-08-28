@@ -10,6 +10,13 @@
             file="Source/test/connection_test.cpp"/>
       <FILE id="WKtadL" name="connection_test.h" compile="0" resource="0"
             file="Source/test/connection_test.h"/>
+      <FILE id="BsVg3R" name="cursor_test.cpp" compile="1" resource="0" file="Source/test/cursor_test.cpp"/>
+      <FILE id="tURWer" name="cursor_test.h" compile="0" resource="0" file="Source/test/cursor_test.h"/>
+      <FILE id="vuR96U" name="storage_test.cpp" compile="1" resource="0"
+            file="Source/test/storage_test.cpp"/>
+      <FILE id="gpnd65" name="storage_test.h" compile="0" resource="0" file="Source/test/storage_test.h"/>
+      <FILE id="HnFyQW" name="test_helper.cpp" compile="1" resource="0" file="Source/test/test_helper.cpp"/>
+      <FILE id="JQPAHz" name="test_helper.h" compile="0" resource="0" file="Source/test/test_helper.h"/>
       <FILE id="sIRprU" name="testdata.kmst" compile="0" resource="1" file="Source/test/testdata.kmst"/>
     </GROUP>
     <GROUP id="{6B97B8E9-F772-9A2A-7F62-28BEC2B37207}" name="km">

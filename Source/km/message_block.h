@@ -5,11 +5,11 @@
 #include "nameable.h"
 #include "output.h"
 
-class MessageBlock : public DBObj, public Nameable, public MidiInputCallback {
+class MessageBlock : public DBObj, public Nameable {
 public:
   MessageBlock(DBObjID id, const String &name);
 
-  MidiMessageSequence &midi_messages() { return _midi_messages; }
+  Array<MidiMessage> &midi_messages() { return _midi_messages; }
 
   void from_hex_string(const String &str);
 
@@ -19,12 +19,9 @@ public:
   void send_to_all_outputs();
   void send_to(Output::Ptr);
 
-  // This MidiInputCallback method is only called when parsing a block of
-  // MIDI bytes. It will never be called by actual incoming MIDI data.
-  void handleIncomingMidiMessage(MidiInput *source, const MidiMessage &message) override;
-
 private:
-  MidiMessageSequence _midi_messages;
+  Array<MidiMessage> _midi_messages;
 
   String to_hex(String message_separator);
+  MidiMessage sysex_from_bytes(uint8 *data, int start, int num_bytes);
 };

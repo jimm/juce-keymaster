@@ -1,5 +1,7 @@
 #pragma once
 
+#include <JuceHeader.h>
+
 // KeyMaster constants and enums
 
 #define UNDEFINED (-1)
@@ -8,6 +10,8 @@
 #define CONTROLLER_BLOCK (-1)
 #define INSTRUMENT_TYPE_INPUT 0
 #define INSTRUMENT_TYPE_OUTPUT 1
+
+extern const MidiMessage EMPTY_MESSAGE;
 
 enum DialogResult {
   cancel,

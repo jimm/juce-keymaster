@@ -3,8 +3,6 @@
 #include "controller.h"
 #include "keymaster.h"
 
-const MidiMessage EMPTY_MESSAGE = MidiMessage(ACTIVE_SENSE);
-
 Controller::Controller(DBObjID id, int num)
   : DBObj(id),
     _cc_num(num),
@@ -98,7 +96,7 @@ MidiMessage Controller::process(const MidiMessage &msg, int output_chan) {
     return EMPTY_MESSAGE;
 
   int chan = (output_chan != CONNECTION_ALL_CHANNELS)
-    ? output_chan + 1           // MidiMessage chans 1-16
+    ? output_chan + 1           // MidiMessage static factory methods require chans 1-16
     : msg.getChannel();
   int data2 = msg.getRawData()[2];
 
