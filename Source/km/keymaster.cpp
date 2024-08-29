@@ -285,15 +285,14 @@ void KeyMaster::panic(bool send_notes_off) {
   MidiMessageSequence buf;
 
   if (send_notes_off) {
-    // MidiMessage static factory methods require chan 1-16
-    for (int chan = 1; chan <= MIDI_CHANNELS; ++chan) {
+    for (int juce_chan = 1; juce_chan <= MIDI_CHANNELS; ++juce_chan) {
       for (int note = 0; note < 128; ++note)
-        buf.addEvent(MidiMessage::noteOff(chan, note), 0);
+        buf.addEvent(MidiMessage::noteOff(juce_chan, note), 0);
     }
   }
   else {
-    for (int chan = 1; chan <= MIDI_CHANNELS; ++chan)
-      buf.addEvent(MidiMessage::controllerEvent(chan, CM_ALL_NOTES_OFF, 0), 0);
+    for (int juce_chan = 1; juce_chan <= MIDI_CHANNELS; ++juce_chan)
+      buf.addEvent(MidiMessage::controllerEvent(juce_chan, CM_ALL_NOTES_OFF, 0), 0);
   }
 
   for (auto &msg : buf)

@@ -49,13 +49,12 @@ void Connection::start() {
 
   int chan = program_change_send_channel();
   if (chan != CONNECTION_ALL_CHANNELS) {
-    // The MidiMessage static factory methods require MIDI channels 1-16
     if (_prog.bank_msb >= 0)
-      midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_MSB, _prog.bank_msb));
+      midi_out(MidiMessage::controllerEvent(JCH(chan), CC_BANK_SELECT_MSB, _prog.bank_msb));
     if (_prog.bank_lsb >= 0)
-      midi_out(MidiMessage::controllerEvent(chan+1, CC_BANK_SELECT_LSB, _prog.bank_lsb));
+      midi_out(MidiMessage::controllerEvent(JCH(chan), CC_BANK_SELECT_LSB, _prog.bank_lsb));
     if (_prog.prog >= 0)
-      midi_out(MidiMessage::programChange(chan+1, _prog.prog));
+      midi_out(MidiMessage::programChange(JCH(chan), _prog.prog));
   }
 }
 

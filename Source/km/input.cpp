@@ -107,14 +107,13 @@ Patch * Input::patch_for_message(const MidiMessage &msg) {
 
 void Input::send_pending_offs() {
   for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
-    // MidiMessage static factory methods require chans 1-16
     if (sustain_off_patches[chan] != nullptr) {
-      sustain_off_patches[chan]->midi_in(this, MidiMessage::controllerEvent(chan+1, CC_SUSTAIN, 0));
+      sustain_off_patches[chan]->midi_in(this, MidiMessage::controllerEvent(JCH(chan), CC_SUSTAIN, 0));
       sustain_off_patches[chan] = nullptr;
     }
     for (int note = 0; note < NOTES_PER_CHANNEL; ++note) {
       if (note_off_patches[chan][note] != nullptr) {
-        note_off_patches[chan][note]->midi_in(this, MidiMessage::noteOff(chan+1, note, (uint8)64));
+        note_off_patches[chan][note]->midi_in(this, MidiMessage::noteOff(JCH(chan), note, (uint8)64));
         note_off_patches[chan][note] = nullptr;
       }
     }

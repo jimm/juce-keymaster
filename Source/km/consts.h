@@ -10,6 +10,9 @@
 #define INSTRUMENT_TYPE_INPUT 0
 #define INSTRUMENT_TYPE_OUTPUT 1
 
+// The JUCE MidiMessage static factory methods require MIDI channels 1-16
+#define JCH(ch) ((ch)+1)
+
 extern const MidiMessage EMPTY_MESSAGE;
 
 enum DialogResult {

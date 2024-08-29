@@ -97,15 +97,15 @@ MidiMessage Controller::process(const MidiMessage &msg, int output_chan) {
   if (_filtered)
     return EMPTY_MESSAGE;
 
-  int chan = (output_chan != CONNECTION_ALL_CHANNELS)
-    ? output_chan + 1           // MidiMessage static factory methods require chans 1-16
+  int juce_chan = (output_chan != CONNECTION_ALL_CHANNELS)
+    ? JCH(output_chan)
     : msg.getChannel();
   int data2 = msg.getRawData()[2];
 
   int new_val = process_data_byte(data2);
   if (new_val == BLOCK_CONTROLLER)
     return EMPTY_MESSAGE;
-  return MidiMessage::controllerEvent(chan, _translated_cc_num, new_val);
+  return MidiMessage::controllerEvent(juce_chan, _translated_cc_num, new_val);
 }
 
 int Controller::process_data_byte(int val) {
