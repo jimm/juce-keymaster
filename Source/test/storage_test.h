@@ -5,7 +5,7 @@
 
 class StorageTest : public UnitTest {
 public:
-  StorageTest() : UnitTest("Storage Test", "km") {}
+  StorageTest() : UnitTest("Storage Test", "km:storage") {}
 
   void initialise() override;
   void shutdown() override;

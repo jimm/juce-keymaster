@@ -47,7 +47,7 @@ protected:
 
 class ConnectionTest : public UnitTest {
 public:
-  ConnectionTest() : UnitTest("Connection Test", "km") {}
+  ConnectionTest() : UnitTest("Connection Test", "km:connection") {}
 
   void initialise() override;
   void shutdown() override;

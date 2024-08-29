@@ -5,9 +5,8 @@
 
 class CursorTest : public UnitTest {
 public:
-  CursorTest() : UnitTest("Cursor Test", "km") {}
+  CursorTest() : UnitTest("Cursor Test", "km:cursor") {}
 
-  void initialise() override;
   void shutdown() override;
   void runTest() override;
 

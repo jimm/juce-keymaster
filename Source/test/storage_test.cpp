@@ -19,7 +19,9 @@ void StorageTest::shutdown() {
 }
 
 void StorageTest::runTest() {
+  beginTest("load");
   test_load("");
+  beginTest("save");
   test_save();
 }
 
