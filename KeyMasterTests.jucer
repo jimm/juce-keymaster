@@ -10,6 +10,10 @@
             file="Source/test/connection_test.cpp"/>
       <FILE id="WKtadL" name="connection_test.h" compile="0" resource="0"
             file="Source/test/connection_test.h"/>
+      <FILE id="MVoKAr" name="controller_test.cpp" compile="1" resource="0"
+            file="Source/test/controller_test.cpp"/>
+      <FILE id="s0ImAj" name="controller_test.h" compile="0" resource="0"
+            file="Source/test/controller_test.h"/>
       <FILE id="BsVg3R" name="cursor_test.cpp" compile="1" resource="0" file="Source/test/cursor_test.cpp"/>
       <FILE id="tURWer" name="cursor_test.h" compile="0" resource="0" file="Source/test/cursor_test.h"/>
       <FILE id="vuR96U" name="storage_test.cpp" compile="1" resource="0"

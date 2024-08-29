@@ -3,6 +3,8 @@
 #include "controller.h"
 #include "keymaster.h"
 
+#define BLOCK_CONTROLLER (-1)
+
 Controller::Controller(DBObjID id, int num)
   : DBObj(id),
     _cc_num(num),
@@ -101,7 +103,7 @@ MidiMessage Controller::process(const MidiMessage &msg, int output_chan) {
   int data2 = msg.getRawData()[2];
 
   int new_val = process_data_byte(data2);
-  if (new_val == CONTROLLER_BLOCK)
+  if (new_val == BLOCK_CONTROLLER)
     return EMPTY_MESSAGE;
   return MidiMessage::controllerEvent(chan, _translated_cc_num, new_val);
 }
@@ -120,7 +122,7 @@ int Controller::process_data_byte(int val) {
 
   // input value out of range, filter out
   if (val < _min_in || val > _max_in)
-    return CONTROLLER_BLOCK;
+    return BLOCK_CONTROLLER;
 
   return _min_out + int(floor((_slope * (val - _min_in)) + 0.5));
 }
