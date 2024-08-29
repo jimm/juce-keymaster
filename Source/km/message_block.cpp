@@ -4,7 +4,7 @@
 #include "keymaster.h"
 #include "message_block.h"
 
-#define is_channel(b) (((b) & 0xf0) < 0xf0)
+#define is_channel(b) ((b) >= 0x80 && (b) < 0xf0)
 #define is_realtime(b) ((b) >= 0xf8)
 
 int CHANNEL_MESSAGE_LENGTHS[] = {
@@ -64,6 +64,7 @@ void MessageBlock::from_hex_string(const String &str) {
         break;
       case SYSEX:
         MidiMessage sysex = sysex_from_bytes(data, i, num_bytes);
+        _midi_messages.add(sysex);
         i += sysex.getSysExDataSize();
         break;
       }
@@ -103,8 +104,9 @@ void MessageBlock::send_to(Output::Ptr out) {
 }
 
 MidiMessage MessageBlock::sysex_from_bytes(uint8 *data, int start, int num_bytes) {
-  for (int i = start + 1; i < num_bytes; ++i)
+  for (int i = start + 1; i < num_bytes; ++i) {
     if (data[i] == EOX || is_channel(data[i]))
-      return MidiMessage::createSysExMessage(data + start + 1, i - start);
+      return MidiMessage::createSysExMessage(data + start + 1, i - start - 1);
+  }
   return MidiMessage::createSysExMessage(data, 0);
 }
