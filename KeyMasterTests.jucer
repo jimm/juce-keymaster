@@ -16,6 +16,10 @@
             file="Source/test/controller_test.h"/>
       <FILE id="BsVg3R" name="cursor_test.cpp" compile="1" resource="0" file="Source/test/cursor_test.cpp"/>
       <FILE id="tURWer" name="cursor_test.h" compile="0" resource="0" file="Source/test/cursor_test.h"/>
+      <FILE id="jQ7AzX" name="keymaster_test.cpp" compile="1" resource="0"
+            file="Source/test/keymaster_test.cpp"/>
+      <FILE id="Hr4QUi" name="keymaster_test.h" compile="0" resource="0"
+            file="Source/test/keymaster_test.h"/>
       <FILE id="PjvPC2" name="message_block_test.cpp" compile="1" resource="0"
             file="Source/test/message_block_test.cpp"/>
       <FILE id="Q4J3si" name="message_block_test.h" compile="0" resource="0"

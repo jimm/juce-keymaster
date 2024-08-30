@@ -45,6 +45,7 @@ KeyMaster *Storage::load(bool testing) {
   load_set_lists(data.getProperty("set_lists", nullish_arr));
   create_default_patches();
 
+  km->reset_changed();
   return km;
 }
 
@@ -153,9 +154,8 @@ void Storage::load_songs(var songs) {
     s->set_clock_on_at_start((bool)vsong.getProperty("clock_on_at_start", v));
     s->set_notes((String)vsong.getProperty("notes", v));
     load_patches(s, vsong.getProperty("patches", v));
-    km->all_songs()->songs().add(s);
+    km->all_songs()->add_song(s);
   }
-  km->sort_all_songs();
 }
 
 void Storage::load_patches(Song *song, var patches) {

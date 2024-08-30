@@ -15,7 +15,7 @@ private:
   DeviceManager dev_mgr;
   KeyMaster *km;
 
-  void test_load(String data_file_path);
+  void test_load(String data_file_path, bool call_begin_test);
   void test_save();
 };
 

@@ -19,16 +19,16 @@ void StorageTest::shutdown() {
 }
 
 void StorageTest::runTest() {
-  beginTest("load");
-  test_load("");
-  beginTest("save");
+  test_load("", true);
   test_save();
 }
 
-void StorageTest::test_load(String data_file_path) {
+void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   km = load_test_data(dev_mgr, data_file_path);
 
   // ==== load messages
+  if (call_begin_test)
+    beginTest("load messages");
   expect(km->messages().size() == 5); // includes 2 start/stop messages
 
   MessageBlock *msg = km->messages()[0];
@@ -47,6 +47,8 @@ void StorageTest::test_load(String data_file_path) {
     expect(mm_eq(msg->midi_messages()[chan], MidiMessage::controllerEvent(JCH(chan), 7, 127)));
 
   // ==== load triggers
+  if (call_begin_test)
+    beginTest("load triggers");
   Trigger *t;
 
   expect(km->triggers().size() == 7);
@@ -73,6 +75,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(t->output_message()->name() == "Tune Request");
 
   // ==== load songs
+  if (call_begin_test)
+    beginTest("load songs");
   Array<Song *> &all_songs = km->all_songs()->songs();
   expect(all_songs.size() == 3);
 
@@ -86,6 +90,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(s->name() == "This is a Song");
 
   // ==== load notes
+  if (call_begin_test)
+    beginTest("load notes");
   s = all_songs[SONG_WITHOUT_INDEX];
   expect(s->notes() == "");
 
@@ -93,6 +99,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(s->notes() == "this song has note text\nthat spans multiple lines");
 
   // ==== load patches
+  if (call_begin_test)
+    beginTest("load patches");
   s = all_songs[THIS_IS_A_SONG_INDEX];
   expect(s->patches().size() == 2);
 
@@ -100,12 +108,16 @@ void StorageTest::test_load(String data_file_path) {
   expect(p->name() == "Vanilla Through, Filter Two's Sustain");
 
   // ==== load start and stop messages
+  if (call_begin_test)
+    beginTest("load start and stop messages");
   s = all_songs[ANOTHER_INDEX];
   p = s->patches().getLast();
   expect(p->start_message()->name() == "_start");
   expect(p->stop_message()->name() == "_stop");
 
   // ==== load connections
+  if (call_begin_test)
+    beginTest("load connections");
   s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
   p = s->patches()[0];          // Two Inputs Merging
   expect(p->connections().size() == 2);
@@ -126,6 +138,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(mf.note());
 
   // ==== load bank msb, lsb, and program
+  if (call_begin_test)
+    beginTest("load bank msb, lsb, and program");
   s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
   p = s->patches()[0];          // Vanilla Through
   expect(p->name() == "Vanilla Through, Filter Two's Sustain"); // DEBUG
@@ -136,6 +150,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(conn->program_prog() == 12);
 
   // ==== load bank lsb only
+  if (call_begin_test)
+    beginTest("load bank lsb only");
   s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
   p = s->patches()[1];          // One Up One Oct...
   conn = p->connections().getLast();
@@ -144,6 +160,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(conn->program_prog() == UNDEFINED);
 
   // ==== load xpose and velocity_curve
+  if (call_begin_test)
+    beginTest("load xpose and velocity_curve");
   s = all_songs[THIS_IS_A_SONG_INDEX];
   p = s->patches()[0];
   conn = p->connections()[0];
@@ -158,6 +176,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(conn->velocity_curve()->name() == "Test Curve");
 
   // ==== load zone
+  if (call_begin_test)
+    beginTest("load zone");
   s = all_songs[THIS_IS_A_SONG_INDEX];
   p = s->patches()[0];
   conn = p->connections()[0];
@@ -175,6 +195,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(conn->zone_high() == 127);
 
   // ==== load controller mappings
+  if (call_begin_test)
+    beginTest("load controller mappings");
   s = all_songs[THIS_IS_A_SONG_INDEX];
   p = s->patches()[0];
   conn = p->connections().getLast();
@@ -195,6 +217,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(cc->max_out() == 50);
 
   // ==== load song list
+  if (call_begin_test)
+    beginTest("load song list");
   expect(km->set_lists().size() == 3);
 
   SetList *sl = km->set_lists()[1]; // first user-defined song list
@@ -210,6 +234,8 @@ void StorageTest::test_load(String data_file_path) {
   expect(sl->songs().getLast() == all_songs[THIS_IS_A_SONG_INDEX]);
 
   // ==== load auto patch
+  if (call_begin_test)
+    beginTest("load auto patch");
   s = all_songs[SONG_WITHOUT_INDEX];
   expect(s->patches().size() == 1);
   p = s->patches()[0];
@@ -220,9 +246,11 @@ void StorageTest::test_load(String data_file_path) {
 }
 
 void StorageTest::test_save() {
+  beginTest("save (after successful save, calls test_load)");
   File save_file("/tmp/km_save_test.kmst");
   Storage saver(dev_mgr, save_file);
   saver.save(km);
   expect(saver.has_error() == false);
-  test_load(save_file.getFullPathName());
+  test_load(save_file.getFullPathName(), false);
+  save_file.deleteFile();
 }

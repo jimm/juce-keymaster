@@ -45,7 +45,6 @@ void Editor::add_trigger(Trigger *trigger) const {
 
 void Editor::add_song(Song *song) const {
   km->all_songs()->add_song(song);
-  km->sort_all_songs();
 
   SetList *curr_set_list = km->cursor()->set_list();
   if (curr_set_list == nullptr)

@@ -176,12 +176,19 @@ void CursorTest::test_cursor() {
   // ==== goto with regex
   // ==== song
   c->init();
-  c->goto_song("nother");
+  expect(c->song()->name() == "Another Song"); // starting here
+  c->goto_song("exp");
   s = c->song();
   expect(s != nullptr);
-  expect(s->name() == "Another Song");
-
+  expect(s->name() == "Song Without Explicit Patch");
   
+  // ==== goto song using regex
+  c->init();
+  c->goto_song(".*x.*at.h$");
+  s = c->song();
+  expect(s != nullptr);
+  expect(s->name() == "Song Without Explicit Patch");
+
   // ==== song, no such song
   c->init();
   Song *before_song = c->song();

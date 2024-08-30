@@ -12,7 +12,12 @@ SetList::~SetList() {
 }
 
 void SetList::add_song(Song *song) {
-  _songs.add(song);
+  if (this == KeyMaster_instance()->all_songs()) {
+    auto sorter = NameableSorter();
+    _songs.addSorted(sorter, song);
+  }
+  else
+    _songs.add(song);
   KeyMaster_instance()->changed();
 }
 

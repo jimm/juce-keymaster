@@ -84,10 +84,11 @@ public:
 #ifndef JUCE_UNIT_TESTS
   void set_file_based_document(FileBasedDocument *doc) { _doc = doc; }
   void changed() { if (_doc != nullptr) _doc->changed(); }
+  void reset_changed() { if (_doc != nullptr) _doc->setChangedFlag(false); }
 #else
   void changed() { }
+  void reset_changed() { }
 #endif
-  void sort_all_songs();
 
 private:
   DeviceManager &_device_manager;

@@ -299,10 +299,3 @@ void KeyMaster::panic(bool send_notes_off) {
     for (auto &out : _device_manager.outputs())
       out->midi_out(msg->message);
 }
-
-// ================ helpers ================
-
-void KeyMaster::sort_all_songs() {
-  auto sorter = NameableSorter();
-  all_songs()->songs().sort(sorter, false);
-}
