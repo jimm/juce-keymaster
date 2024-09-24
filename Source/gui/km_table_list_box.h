@@ -4,6 +4,8 @@
 #include "../km/keymaster.h"
 
 
+class KmTableListBox;
+
 class KmTableListBoxModel : public TableListBoxModel {
 public:
   virtual void make_columns(TableHeaderComponent &header) = 0;
@@ -31,7 +33,11 @@ public:
 
   virtual int selected_row_num() { return -1; }
 
+  void set_list_box(KmTableListBox *list_box) { _list_box = list_box; }
+
 protected:
+  KmTableListBox *_list_box;
+
   LookAndFeel &_lf { LookAndFeel::getDefaultLookAndFeel() };
 
   Cursor *cursor() { return KeyMaster_instance()->cursor(); }

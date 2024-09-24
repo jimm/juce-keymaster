@@ -2,6 +2,7 @@
 #include "../km/connection.h"
 #include "../km/patch.h"
 #include "connections_table.h"
+#include "connection_dialog_component.h"
 
 void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
   header.addColumn("Input", 1, 75);
@@ -52,8 +53,11 @@ void ConnectionsTableListBoxModel::paintCell(
       str = String(c->output_chan());
     break;
   case 5:                       // zone
-    if (c->zone_low() != 0 || c->zone_high() != 127)
-      str = String::formatted("%d - %d", c->zone_low(), c->zone_high());
+    if (c->zone_low() != 0 || c->zone_high() != 127) {
+      str = MidiMessage::getMidiNoteName(c->zone_low(), true, true, 4);
+      str << " - ";
+      str << MidiMessage::getMidiNoteName(c->zone_high(), true, true, 4);
+    }
     break;
   case 6:                       // xpose
     if (c->xpose() != 0)
@@ -70,6 +74,23 @@ void ConnectionsTableListBoxModel::paintCell(
   g.drawText(str, 2, 0, width - 4, height, Justification::centredLeft, true);
   g.setColour(_lf.findColour(ListBox::backgroundColourId));
   g.fillRect(width - 1, 0, 1, height);
+}
+
+void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
+  Patch *p = KeyMaster_instance()->cursor()->patch();
+  Connection *c = p->connections()[row];
+
+  // open editor
+  DialogWindow::LaunchOptions opts;
+  opts.dialogTitle = "Connection";
+  opts.dialogBackgroundColour =
+    LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
+  opts.resizable = false;
+  auto cdc = new ConnectionDialogComponent(p, c, false, _list_box);
+  opts.content.setOwned(cdc);
+  auto dialog_win = opts.launchAsync();
+  if (dialog_win != nullptr)
+    dialog_win->centreWithSize(cdc->width(), cdc->height());
 }
 
 String ConnectionsTableListBoxModel::program_str(Connection *c) {

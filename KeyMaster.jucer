@@ -6,6 +6,12 @@
               bundleIdentifier="jimm.KeyMaster" cppLanguageStandard="20">
   <MAINGROUP id="vDaUrm" name="KeyMaster">
     <GROUP id="{9BE1D933-937C-5CFF-F347-C7F459F49700}" name="gui">
+      <FILE id="dsM425" name="connection_dialog_component.cpp" compile="1"
+            resource="0" file="Source/gui/connection_dialog_component.cpp"/>
+      <FILE id="yP8oSL" name="connection_dialog_component.h" compile="0"
+            resource="0" file="Source/gui/connection_dialog_component.h"/>
+      <FILE id="E3Pu3X" name="connection_dialog_window.h" compile="0" resource="0"
+            file="Source/gui/connection_dialog_window.h"/>
       <FILE id="VlgiOB" name="connections_table.cpp" compile="1" resource="0"
             file="Source/gui/connections_table.cpp"/>
       <FILE id="UrMJqx" name="connections_table.h" compile="0" resource="0"

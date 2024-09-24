@@ -26,6 +26,8 @@ public:
 
   int selected_row_num() override { return cursor()->connection_index; }
 
+  virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
+
 private:
   Patch *patch() { return cursor()->patch(); }
   String program_str(Connection *c);

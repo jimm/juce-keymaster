@@ -4,6 +4,8 @@
 #include "../km/keymaster.h"
 
 
+class KmListBox;
+
 class KmListBoxModel : public ListBoxModel {
 public:
   virtual String &getText(int rowNumber) = 0;
@@ -28,7 +30,11 @@ public:
 
   virtual int selected_row_num() { return -1; }
 
+  void set_list_box(KmListBox *list_box) { _list_box = list_box; }
+
 protected:
+  KmListBox *_list_box;
+
   Cursor *cursor() { return KeyMaster_instance()->cursor(); }
 };
 

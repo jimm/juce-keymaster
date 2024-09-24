@@ -207,36 +207,15 @@ void MainComponent::new_connection() {
   Connection *c = e.create_connection(nullptr, nullptr);
 
   // open editor
-
-  auto *alert_window = new AlertWindow("New Connection", "Create a new connection", MessageBoxIconType::NoIcon);
-  enum NewConnResult { cancel, ok };
-  alert_window->addButton("Cancel", NewConnResult::cancel);
-  alert_window->addButton("Ok", NewConnResult::ok);
-
-  alert_window->enterModalState(true, ModalCallbackFunction::create([ref = SafePointer{this}, e, c, p] (int result) {
-    if (ref == nullptr)
-      return;
-    if (result == NewConnResult::ok) {
-      e.add_connection(c, p);
-      ref->update();
-    }
-    else
-      delete c;
-  }), true);
-
-  // DialogWindow::LaunchOptions opts;
-  // opts.dialogTitle = "Connection";
-  // opts.dialogBackgroundColour = getLookAndFeel().findColour(ResizableWindow::backgroundColourId);
-  // opts.escapeKeyTriggersCloseButton = false;
-  // opts.resizable = false;
-  // opts.content.setOwned(new ConnectionDialogComponent(p, c));
-  // opts.content->setSize(300, 200);
-  // auto dialog_win = opts.launchAsync();
-  // if (dialog_win != nullptr)
-  //   dialog_win->centreWithSize(300, 200);
-  // // TODO wait for it to close and then update content if anything changed
-
-    connections_table.updateContent();
+  DialogWindow::LaunchOptions opts;
+  opts.dialogTitle = "Connection";
+  opts.dialogBackgroundColour = getLookAndFeel().findColour(ResizableWindow::backgroundColourId);
+  opts.resizable = false;
+  auto cdc = new ConnectionDialogComponent(p, c, true, &connections_table);
+  opts.content.setOwned(cdc);
+  auto dialog_win = opts.launchAsync();
+  if (dialog_win != nullptr)
+    dialog_win->centreWithSize(cdc->width(), cdc->height());
 }
 
 void MainComponent::new_set_list() {
@@ -373,6 +352,7 @@ void MainComponent::config_list_box(
 {
   box_models.add(model);
   list_box.setModel(model);
+  model->set_list_box(&list_box);
   config_lbox(label_text, label, list_box);
 }
 
@@ -381,6 +361,7 @@ void MainComponent::config_table_list_box(
 {
   table_box_models.add(model);
   list_box.setModel(model);
+  model->set_list_box(&list_box);
   model->make_columns(list_box.getHeader());
   config_lbox(label_text, label, list_box);
 }

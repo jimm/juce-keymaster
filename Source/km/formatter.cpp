@@ -9,12 +9,8 @@ static const int NOTE_OFFSETS[] = {
   9, 11, 0, 2, 4, 5, 7
 };
 
-String note_num_to_name(int num) {
-  return MidiMessage::getMidiNoteName(num, true, true, 4);
-}
-
 // str may point to an integer string like "64" as well
-int note_name_to_num(String &str) {
+int note_name_to_num(String str) {
   char ch = (char)str[0];
 
   if (isdigit(ch))
