@@ -50,6 +50,9 @@ private:
   Label _xpose_label { {}, "Transpose" };
   TextEditor _xpose { "Tranpose" };
 
+  Label _vc_label { {}, "Velocity Curve" };
+  ComboBox _vc;
+
   // TODO curve, filter, cc map
 
   TextButton _ok { "Ok" };
@@ -61,7 +64,7 @@ private:
   );
   void layout_program(Rectangle<int> &area);
   void layout_zone(Rectangle<int> &area);
-  void layout_xpose(Rectangle<int> &area);
+  void layout_xpose_and_velocity_curve(Rectangle<int> &area);
   void layout_buttons(Rectangle<int> &area);
 
   void init_input();
@@ -69,6 +72,7 @@ private:
   void init_prog();
   void init_zone();
   void init_xpose();
+  void init_velocity_curve();
 
   void init_text_editor(TextEditor &te, String initial_contents);
 

@@ -5,7 +5,7 @@
 #include "../km/connection.h"
 #include "../km/formatter.h"
 
-#define UNSELECTED_INSTRUMENT (-1)
+#define UNSELECTED (-1)
 
 #define SPACE 12
 #define BETWEEN_ROW_SPACE 20
@@ -19,7 +19,9 @@
 #define PROG_WIDTH 40
 #define ZONE_WIDTH 40
 #define ZONE_BETWEEN_WIDTH 16
-#define XPOSE_WIDTH 40
+#define XPOSE_COLUMN_WIDTH 100
+#define XPOSE_FIELD_WIDTH 40
+#define VCURVE_WIDTH 250
 #define WINDOW_WIDTH (SPACE + INSTRUMENT_WIDTH + SPACE + CHANNEL_COMBO_WIDTH + SPACE)
 #define WINDOW_HEIGHT (SPACE * 7 + BETWEEN_ROW_SPACE * 5 + LABEL_HEIGHT * 5 + DATA_ROW_HEIGHT * 5 + BUTTON_HEIGHT)
 
@@ -32,6 +34,7 @@ ConnectionDialogComponent::ConnectionDialogComponent(
   init_prog();
   init_zone();
   init_xpose();
+  init_velocity_curve();
 
   // TODO velocity curve, message filter
 
@@ -74,7 +77,7 @@ void ConnectionDialogComponent::resized() {
   layout_zone(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
-  layout_xpose(area);
+  layout_xpose_and_velocity_curve(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_buttons(area);
@@ -127,12 +130,17 @@ void ConnectionDialogComponent::layout_zone(Rectangle<int> &area) {
   _zone_high.setBounds(row_area.removeFromLeft(ZONE_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_xpose(Rectangle<int> &area) {
-  _xpose_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
+void ConnectionDialogComponent::layout_xpose_and_velocity_curve(Rectangle<int> &area) {
+  auto row_area = area.removeFromTop(LABEL_HEIGHT);
+  _xpose_label.setBounds(row_area.removeFromLeft(XPOSE_COLUMN_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _vc_label.setBounds(row_area.removeFromLeft(VCURVE_WIDTH));
 
   area.removeFromTop(SPACE);
-  auto row_area = area.removeFromTop(DATA_ROW_HEIGHT);
-  _xpose.setBounds(row_area.removeFromLeft(XPOSE_WIDTH));
+  row_area = area.removeFromTop(DATA_ROW_HEIGHT);
+  _xpose.setBounds(row_area.removeFromLeft(XPOSE_FIELD_WIDTH));
+  row_area.removeFromLeft((XPOSE_COLUMN_WIDTH - XPOSE_FIELD_WIDTH) + SPACE);
+  _vc.setBounds(row_area.removeFromLeft(VCURVE_WIDTH));
 }
 
 void ConnectionDialogComponent::layout_buttons(Rectangle<int> &area) {
@@ -145,7 +153,7 @@ void ConnectionDialogComponent::layout_buttons(Rectangle<int> &area) {
 }
 
 void ConnectionDialogComponent::init_input() {
-  _input_instrument.addItem("Select input instrument", UNSELECTED_INSTRUMENT);
+  _input_instrument.addItem("Select input instrument", UNSELECTED);
   int i = 0;
   for (auto inp : KeyMaster_instance()->device_manager().inputs()) {
     _input_instrument.addItem(inp->info.name, i+1);
@@ -171,7 +179,7 @@ void ConnectionDialogComponent::init_input() {
 }
 
 void ConnectionDialogComponent::init_output() {
-  _output_instrument.addItem("Select output instrument", UNSELECTED_INSTRUMENT);
+  _output_instrument.addItem("Select output instrument", UNSELECTED);
   int i = 0;
   for (auto outp : KeyMaster_instance()->device_manager().outputs()) {
     _output_instrument.addItem(outp->info.name, i+1);
@@ -182,7 +190,7 @@ void ConnectionDialogComponent::init_output() {
   if (_output_instrument.getSelectedId() == 0)
     _output_instrument.setSelectedId(1);
 
-  _output_chan.addItem("All Channels", CONNECTION_ALL_CHANNELS);
+  _output_chan.addItem("Input Channel", CONNECTION_ALL_CHANNELS);
   for (i = 1; i <= MIDI_CHANNELS; ++i)
     _output_chan.addItem(String(i), i);
   if (_conn->output_chan() == CONNECTION_ALL_CHANNELS)
@@ -231,6 +239,20 @@ void ConnectionDialogComponent::init_xpose() {
   addAndMakeVisible(_xpose_label);
 }
 
+void ConnectionDialogComponent::init_velocity_curve() {
+  _vc.addItem("None (Linear)", UNSELECTED);
+  _vc.setSelectedId(UNSELECTED);
+  int i = 0;
+  for (auto *curve : KeyMaster_instance()->curves()) {
+    _vc.addItem(curve->name(), ++i);
+    if (curve == _conn->velocity_curve())
+      _vc.setSelectedId(i);
+  }
+
+  addAndMakeVisible(_vc_label);
+  addAndMakeVisible(_vc);
+}
+
 void ConnectionDialogComponent::ok() {
   if (apply())
     static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
@@ -246,14 +268,14 @@ bool ConnectionDialogComponent::apply() {
 
   DeviceManager &dm = KeyMaster_instance()->device_manager();
   int id = _input_instrument.getSelectedId();
-  Input::Ptr input = id == UNSELECTED_INSTRUMENT ? nullptr : dm.inputs()[id-1];
+  Input::Ptr input = id == UNSELECTED ? nullptr : dm.inputs()[id-1];
 
   int input_chan = _input_chan.getSelectedId();
   if (input_chan != CONNECTION_ALL_CHANNELS)
     --input_chan;
 
   id = _output_instrument.getSelectedId();
-  Output::Ptr output = id == UNSELECTED_INSTRUMENT ? nullptr : dm.outputs()[id-1];
+  Output::Ptr output = id == UNSELECTED ? nullptr : dm.outputs()[id-1];
 
   int output_chan = _output_chan.getSelectedId();
   if (output_chan != CONNECTION_ALL_CHANNELS)
@@ -284,6 +306,11 @@ bool ConnectionDialogComponent::apply() {
 
   int xpose = _xpose.getText().getIntValue();
 
+  id = _vc.getSelectedId();
+  Curve *curve = nullptr;
+  if (id != UNSELECTED)
+    curve = KeyMaster_instance()->curves()[id-1];
+
   // TODO velocity curve, message filter
 
   if (!error_msgs.isEmpty()) {
@@ -308,6 +335,7 @@ bool ConnectionDialogComponent::apply() {
   _conn->set_zone_low(zone_low);
   _conn->set_zone_high(zone_high);
   _conn->set_xpose(xpose);
+  _conn->set_velocity_curve(curve);
 
   if (_is_new) {
     _patch->add_connection(_conn);

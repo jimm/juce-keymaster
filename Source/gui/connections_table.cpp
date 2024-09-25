@@ -6,13 +6,14 @@
 
 void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
   header.addColumn("Input", 1, 75);
-  header.addColumn("Chan", 2, 30);
+  header.addColumn("Chan", 2, 20, 20);
   header.addColumn("Output", 3, 75);
-  header.addColumn("Chan", 4, 20);
+  header.addColumn("Chan", 4, 25, 25);
   header.addColumn("Zone", 5, 30);
-  header.addColumn("Xpose", 6, 20);
-  header.addColumn("Prog", 7, 60);
-  header.addColumn("CC Filts/Maps", 8, 200);
+  header.addColumn("Xpose", 6, 18, 18);
+  header.addColumn("Prog", 7, 50);
+  header.addColumn("Curve", 8, 20, 20);
+  header.addColumn("CC Filts/Maps", 9, 200);
   header.setStretchToFitActive(true);
 }
 
@@ -26,6 +27,7 @@ void ConnectionsTableListBoxModel::paintCell(
     return;
 
   Connection *c = p->connections()[rowNumber];
+  Curve *curve = c->velocity_curve();
   String str;
   switch (columnId) {
   case 1:                       // input name
@@ -38,7 +40,7 @@ void ConnectionsTableListBoxModel::paintCell(
     if (c->input_chan() == CONNECTION_ALL_CHANNELS)
       str = String("All");
     else
-      str = String(c->input_chan());
+      str = String(c->input_chan() + 1);
     break;
   case 3:                       // output name
     if (c->output())
@@ -50,23 +52,23 @@ void ConnectionsTableListBoxModel::paintCell(
     if (c->output_chan() == CONNECTION_ALL_CHANNELS)
       str = String("Input");
     else
-      str = String(c->output_chan());
+      str = String(c->output_chan() + 1);
     break;
   case 5:                       // zone
-    if (c->zone_low() != 0 || c->zone_high() != 127) {
-      str = MidiMessage::getMidiNoteName(c->zone_low(), true, true, 4);
-      str << " - ";
-      str << MidiMessage::getMidiNoteName(c->zone_high(), true, true, 4);
-    }
+    str = MidiMessage::getMidiNoteName(c->zone_low(), true, true, 4);
+    str << " - ";
+    str << MidiMessage::getMidiNoteName(c->zone_high(), true, true, 4);
     break;
   case 6:                       // xpose
-    if (c->xpose() != 0)
-      str = String(c->xpose());
+    str = String(c->xpose());
     break;
   case 7:                       // prog
     str = program_str(c);
     break;
-  case 8:                       // CC filters / maps
+  case 8:                       // velocity curve
+    str = curve == nullptr ? "lin" : curve->short_name();
+    break;
+  case 9:                       // CC filters / maps
     str = controllers_str(c);
     break;
   }
@@ -100,24 +102,24 @@ String ConnectionsTableListBoxModel::program_str(Connection *c) {
   int has_bank = has_msb || has_lsb;
 
   if (has_bank)
-    str += '[';
+    str << '[';
 
   if (has_msb)
-    str += String::formatted("%3d", c->program_bank_msb());
+    str << String::formatted("%3d", c->program_bank_msb());
 
   if (has_bank)
-    str += ',';
+    str << ',';
 
   if (has_lsb)
-    str += String::formatted("%3d", c->program_bank_lsb());
+    str << String::formatted("%3d", c->program_bank_lsb());
   else
-    str += " ";
+    str << " ";
 
   if (has_bank)
-    str += ']';
+    str << ']';
 
   if (c->program_prog() != UNDEFINED)
-    str += String::formatted("%d", c->program_prog());
+    str << String::formatted("%d", c->program_prog());
     
   return str;
 }

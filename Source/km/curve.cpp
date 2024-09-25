@@ -1,16 +1,6 @@
 #include "curve.h"
 #include "formatter.h"
 
-class LinearCurve : public Curve {
-public:
-  LinearCurve() : Curve(1, "Linear", "lin") { generate(); }
-protected:
-  virtual void generate() {
-    for (int i = 0; i < 128; ++i)
-      curve[i] = uint8(i);
-  }
-};
-
 class ExponentialCurve : public Curve {
 public:
   ExponentialCurve() : Curve(1, "Exponential", "exp") { generate(); }
@@ -68,7 +58,6 @@ protected:
 };
 
 void generate_default_curves(Array<Curve *> &curves) {
-  curves.add(new LinearCurve());
   curves.add(new ExponentialCurve());
   curves.add(new HalfExponentialCurve());
   curves.add(new InverseExponentialCurve());
