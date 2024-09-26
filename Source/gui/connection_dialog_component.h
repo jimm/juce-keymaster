@@ -34,7 +34,7 @@ private:
   Label _output_chan_label { {}, "Output Chan" };
   ComboBox _output_chan;
 
-  Label _prog_label { {}, "Program Change (in or out channel must be selected)" };
+  Label _prog_label { {}, "Program Change (ignored if in chan = All and out chan = Input)" };
   Label _msb_label { {}, "MSB:" };
   TextEditor _msb { "Bank MSB" };
   Label _lsb_label { {}, "LSB:" };
@@ -80,3 +80,6 @@ private:
   void cancel();
   bool apply();
 };
+
+// If connection is nullptr we create a new one.
+void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table);

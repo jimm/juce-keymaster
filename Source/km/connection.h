@@ -63,6 +63,9 @@ public:
   // send to (because both input and output don't declare channels). This
   // means that no program change will be sent.
   int program_change_send_channel();
+  bool program_change_can_be_sent() {
+    return program_change_send_channel() != CONNECTION_ALL_CHANNELS;
+  }
 
   void begin_changes();
   void end_changes();

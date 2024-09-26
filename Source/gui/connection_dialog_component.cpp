@@ -3,6 +3,7 @@
 #include "../km/keymaster.h"
 #include "../km/patch.h"
 #include "../km/connection.h"
+#include "../km/editor.h"
 #include "../km/formatter.h"
 
 #define UNSELECTED (-1)
@@ -25,6 +26,26 @@
 #define WINDOW_WIDTH (SPACE + INSTRUMENT_WIDTH + SPACE + CHANNEL_COMBO_WIDTH + SPACE)
 #define WINDOW_HEIGHT (SPACE * 7 + BETWEEN_ROW_SPACE * 5 + LABEL_HEIGHT * 5 + DATA_ROW_HEIGHT * 5 + BUTTON_HEIGHT)
 
+void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table)
+{
+  bool is_new = c == nullptr;
+  if (is_new) {
+    Editor e;
+    c = e.create_connection(nullptr, nullptr);
+  }
+
+  DialogWindow::LaunchOptions opts;
+  opts.dialogTitle = "Connection";
+  opts.dialogBackgroundColour =
+    LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
+  opts.resizable = false;
+  auto cdc = new ConnectionDialogComponent(p, c, is_new, connections_table);
+  opts.content.setOwned(cdc);
+  auto dialog_win = opts.launchAsync();
+  if (dialog_win != nullptr)
+    dialog_win->centreWithSize(cdc->width(), cdc->height());
+}
+
 ConnectionDialogComponent::ConnectionDialogComponent(
   Patch *p, Connection *c, bool is_new, KmTableListBox *connections_table)
   : _patch(p), _conn(c), _is_new(is_new), _connections_table(connections_table)
@@ -36,7 +57,7 @@ ConnectionDialogComponent::ConnectionDialogComponent(
   init_xpose();
   init_velocity_curve();
 
-  // TODO velocity curve, message filter
+  // TODO message filter, CC maps
 
   _ok.onClick = [this] { ok(); };
   _cancel.onClick = [this] { cancel(); };
@@ -259,6 +280,8 @@ void ConnectionDialogComponent::ok() {
 }
 
 void ConnectionDialogComponent::cancel() {
+  if (_is_new)
+    delete _conn;
   static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
 }
 
@@ -282,17 +305,17 @@ bool ConnectionDialogComponent::apply() {
     --output_chan;
 
   auto text = _msb.getText();
-  int msb = text.isEmpty() ? UNDEFINED : _msb.getText().getIntValue();
+  int msb = text.isEmpty() ? UNDEFINED : text.getIntValue();
   if (msb != UNDEFINED && (msb < 0 || msb > 127))
     error_msgs.add("Bank MSB value must be 0-127");
 
   text = _lsb.getText();
-  int lsb = text.isEmpty() ? UNDEFINED : _msb.getText().getIntValue();
+  int lsb = text.isEmpty() ? UNDEFINED : text.getIntValue();
   if (lsb != UNDEFINED && (lsb < 0 || lsb > 127))
     error_msgs.add("Bank LSB value must be 0-127");
 
   text = _prog.getText();
-  int prog = text.isEmpty() ? UNDEFINED : _msb.getText().getIntValue();
+  int prog = text.isEmpty() ? UNDEFINED : text.getIntValue();
   if (prog != UNDEFINED && (prog < 0 || prog > 127))
     error_msgs.add("Program value must be 0-127");
 
@@ -311,7 +334,7 @@ bool ConnectionDialogComponent::apply() {
   if (id != UNSELECTED)
     curve = KeyMaster_instance()->curves()[id-1];
 
-  // TODO velocity curve, message filter
+  // TODO message filter, CC maps
 
   if (!error_msgs.isEmpty()) {
     String message = "The following errors prevent the connection from being saved:\n";
@@ -325,6 +348,7 @@ bool ConnectionDialogComponent::apply() {
     return false;
   }
 
+  _conn->begin_changes();
   _conn->set_input(input);
   _conn->set_input_chan(input_chan);
   _conn->set_output(output);
@@ -336,6 +360,7 @@ bool ConnectionDialogComponent::apply() {
   _conn->set_zone_high(zone_high);
   _conn->set_xpose(xpose);
   _conn->set_velocity_curve(curve);
+  _conn->end_changes();
 
   if (_is_new) {
     _patch->add_connection(_conn);
@@ -344,5 +369,6 @@ bool ConnectionDialogComponent::apply() {
 
   // FIXME not updating if not just created; conn not sending changed to KM instance?
   _connections_table->updateContent();
+  _connections_table->repaint();
   return true;
 }

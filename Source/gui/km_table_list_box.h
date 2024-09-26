@@ -25,9 +25,13 @@ public:
     }
 
   void paintCell(
-    Graphics &g, int _r, int _c, int _w, int _h, bool _selected) override
+    Graphics &g, int _r, int _c, int _w, int _h, bool rowIsSelected) override
     {
-      g.setColour(_lf.findColour(ListBox::textColourId));
+      auto text_color = _lf.findColour(ListBox::textColourId);
+      if (rowIsSelected)
+        text_color = Colours::black;
+
+      g.setColour(text_color);
       g.setFont(FontOptions(14.0f));
     }
 

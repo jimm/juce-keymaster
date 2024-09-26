@@ -202,20 +202,8 @@ void MainComponent::new_patch() {
 }
 
 void MainComponent::new_connection() {
-  Editor e;
   Patch *p = KeyMaster_instance()->cursor()->patch();
-  Connection *c = e.create_connection(nullptr, nullptr);
-
-  // open editor
-  DialogWindow::LaunchOptions opts;
-  opts.dialogTitle = "Connection";
-  opts.dialogBackgroundColour = getLookAndFeel().findColour(ResizableWindow::backgroundColourId);
-  opts.resizable = false;
-  auto cdc = new ConnectionDialogComponent(p, c, true, &connections_table);
-  opts.content.setOwned(cdc);
-  auto dialog_win = opts.launchAsync();
-  if (dialog_win != nullptr)
-    dialog_win->centreWithSize(cdc->width(), cdc->height());
+  open_connection_editor(p, nullptr, &connections_table);
 }
 
 void MainComponent::new_set_list() {

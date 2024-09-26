@@ -157,8 +157,8 @@ void Connection::set_cc_map(int cc_num, Controller *val) {
   }
 }
 
-// Returns the channel that we should send the initial bank/program change
-// messages. If we can't determine that (both input and output channels are
+// Returns the channel for the initial bank/program change messages. If we
+// can't determine that (both input and output channels are
 // CONNECTION_ALL_CHANNELS) then return CONNECTION_ALL_CHANNELS.
 int Connection::program_change_send_channel() {
   if (_output_chan != CONNECTION_ALL_CHANNELS)
@@ -186,7 +186,7 @@ void Connection::end_changes() {
 // Takes a MIDI message `msg` from an input, processes it, and sends it to
 // an output (unless it's been filtered out).
 void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
-  if (_input == nullptr || _input != input || _output == nullptr)
+  if (!_running || _input == nullptr || _input != input || _output == nullptr)
     return;
 
   const juce::uint8 *data = msg.getRawData();

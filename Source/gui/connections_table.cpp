@@ -74,53 +74,41 @@ void ConnectionsTableListBoxModel::paintCell(
   }
 
   g.drawText(str, 2, 0, width - 4, height, Justification::centredLeft, true);
-  g.setColour(_lf.findColour(ListBox::backgroundColourId));
-  g.fillRect(width - 1, 0, 1, height);
+  // g.setColour(_lf.findColour(ListBox::backgroundColourId));
+  // g.fillRect(width - 1, 0, 1, height);
 }
 
 void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
   Patch *p = KeyMaster_instance()->cursor()->patch();
   Connection *c = p->connections()[row];
-
-  // open editor
-  DialogWindow::LaunchOptions opts;
-  opts.dialogTitle = "Connection";
-  opts.dialogBackgroundColour =
-    LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
-  opts.resizable = false;
-  auto cdc = new ConnectionDialogComponent(p, c, false, _list_box);
-  opts.content.setOwned(cdc);
-  auto dialog_win = opts.launchAsync();
-  if (dialog_win != nullptr)
-    dialog_win->centreWithSize(cdc->width(), cdc->height());
+  open_connection_editor(p, c, _list_box);
 }
 
 String ConnectionsTableListBoxModel::program_str(Connection *c) {
   String str;
-  int has_msb = c->program_bank_msb() != UNDEFINED;
-  int has_lsb = c->program_bank_lsb() != UNDEFINED;
-  int has_bank = has_msb || has_lsb;
+  bool has_msb = c->program_bank_msb() != UNDEFINED;
+  bool has_lsb = c->program_bank_lsb() != UNDEFINED;
+  bool has_prog = c->program_prog() != UNDEFINED;
 
-  if (has_bank)
+  if (has_msb || has_lsb) {
     str << '[';
-
-  if (has_msb)
-    str << String::formatted("%3d", c->program_bank_msb());
-
-  if (has_bank)
-    str << ',';
-
-  if (has_lsb)
-    str << String::formatted("%3d", c->program_bank_lsb());
-  else
-    str << " ";
-
-  if (has_bank)
+    if (has_msb)
+      str << String::formatted("%d", c->program_bank_msb());
+    if (has_msb && has_lsb)
+      str << ',';
+    if (has_lsb)
+      str << String::formatted("%d", c->program_bank_lsb());
     str << ']';
+    if (has_prog)
+      str << ' ';
+  }
 
-  if (c->program_prog() != UNDEFINED)
+  if (has_prog)
     str << String::formatted("%d", c->program_prog());
     
+  if (!str.isEmpty() && !c->program_change_can_be_sent())
+    str = '(' + str + ')';
+
   return str;
 }
 
