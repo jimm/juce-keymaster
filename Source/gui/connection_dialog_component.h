@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "../km/connection.h"
 #include "connections_table.h"
+#include "cc_maps_table.h"
 #include "km_table_list_box.h"
 
 class Patch;
@@ -68,8 +69,11 @@ private:
   ToggleButton _filt_start { "Start/Continue/Stop" };
   ToggleButton _filt_reset { "System Reset" };
 
-  // TODO curve, filter, cc map
+  Label _cc_maps_label { {}, "Controller Mappings" };
+  CcMapsTableListBox _cc_maps_list_box;
 
+  TextButton _add_cc_map { "+" };
+  TextButton _del_cc_map { "-" };
   TextButton _ok { "Ok" };
   TextButton _cancel { "Cancel" };
   TextButton _apply { "Apply" };
@@ -82,6 +86,7 @@ private:
   void layout_xpose_and_velocity_curve(Rectangle<int> &area);
   void layout_message_filters(Rectangle<int> &area);
   void layout_toggle_row(Rectangle<int> &area, ToggleButton &left, ToggleButton &right);
+  void layout_cc_maps(Rectangle<int> &area);
   void layout_buttons(Rectangle<int> &area);
 
   void init_input();
@@ -91,8 +96,13 @@ private:
   void init_xpose();
   void init_message_filters();
   void init_velocity_curve();
+  void init_cc_maps();
 
   void init_text_editor(TextEditor &te, String initial_contents);
+
+  void add_cc_map();
+  void del_cc_map();
+  void update_conn_cc_maps();
 
   void ok();
   void cancel();

@@ -265,7 +265,7 @@ void Storage::load_controller_mappings(Connection *conn, var vconn) {
     var cmap = arr[i];
     int cc_num = (int)cmap.getProperty("cc_num", v);
     Controller *c = new Controller(UNDEFINED, cc_num);
-    c->set_cc_num((int)cmap.getProperty("cc_num", v));
+    c->set_cc_num(cc_num);
     c->set_translated_cc_num((int)cmap.getProperty("translated_cc_num", v));
     c->set_filtered((bool)cmap.getProperty("filtered", v));
     c->set_range(

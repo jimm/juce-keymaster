@@ -28,9 +28,14 @@
 #define MESSAGE_FILTER_CHECKBOX_WIDTH 150
 #define MESSAGE_FILTER_CHECKBOX_HEIGHT 18
 
-#define WINDOW_WIDTH (SPACE + INSTRUMENT_WIDTH + SPACE + CHANNEL_COMBO_WIDTH + SPACE)
-// #define WINDOW_WIDTH (MESSAGE_FILTER_CHECKBOX_WIDTH * 2 + SPACE * 3)
-#define WINDOW_HEIGHT (SPACE * 8 + BETWEEN_ROW_SPACE * 6 + LABEL_HEIGHT * 6 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + BUTTON_HEIGHT)
+#define CC_MAPS_TABLE_HEIGHT 150
+#define CC_MAPS_TABLE_WIDTH 300
+#define CC_MAPS_BUTTON_HEIGHT 25
+#define CC_MAPS_BUTTON_WIDTH 40
+
+// #define WINDOW_WIDTH (SPACE + INSTRUMENT_WIDTH + SPACE + CHANNEL_COMBO_WIDTH + SPACE)
+#define WINDOW_WIDTH (CC_MAPS_TABLE_WIDTH * 2 + SPACE * 2)
+#define WINDOW_HEIGHT (SPACE * 10 + BETWEEN_ROW_SPACE * 7 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT + BUTTON_HEIGHT)
 
 void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table)
 {
@@ -63,8 +68,10 @@ ConnectionDialogComponent::ConnectionDialogComponent(
   init_xpose();
   init_message_filters();
   init_velocity_curve();
+  init_cc_maps();
 
-  // TODO message filter, CC maps
+  _add_cc_map.onClick = [this] { add_cc_map(); };
+  _del_cc_map.onClick = [this] { del_cc_map(); };
 
   _ok.onClick = [this] { ok(); };
   _cancel.onClick = [this] { cancel(); };
@@ -109,6 +116,9 @@ void ConnectionDialogComponent::resized() {
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_message_filters(area);
+
+  area.removeFromTop(BETWEEN_ROW_SPACE);
+  layout_cc_maps(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_buttons(area);
@@ -184,7 +194,6 @@ void ConnectionDialogComponent::layout_toggle_row(
 }
 
 void ConnectionDialogComponent::layout_message_filters(Rectangle<int> &area) {
-  
   _filters_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
   area.removeFromTop(SPACE);
 
@@ -197,6 +206,18 @@ void ConnectionDialogComponent::layout_message_filters(Rectangle<int> &area) {
   auto row_area = area.removeFromTop(MESSAGE_FILTER_CHECKBOX_HEIGHT);
   row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH + SPACE);
   _filt_reset.setBounds(row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH));
+}
+
+void ConnectionDialogComponent::layout_cc_maps(Rectangle<int> &area) {
+  _cc_maps_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
+  area.removeFromTop(SPACE);
+  _cc_maps_list_box.setBounds(area.removeFromTop(CC_MAPS_TABLE_HEIGHT));
+  area.removeFromTop(SPACE);
+
+  auto row_area = area.removeFromTop(BUTTON_HEIGHT);
+  _add_cc_map.setBounds(row_area.removeFromLeft(CC_MAPS_BUTTON_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _del_cc_map.setBounds(row_area.removeFromLeft(CC_MAPS_BUTTON_WIDTH));
 }
 
 void ConnectionDialogComponent::layout_buttons(Rectangle<int> &area) {
@@ -343,6 +364,21 @@ void ConnectionDialogComponent::init_velocity_curve() {
   addAndMakeVisible(_vc);
 }
 
+void ConnectionDialogComponent::init_cc_maps() {
+  auto model = new CcMapsTableListBoxModel();
+  model->set_connection(_conn);
+  model->set_list_box(&_cc_maps_list_box);
+  model->make_columns(_cc_maps_list_box.getHeader());
+  _cc_maps_list_box.setModel(model);
+  _cc_maps_list_box.setColour(ListBox::outlineColourId, Colours::grey);
+  _cc_maps_list_box.setOutlineThickness(1);
+
+  addAndMakeVisible(_cc_maps_label);
+  addAndMakeVisible(_cc_maps_list_box);
+  addAndMakeVisible(_add_cc_map);
+  addAndMakeVisible(_del_cc_map);
+}
+
 void ConnectionDialogComponent::ok() {
   if (apply())
     static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
@@ -403,7 +439,7 @@ bool ConnectionDialogComponent::apply() {
   if (id != UNSELECTED)
     curve = KeyMaster_instance()->curves()[id-1];
 
-  // TODO message filter, CC maps
+  // TODO CC maps
 
   if (!error_msgs.isEmpty()) {
     String message = "The following errors prevent the connection from being saved:\n";
@@ -431,6 +467,8 @@ bool ConnectionDialogComponent::apply() {
   _conn->set_xpose(xpose);
   _conn->set_velocity_curve(curve);
 
+  update_conn_cc_maps();
+
   auto &mf = _conn->message_filter();
   mf.set_note(_filt_note.getToggleState());
   mf.set_poly_pressure(_filt_poly_press.getToggleState());
@@ -444,8 +482,8 @@ bool ConnectionDialogComponent::apply() {
   mf.set_sysex(_filt_sysex.getToggleState());
   mf.set_clock(_filt_clock.getToggleState());
   mf.set_start_continue_stop(_filt_start.getToggleState());
-  mf.set_system_reset(_filt_reset.getToggleState())
-;
+  mf.set_system_reset(_filt_reset.getToggleState());
+
   _conn->end_changes();
 
   if (_is_new) {
@@ -453,8 +491,47 @@ bool ConnectionDialogComponent::apply() {
     _is_new = false;
   }
 
-  // FIXME not updating if not just created; conn not sending changed to KM instance?
   _connections_table->updateContent();
   _connections_table->repaint();
   return true;
 }
+
+void ConnectionDialogComponent::add_cc_map() {
+  // TODO
+  // open_cc_map_editor(model.cc_maps()[row], _cc_maps_list_box);
+}
+
+void ConnectionDialogComponent::del_cc_map() {
+  // TODO
+  // if line selected, delete its entry from model.     
+  // open_cc_map_editor(model.cc_maps()[row], _cc_maps_list_box);
+}
+
+void ConnectionDialogComponent::update_conn_cc_maps() {
+  auto model = static_cast<CcMapsTableListBoxModel *>(_cc_maps_list_box.getTableListBoxModel());
+  for (auto controller : model->cc_maps())
+    _conn->set_cc_map(controller->cc_num(), controller);
+
+  // Get rid of controllers that are in the connection but not in the new
+  // model's list.
+  for (int i = 0; i < 128; ++i) {
+    if (_conn->cc_map(i) == nullptr)
+      break;
+
+    bool is_in_new_list = false;
+    for (auto controller : model->cc_maps()) {
+      if (controller->cc_num() == i) {
+        is_in_new_list = true;
+        break;
+      }
+    }
+
+    if (!is_in_new_list) {
+      // This CC number has an old controller that is not in the new list.
+      // Delete it.
+      _conn->set_cc_map(i, nullptr); // takes care of deleting old one
+    }
+  }
+}
+
+  

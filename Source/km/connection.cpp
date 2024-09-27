@@ -150,8 +150,13 @@ void Connection::set_running(bool val) {
   }
 }
 
+// Replaces controller mapping, deleting existing one if it exists.
 void Connection::set_cc_map(int cc_num, Controller *val) {
   if (_cc_maps[cc_num] != val) {
+    Controller *old = _cc_maps[cc_num];
+    if (old != nullptr)
+      delete old;
+
     _cc_maps[cc_num] = val;
     KeyMaster_instance()->changed();
   }

@@ -74,8 +74,6 @@ void ConnectionsTableListBoxModel::paintCell(
   }
 
   g.drawText(str, 2, 0, width - 4, height, Justification::centredLeft, true);
-  // g.setColour(_lf.findColour(ListBox::backgroundColourId));
-  // g.fillRect(width - 1, 0, 1, height);
 }
 
 void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
