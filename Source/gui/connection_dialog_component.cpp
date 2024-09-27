@@ -14,6 +14,7 @@
 #define BUTTON_HEIGHT 35
 #define BUTTON_WIDTH 80
 #define DATA_ROW_HEIGHT 20
+
 #define INSTRUMENT_WIDTH 250
 #define CHANNEL_COMBO_WIDTH 125
 #define PROG_LABEL_WIDTH 35
@@ -23,8 +24,13 @@
 #define XPOSE_COLUMN_WIDTH 100
 #define XPOSE_FIELD_WIDTH 40
 #define VCURVE_WIDTH 250
+
+#define MESSAGE_FILTER_CHECKBOX_WIDTH 150
+#define MESSAGE_FILTER_CHECKBOX_HEIGHT 18
+
 #define WINDOW_WIDTH (SPACE + INSTRUMENT_WIDTH + SPACE + CHANNEL_COMBO_WIDTH + SPACE)
-#define WINDOW_HEIGHT (SPACE * 7 + BETWEEN_ROW_SPACE * 5 + LABEL_HEIGHT * 5 + DATA_ROW_HEIGHT * 5 + BUTTON_HEIGHT)
+// #define WINDOW_WIDTH (MESSAGE_FILTER_CHECKBOX_WIDTH * 2 + SPACE * 3)
+#define WINDOW_HEIGHT (SPACE * 8 + BETWEEN_ROW_SPACE * 6 + LABEL_HEIGHT * 6 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + BUTTON_HEIGHT)
 
 void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table)
 {
@@ -55,6 +61,7 @@ ConnectionDialogComponent::ConnectionDialogComponent(
   init_prog();
   init_zone();
   init_xpose();
+  init_message_filters();
   init_velocity_curve();
 
   // TODO message filter, CC maps
@@ -99,6 +106,9 @@ void ConnectionDialogComponent::resized() {
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_xpose_and_velocity_curve(area);
+
+  area.removeFromTop(BETWEEN_ROW_SPACE);
+  layout_message_filters(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_buttons(area);
@@ -162,6 +172,31 @@ void ConnectionDialogComponent::layout_xpose_and_velocity_curve(Rectangle<int> &
   _xpose.setBounds(row_area.removeFromLeft(XPOSE_FIELD_WIDTH));
   row_area.removeFromLeft((XPOSE_COLUMN_WIDTH - XPOSE_FIELD_WIDTH) + SPACE);
   _vc.setBounds(row_area.removeFromLeft(VCURVE_WIDTH));
+}
+
+void ConnectionDialogComponent::layout_toggle_row(
+  Rectangle<int> &area, ToggleButton &left, ToggleButton &right)
+{
+  auto row_area = area.removeFromTop(MESSAGE_FILTER_CHECKBOX_HEIGHT);
+  left.setBounds(row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  right.setBounds(row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH));
+}
+
+void ConnectionDialogComponent::layout_message_filters(Rectangle<int> &area) {
+  
+  _filters_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
+  area.removeFromTop(SPACE);
+
+  layout_toggle_row(area, _filt_note, _filt_sptr);
+  layout_toggle_row(area, _filt_poly_press, _filt_ssel);
+  layout_toggle_row(area, _filt_chan_press, _filt_tune);
+  layout_toggle_row(area, _filt_prog, _filt_sysex);
+  layout_toggle_row(area, _filt_bend, _filt_clock);
+  layout_toggle_row(area, _filt_ctrl, _filt_start);
+  auto row_area = area.removeFromTop(MESSAGE_FILTER_CHECKBOX_HEIGHT);
+  row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH + SPACE);
+  _filt_reset.setBounds(row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH));
 }
 
 void ConnectionDialogComponent::layout_buttons(Rectangle<int> &area) {
@@ -260,6 +295,40 @@ void ConnectionDialogComponent::init_xpose() {
   addAndMakeVisible(_xpose_label);
 }
 
+void ConnectionDialogComponent::init_message_filters() {
+  auto &mf = _conn->message_filter();
+
+  auto ignore = NotificationType::dontSendNotification;
+  _filt_note.setToggleState(mf.note(), ignore);
+  _filt_poly_press.setToggleState(mf.poly_pressure(), ignore);
+  _filt_chan_press.setToggleState(mf.chan_pressure(), ignore);
+  _filt_prog.setToggleState(mf.program_change(), ignore);
+  _filt_bend.setToggleState(mf.pitch_bend(), ignore);
+  _filt_ctrl.setToggleState(mf.controller(), ignore);
+  _filt_sptr.setToggleState(mf.song_pointer(), ignore);
+  _filt_ssel.setToggleState(mf.song_select(), ignore);
+  _filt_tune.setToggleState(mf.tune_request(), ignore);
+  _filt_sysex.setToggleState(mf.sysex(), ignore);
+  _filt_clock.setToggleState(mf.clock(), ignore);
+  _filt_start.setToggleState(mf.start_continue_stop(), ignore);
+  _filt_reset.setToggleState(mf.system_reset(), ignore);
+
+  addAndMakeVisible(_filters_label);
+  addAndMakeVisible(_filt_note);
+  addAndMakeVisible(_filt_poly_press);
+  addAndMakeVisible(_filt_chan_press);
+  addAndMakeVisible(_filt_prog);
+  addAndMakeVisible(_filt_bend);
+  addAndMakeVisible(_filt_ctrl);
+  addAndMakeVisible(_filt_sptr);
+  addAndMakeVisible(_filt_ssel);
+  addAndMakeVisible(_filt_tune);
+  addAndMakeVisible(_filt_sysex);
+  addAndMakeVisible(_filt_clock);
+  addAndMakeVisible(_filt_start);
+  addAndMakeVisible(_filt_reset);
+}
+
 void ConnectionDialogComponent::init_velocity_curve() {
   _vc.addItem("None (Linear)", UNSELECTED);
   _vc.setSelectedId(UNSELECTED);
@@ -349,6 +418,7 @@ bool ConnectionDialogComponent::apply() {
   }
 
   _conn->begin_changes();
+
   _conn->set_input(input);
   _conn->set_input_chan(input_chan);
   _conn->set_output(output);
@@ -360,6 +430,22 @@ bool ConnectionDialogComponent::apply() {
   _conn->set_zone_high(zone_high);
   _conn->set_xpose(xpose);
   _conn->set_velocity_curve(curve);
+
+  auto &mf = _conn->message_filter();
+  mf.set_note(_filt_note.getToggleState());
+  mf.set_poly_pressure(_filt_poly_press.getToggleState());
+  mf.set_chan_pressure(_filt_chan_press.getToggleState());
+  mf.set_program_change(_filt_prog.getToggleState());
+  mf.set_pitch_bend(_filt_bend.getToggleState());
+  mf.set_controller(_filt_ctrl.getToggleState());
+  mf.set_song_pointer(_filt_sptr.getToggleState());
+  mf.set_song_select(_filt_ssel.getToggleState());
+  mf.set_tune_request(_filt_tune.getToggleState());
+  mf.set_sysex(_filt_sysex.getToggleState());
+  mf.set_clock(_filt_clock.getToggleState());
+  mf.set_start_continue_stop(_filt_start.getToggleState());
+  mf.set_system_reset(_filt_reset.getToggleState())
+;
   _conn->end_changes();
 
   if (_is_new) {

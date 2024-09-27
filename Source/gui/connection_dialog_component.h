@@ -53,6 +53,21 @@ private:
   Label _vc_label { {}, "Velocity Curve" };
   ComboBox _vc;
 
+  Label _filters_label { {}, "Message Filters" };
+  ToggleButton _filt_note { "Note On/Off" };
+  ToggleButton _filt_poly_press { "Polyphonic Pressure" };
+  ToggleButton _filt_chan_press { "Channel Pressure" };
+  ToggleButton _filt_prog { "Program Change + Bank" };
+  ToggleButton _filt_bend { "Pitch Bend" };
+  ToggleButton _filt_ctrl { "Controller" };
+  ToggleButton _filt_sptr { "Song Pointer" };
+  ToggleButton _filt_ssel { "Song Select" };
+  ToggleButton _filt_tune { "Tune Request" };
+  ToggleButton _filt_sysex { "System Exclusive" };
+  ToggleButton _filt_clock { "Clock" };
+  ToggleButton _filt_start { "Start/Continue/Stop" };
+  ToggleButton _filt_reset { "System Reset" };
+
   // TODO curve, filter, cc map
 
   TextButton _ok { "Ok" };
@@ -65,6 +80,8 @@ private:
   void layout_program(Rectangle<int> &area);
   void layout_zone(Rectangle<int> &area);
   void layout_xpose_and_velocity_curve(Rectangle<int> &area);
+  void layout_message_filters(Rectangle<int> &area);
+  void layout_toggle_row(Rectangle<int> &area, ToggleButton &left, ToggleButton &right);
   void layout_buttons(Rectangle<int> &area);
 
   void init_input();
@@ -72,6 +89,7 @@ private:
   void init_prog();
   void init_zone();
   void init_xpose();
+  void init_message_filters();
   void init_velocity_curve();
 
   void init_text_editor(TextEditor &te, String initial_contents);

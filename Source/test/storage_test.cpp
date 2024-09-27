@@ -142,7 +142,7 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
     beginTest("load bank msb, lsb, and program");
   s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
   p = s->patches()[0];          // Vanilla Through
-  expect(p->name() == "Vanilla Through, Filter Two's Sustain"); // DEBUG
+  expect(p->name() == "Vanilla Through, Filter Two's Sustain");
   conn = p->connections().getLast();
 
   expect(conn->program_bank_msb() == 3);
