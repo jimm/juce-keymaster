@@ -12,8 +12,6 @@ public:
   inline bool filtered() { return _filtered; }
   inline bool pass_through_0() { return _pass_through_0; }
   inline bool pass_through_127() { return _pass_through_127; }
-
-  // needed by formatter
   inline int min_in() { return _min_in; }
   inline int max_in() { return _max_in; }
   inline int min_out() { return _min_out; }

@@ -1,4 +1,5 @@
 #include "connection_dialog_component.h"
+#include "cc_map_dialog_component.h"
 #include "../km/consts.h"
 #include "../km/keymaster.h"
 #include "../km/patch.h"
@@ -35,7 +36,7 @@
 
 // #define WINDOW_WIDTH (SPACE + INSTRUMENT_WIDTH + SPACE + CHANNEL_COMBO_WIDTH + SPACE)
 #define WINDOW_WIDTH (CC_MAPS_TABLE_WIDTH * 2 + SPACE * 2)
-#define WINDOW_HEIGHT (SPACE * 10 + BETWEEN_ROW_SPACE * 7 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT + BUTTON_HEIGHT)
+#define WINDOW_HEIGHT (SPACE * 10 + BETWEEN_ROW_SPACE * 8 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT + BUTTON_HEIGHT)
 
 void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table)
 {
@@ -93,10 +94,6 @@ int ConnectionDialogComponent::height() {
 }
 
 void ConnectionDialogComponent::resized() {
-  using Track = Grid::TrackInfo;
-  using Fr = Grid::Fr;
-  using Px = Grid::Px;
-
   auto area = getLocalBounds();
   area.reduce(SPACE, SPACE);
 
@@ -365,11 +362,11 @@ void ConnectionDialogComponent::init_velocity_curve() {
 }
 
 void ConnectionDialogComponent::init_cc_maps() {
-  auto model = new CcMapsTableListBoxModel();
-  model->set_connection(_conn);
-  model->set_list_box(&_cc_maps_list_box);
-  model->make_columns(_cc_maps_list_box.getHeader());
-  _cc_maps_list_box.setModel(model);
+  _cc_maps_model = new CcMapsTableListBoxModel();
+  _cc_maps_model->set_connection(_conn);
+  _cc_maps_model->set_list_box(&_cc_maps_list_box);
+  _cc_maps_model->make_columns(_cc_maps_list_box.getHeader());
+  _cc_maps_list_box.setModel(_cc_maps_model);
   _cc_maps_list_box.setColour(ListBox::outlineColourId, Colours::grey);
   _cc_maps_list_box.setOutlineThickness(1);
 
@@ -439,10 +436,10 @@ bool ConnectionDialogComponent::apply() {
   if (id != UNSELECTED)
     curve = KeyMaster_instance()->curves()[id-1];
 
-  // TODO CC maps
-
   if (!error_msgs.isEmpty()) {
-    String message = "The following errors prevent the connection from being saved:\n";
+    String message = "The following";
+    message << String((error_msgs.size() == 1) ? "error prevents" : "errors prevent");
+    message << " the connection from being saved:\n";
     for (auto err : error_msgs) {
       message << "\n- ";
       message << err;
@@ -497,19 +494,22 @@ bool ConnectionDialogComponent::apply() {
 }
 
 void ConnectionDialogComponent::add_cc_map() {
-  // TODO
-  // open_cc_map_editor(model.cc_maps()[row], _cc_maps_list_box);
+  Controller *c = new Controller(UNDEFINED, 0);
+  open_cc_map_editor(_conn, c, &_cc_maps_list_box);
 }
 
 void ConnectionDialogComponent::del_cc_map() {
-  // TODO
-  // if line selected, delete its entry from model.     
-  // open_cc_map_editor(model.cc_maps()[row], _cc_maps_list_box);
+  int row = _cc_maps_list_box.getSelectedRows()[0];
+  if (row != 0) {
+    Controller *c = _cc_maps_model->cc_maps()[row];
+    delete c;
+    _cc_maps_list_box.updateContent();
+    _cc_maps_list_box.repaint();
+  }
 }
 
 void ConnectionDialogComponent::update_conn_cc_maps() {
-  auto model = static_cast<CcMapsTableListBoxModel *>(_cc_maps_list_box.getTableListBoxModel());
-  for (auto controller : model->cc_maps())
+  for (auto controller : _cc_maps_model->cc_maps())
     _conn->set_cc_map(controller->cc_num(), controller);
 
   // Get rid of controllers that are in the connection but not in the new
@@ -519,7 +519,7 @@ void ConnectionDialogComponent::update_conn_cc_maps() {
       break;
 
     bool is_in_new_list = false;
-    for (auto controller : model->cc_maps()) {
+    for (auto controller : _cc_maps_model->cc_maps()) {
       if (controller->cc_num() == i) {
         is_in_new_list = true;
         break;
@@ -533,5 +533,3 @@ void ConnectionDialogComponent::update_conn_cc_maps() {
     }
   }
 }
-
-  

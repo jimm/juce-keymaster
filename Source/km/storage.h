@@ -25,7 +25,6 @@ private:
   String error_str;
 
   void load_schema_version(var);
-  void load_instruments(var);
   void load_curves(var);
   void load_messages(var);
   void load_triggers(var);

@@ -15,6 +15,10 @@ test:
 run:
 	open $(APP_DIR)/KeyMaster.app
 
+.PHONY: tags
+tags:
+	find Source -name '*.cpp' -o -name '*.h' | xargs etags
+
 .PHONY: rm-prefs
 rm-prefs:
 	rm -f "~/Library/Application Support/KeyMaster.props"

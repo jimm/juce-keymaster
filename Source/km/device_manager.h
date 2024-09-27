@@ -16,11 +16,11 @@ public:
 
   Input::Ptr find_input(const String &identifier);
   Input::Ptr find_or_create_input(const String &identifier, const String &name);
-  Input::Ptr find_or_create_input(const MidiDeviceInfo &info);
+  Input::Ptr find_or_create_input(const MidiDeviceInfo info);
 
   Output::Ptr find_output(const String &identifier);
   Output::Ptr find_or_create_output(const String &identifier, const String &name);
-  Output::Ptr find_or_create_output(const MidiDeviceInfo &info);
+  Output::Ptr find_or_create_output(const MidiDeviceInfo info);
 
 private:
   ReferenceCountedArray<Input> _inputs;

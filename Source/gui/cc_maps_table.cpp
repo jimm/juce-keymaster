@@ -2,6 +2,7 @@
 #include "../km/controller.h"
 #include "../km/connection.h"
 #include "cc_maps_table.h"
+#include "cc_map_dialog_component.h"
 
 void CcMapsTableListBoxModel::set_connection(Connection *c)
 {
@@ -67,6 +68,5 @@ void CcMapsTableListBoxModel::paintCell(
 }
 
 void CcMapsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
-  // TODO
-  // open_cc_map_editor(_cc_maps[row], _list_box);
+  open_cc_map_editor(_conn, _cc_maps[row], _list_box);
 }

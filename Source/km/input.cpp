@@ -13,7 +13,6 @@ Input::Input(MidiDeviceInfo device_info, MidiInputCallback *listener)
 
 Input::~Input() {
   stop();
-  device.reset();
 }
 
 void Input::initialize() {
@@ -25,16 +24,9 @@ void Input::initialize() {
   start();
 }
 
-void Input::start() {
-  if (device)
-    device->start();
-}
-
 void Input::stop() {
-  if (device) {
+  if (device)
     send_pending_offs();
-    device->stop();
-  }
 }
 
 void Input::midi_in(const MidiMessage &message) {

@@ -8,5 +8,4 @@ Output::Output(MidiDeviceInfo device_info)
 
 Output::~Output() {
   stop();
-  device.reset();
 }

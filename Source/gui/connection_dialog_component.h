@@ -71,6 +71,7 @@ private:
 
   Label _cc_maps_label { {}, "Controller Mappings" };
   CcMapsTableListBox _cc_maps_list_box;
+  CcMapsTableListBoxModel *_cc_maps_model;
 
   TextButton _add_cc_map { "+" };
   TextButton _del_cc_map { "-" };
