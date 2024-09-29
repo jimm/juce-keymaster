@@ -25,21 +25,21 @@ public:
   Connection(const Connection &other) noexcept;
   ~Connection();
 
-  inline Input::Ptr input() { return _input; }
-  inline Output::Ptr output() { return _output; }
-  inline int input_chan() { return _input_chan; }
-  inline int output_chan() { return _output_chan; }
-  inline int program_bank_msb() { return _prog.bank_msb; }
-  inline int program_bank_lsb() { return _prog.bank_lsb; }
-  inline int program_prog() { return _prog.prog; }
-  inline int zone_low() { return _zone.low; }
-  inline int zone_high() { return _zone.high; }
-  inline int xpose() { return _xpose; }
-  inline Curve *velocity_curve() { return _velocity_curve; }
+  inline Input::Ptr input() const { return _input; }
+  inline Output::Ptr output() const { return _output; }
+  inline int input_chan() const { return _input_chan; }
+  inline int output_chan() const { return _output_chan; }
+  inline int program_bank_msb() const { return _prog.bank_msb; }
+  inline int program_bank_lsb() const { return _prog.bank_lsb; }
+  inline int program_prog() const { return _prog.prog; }
+  inline int zone_low() const { return _zone.low; }
+  inline int zone_high() const { return _zone.high; }
+  inline int xpose() const { return _xpose; }
+  inline Curve *velocity_curve() const { return _velocity_curve; }
   inline MessageFilter &message_filter() { return _message_filter; }
-  inline bool running() { return _running; }
-  inline bool changing_was_running() { return _changing_was_running; }
-  inline Controller *cc_map(int i) { return _cc_maps[i]; }
+  inline bool running() const { return _running; }
+  inline bool changing_was_running() const { return _changing_was_running; }
+  inline Controller *cc_map(int i) const { return _cc_maps[i]; }
 
   void set_input(Input::Ptr val);
   void set_output(Output::Ptr val);

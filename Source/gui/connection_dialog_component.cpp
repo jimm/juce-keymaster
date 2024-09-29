@@ -501,7 +501,7 @@ void ConnectionDialogComponent::add_cc_map() {
 void ConnectionDialogComponent::del_cc_map() {
   int row = _cc_maps_list_box.getSelectedRows()[0];
   if (row != 0) {
-    Controller *c = _cc_maps_model->cc_maps()[row];
+    Controller *c = _cc_maps_model->nth_cc_map(row);
     delete c;
     _cc_maps_list_box.updateContent();
     _cc_maps_list_box.repaint();
@@ -509,8 +509,11 @@ void ConnectionDialogComponent::del_cc_map() {
 }
 
 void ConnectionDialogComponent::update_conn_cc_maps() {
-  for (auto controller : _cc_maps_model->cc_maps())
+  int num_cc_maps = _cc_maps_model->getNumRows();
+  for (int i = 0; i < num_cc_maps; ++i) {
+    auto controller = _cc_maps_model->nth_cc_map(i);
     _conn->set_cc_map(controller->cc_num(), controller);
+  }
 
   // Get rid of controllers that are in the connection but not in the new
   // model's list.
@@ -519,7 +522,8 @@ void ConnectionDialogComponent::update_conn_cc_maps() {
       break;
 
     bool is_in_new_list = false;
-    for (auto controller : _cc_maps_model->cc_maps()) {
+    for (int j = 0; i < num_cc_maps; ++i) {
+      auto controller = _cc_maps_model->nth_cc_map(j);
       if (controller->cc_num() == i) {
         is_in_new_list = true;
         break;

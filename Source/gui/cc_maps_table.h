@@ -12,19 +12,19 @@ class CcMapsTableListBoxModel : public KmTableListBoxModel {
 public:
   void make_columns(TableHeaderComponent &header) override;
 
-  int getNumRows() override { return _cc_maps.size(); }
+  Controller *nth_cc_map(int n);
+
+  virtual int getNumRows() override;
 
   void paintCell(Graphics& g, int rowNumber, int columnId,
                  int width, int height, bool rowIsSelected) override;
 
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
 
-  void set_connection(Connection *c);
-  Array<Controller *> &cc_maps() { return _cc_maps; }
+  void set_connection(Connection *c) { _conn = c; }
 
 private:
   Connection *_conn;
-  Array<Controller *> _cc_maps;
 };
 
 

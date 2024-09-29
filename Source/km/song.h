@@ -11,8 +11,8 @@ public:
 
   inline Array<Patch *> &patches() { return _patches; }
   inline String &notes() { return _notes; }
-  inline float bpm() { return _bpm; }
-  inline bool clock_on_at_start() { return _clock_on_at_start; }
+  inline float bpm() const { return _bpm; }
+  inline bool clock_on_at_start() const { return _clock_on_at_start; }
 
   void set_notes(const String &notes);
   void set_bpm(float bpm);

@@ -45,40 +45,40 @@ void Cursor::init() {
   }
 }
 
-SetList *Cursor::set_list() {
+SetList *Cursor::set_list() const {
   if (set_list_index == UNDEFINED)
     return km->all_songs();
   return km->set_lists()[set_list_index];
 }
 
-Song *Cursor::song() {
+Song *Cursor::song() const {
   SetList *sl = set_list();
   if (sl == nullptr || song_index == UNDEFINED || sl->songs().size() == 0)
     return nullptr;
   return sl->songs()[song_index];
 }
 
-Patch *Cursor::patch() {
+Patch *Cursor::patch() const {
   Song *s = song();
   if (s == nullptr || patch_index == UNDEFINED)
     return nullptr;
   return s->patches()[patch_index];
 }
 
-Connection *Cursor::connection() {
+Connection *Cursor::connection() const {
   Patch *p = patch();
   if (p == nullptr || connection_index == UNDEFINED)
     return nullptr;
   return p->connections()[connection_index];
 }
 
-MessageBlock *Cursor::message() {
+MessageBlock *Cursor::message() const {
   if (message_index == UNDEFINED)
     return nullptr;
   return km->messages()[message_index];
 }
 
-Trigger *Cursor::trigger() {
+Trigger *Cursor::trigger() const {
   if (trigger_index == UNDEFINED)
     return nullptr;
   return km->triggers()[trigger_index];

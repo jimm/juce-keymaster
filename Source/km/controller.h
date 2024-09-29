@@ -7,15 +7,15 @@ class Controller : public DBObj {
 public:
   Controller(DBObjID id, int cc_num);
 
-  inline int cc_num() { return _cc_num; }
-  inline int translated_cc_num() { return _translated_cc_num; }
-  inline bool filtered() { return _filtered; }
-  inline bool pass_through_0() { return _pass_through_0; }
-  inline bool pass_through_127() { return _pass_through_127; }
-  inline int min_in() { return _min_in; }
-  inline int max_in() { return _max_in; }
-  inline int min_out() { return _min_out; }
-  inline int max_out() { return _max_out; }
+  inline int cc_num() const { return _cc_num; }
+  inline int translated_cc_num() const { return _translated_cc_num; }
+  inline bool filtered() const { return _filtered; }
+  inline bool pass_through_0() const { return _pass_through_0; }
+  inline bool pass_through_127() const { return _pass_through_127; }
+  inline int min_in() const { return _min_in; }
+  inline int max_in() const { return _max_in; }
+  inline int min_out() const { return _min_out; }
+  inline int max_out() const { return _max_out; }
 
   void set_cc_num(int val);
   void set_translated_cc_num(int val);

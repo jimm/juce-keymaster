@@ -27,14 +27,14 @@ public:
   void clear();
   void init();
 
-  SetList *set_list();
-  Song *song();
-  Patch *patch();
+  SetList *set_list() const;
+  Song *song() const;
+  Patch *patch() const;
 
   // For editing
-  Connection *connection();
-  MessageBlock *message();
-  Trigger *trigger();
+  Connection *connection() const;
+  MessageBlock *message() const;
+  Trigger *trigger() const;
 
   void next_song(bool send_changed = true);
   void prev_song(bool send_changed = true);

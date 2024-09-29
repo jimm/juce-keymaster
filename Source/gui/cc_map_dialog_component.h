@@ -20,8 +20,8 @@ public:
 private:
   Connection *_conn;
   Controller *_controller;
-  bool _is_new;
   KmTableListBox *_cc_map_table;
+  bool _is_new;
 
   Label _cc_num_label { {}, "Controller Number" };
   TextEditor _cc_num;

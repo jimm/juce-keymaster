@@ -4,14 +4,24 @@
 #include "cc_maps_table.h"
 #include "cc_map_dialog_component.h"
 
-void CcMapsTableListBoxModel::set_connection(Connection *c)
-{
-  _conn = c;
+Controller * CcMapsTableListBoxModel::nth_cc_map(int n) {
+  int count = 0;
   for (int i = 0; i < 128; ++i) {
-    auto *controller = _conn->cc_map(i);
-    if (controller != nullptr)
-      _cc_maps.add(controller);
+    auto controller = _conn->cc_map(i);
+    if (controller != nullptr) {
+      if (count++ == n)
+        return controller;
+    }
   }
+  return nullptr;
+}
+
+int CcMapsTableListBoxModel::getNumRows() {
+  int count = 0;
+  for (int i = 0; i < 128; ++i)
+    if (_conn->cc_map(i) != nullptr)
+      ++count;
+  return count;
 }
 
 void CcMapsTableListBoxModel::make_columns(TableHeaderComponent &header) {
@@ -30,7 +40,7 @@ void CcMapsTableListBoxModel::make_columns(TableHeaderComponent &header) {
 void CcMapsTableListBoxModel::paintCell(
   Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
-  Controller *c = _cc_maps[rowNumber];
+  Controller *c = nth_cc_map(rowNumber);
   KmTableListBoxModel::paintCell(g, rowNumber, columnId, width, height, rowIsSelected);
   String str;
 
@@ -68,5 +78,5 @@ void CcMapsTableListBoxModel::paintCell(
 }
 
 void CcMapsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
-  open_cc_map_editor(_conn, _cc_maps[row], _list_box);
+  open_cc_map_editor(_conn, nth_cc_map(row), _list_box);
 }

@@ -7,7 +7,7 @@ public:
   Clock();
   virtual ~Clock() override;
 
-  float bpm() { return _bpm; }
+  float bpm() const { return _bpm; }
   void set_bpm(float bpm);
 
   void start();

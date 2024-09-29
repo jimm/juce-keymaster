@@ -40,7 +40,7 @@ void open_cc_map_editor(Connection *conn, Controller *c, KmTableListBox *cc_map_
 
 CcMapDialogComponent::CcMapDialogComponent(
   Connection *conn, Controller *c, bool is_new, KmTableListBox *cc_map_table)
-  : _conn(conn), _controller(c), _is_new(is_new), _cc_map_table(cc_map_table)
+  : _conn(conn), _controller(c), _cc_map_table(cc_map_table), _is_new(is_new)
 {
   init();
 
@@ -160,7 +160,6 @@ void CcMapDialogComponent::cancel() {
   static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
 }
 
-// Displays an alert and returns false if apply fails.
 bool CcMapDialogComponent::apply() {
   Array<String> error_msgs;
 
@@ -213,12 +212,12 @@ bool CcMapDialogComponent::apply() {
   _controller->set_filtered(filtered);
   _controller->set_range(pass_0, pass_127, min_in, max_in, min_out, max_out);
 
-  _conn->set_cc_map(cc_num, _controller);
-  _is_new = false;
-
+  _conn->set_cc_map(_controller->cc_num(), _controller);
   _conn->end_changes();
 
+  _is_new = false;
   _cc_map_table->updateContent();
   _cc_map_table->repaint();
+
   return true;
 }
