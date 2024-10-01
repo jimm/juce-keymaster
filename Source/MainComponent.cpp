@@ -208,7 +208,7 @@ void MainComponent::new_patch() {
 
 void MainComponent::new_connection() {
   Patch *p = KeyMaster_instance()->cursor()->patch();
-  open_connection_editor(p, nullptr, &connections_table);
+  open_connection_editor(p, nullptr)->addActionListener(&connections_table);
 }
 
 void MainComponent::new_set_list() {

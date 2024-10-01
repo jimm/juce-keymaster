@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH (CC_MAPS_TABLE_WIDTH * 2 + SPACE * 2)
 #define WINDOW_HEIGHT (SPACE * 10 + BETWEEN_ROW_SPACE * 8 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT + BUTTON_HEIGHT)
 
-void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table)
+ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c)
 {
   bool is_new = c == nullptr;
   if (is_new) {
@@ -51,16 +51,17 @@ void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections
   opts.dialogBackgroundColour =
     LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
   opts.resizable = false;
-  auto cdc = new ConnectionDialogComponent(p, c, is_new, connections_table);
+  auto cdc = new ConnectionDialogComponent(p, c, is_new);
   opts.content.setOwned(cdc);
   auto dialog_win = opts.launchAsync();
   if (dialog_win != nullptr)
     dialog_win->centreWithSize(cdc->width(), cdc->height());
+  return cdc;
 }
 
 ConnectionDialogComponent::ConnectionDialogComponent(
-  Patch *p, Connection *c, bool is_new, KmTableListBox *connections_table)
-  : _patch(p), _conn(c), _is_new(is_new), _connections_table(connections_table)
+  Patch *p, Connection *c, bool is_new)
+  : _patch(p), _conn(c), _is_new(is_new)
 {
   init_input();
   init_output();
@@ -488,14 +489,13 @@ bool ConnectionDialogComponent::apply() {
     _is_new = false;
   }
 
-  _connections_table->updateContent();
-  _connections_table->repaint();
+  sendActionMessage(CONNECTION_CHANGED_MESSAGE);
   return true;
 }
 
 void ConnectionDialogComponent::add_cc_map() {
   Controller *c = new Controller(UNDEFINED, 0);
-  open_cc_map_editor(_conn, c, &_cc_maps_list_box);
+  open_cc_map_editor(_conn, c)->addActionListener(&_cc_maps_list_box);
 }
 
 void ConnectionDialogComponent::del_cc_map() {

@@ -20,7 +20,7 @@
 #define WINDOW_WIDTH (SPACE + 300 + SPACE)
 #define WINDOW_HEIGHT (SPACE * 6 + BETWEEN_ROW_SPACE * 5 + LABEL_HEIGHT * 4 + FILTER_TOGGLE_HEIGHT * 3 + DATA_ROW_HEIGHT * 3 + BUTTON_HEIGHT)
 
-void open_cc_map_editor(Connection *conn, Controller *c, KmTableListBox *cc_map_table)
+CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c)
 {
   bool is_new = c == nullptr;
   if (is_new)
@@ -31,16 +31,17 @@ void open_cc_map_editor(Connection *conn, Controller *c, KmTableListBox *cc_map_
   opts.dialogBackgroundColour =
     LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
   opts.resizable = false;
-  auto cdc = new CcMapDialogComponent(conn, c, is_new, cc_map_table);
-  opts.content.setOwned(cdc);
+  auto cmdc = new CcMapDialogComponent(conn, c, is_new);
+  opts.content.setOwned(cmdc);
   auto dialog_win = opts.launchAsync();
   if (dialog_win != nullptr)
-    dialog_win->centreWithSize(cdc->width(), cdc->height());
+    dialog_win->centreWithSize(cmdc->width(), cmdc->height());
+  return cmdc;
 }
 
 CcMapDialogComponent::CcMapDialogComponent(
-  Connection *conn, Controller *c, bool is_new, KmTableListBox *cc_map_table)
-  : _conn(conn), _controller(c), _cc_map_table(cc_map_table), _is_new(is_new)
+  Connection *conn, Controller *c, bool is_new)
+  : _conn(conn), _controller(c), _is_new(is_new)
 {
   init();
 
@@ -216,8 +217,6 @@ bool CcMapDialogComponent::apply() {
   _conn->end_changes();
 
   _is_new = false;
-  _cc_map_table->updateContent();
-  _cc_map_table->repaint();
-
+  sendActionMessage(CC_MAP_CHANGED_MESSAGE);
   return true;
 }

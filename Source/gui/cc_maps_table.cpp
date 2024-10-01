@@ -78,5 +78,5 @@ void CcMapsTableListBoxModel::paintCell(
 }
 
 void CcMapsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
-  open_cc_map_editor(_conn, nth_cc_map(row), _list_box);
+  open_cc_map_editor(_conn, nth_cc_map(row))->addActionListener(this);
 }

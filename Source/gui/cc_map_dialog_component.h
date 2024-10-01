@@ -8,9 +8,9 @@
 class Connection;
 class Controller;
 
-class CcMapDialogComponent : public Component {
+class CcMapDialogComponent : public Component, public ActionBroadcaster {
 public:
-  CcMapDialogComponent(Connection *conn, Controller *c, bool is_new, KmTableListBox *cc_map_table);
+  CcMapDialogComponent(Connection *conn, Controller *c, bool is_new);
 
   void resized() override;
 
@@ -20,7 +20,6 @@ public:
 private:
   Connection *_conn;
   Controller *_controller;
-  KmTableListBox *_cc_map_table;
   bool _is_new;
 
   Label _cc_num_label { {}, "Controller Number" };
@@ -61,4 +60,4 @@ private:
 };
 
 // If Controller is nullptr we create a new one.
-void open_cc_map_editor(Connection *conn, Controller *c, KmTableListBox *cc_map_table);
+CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c);

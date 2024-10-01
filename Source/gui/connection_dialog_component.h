@@ -8,9 +8,9 @@
 
 class Patch;
 
-class ConnectionDialogComponent : public Component {
+class ConnectionDialogComponent : public Component, public ActionBroadcaster {
 public:
-  ConnectionDialogComponent(Patch *p, Connection *c, bool is_new, KmTableListBox *connections_table);
+  ConnectionDialogComponent(Patch *p, Connection *c, bool is_new);
 
   void resized() override;
 
@@ -21,7 +21,6 @@ private:
   Patch *_patch;
   Connection *_conn;
   bool _is_new;
-  KmTableListBox *_connections_table;
 
   Label _input_inst_label { {}, "Input" };
   ComboBox _input_instrument;
@@ -111,4 +110,4 @@ private:
 };
 
 // If connection is nullptr we create a new one.
-void open_connection_editor(Patch *p, Connection *c, KmTableListBox *connections_table);
+ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c);

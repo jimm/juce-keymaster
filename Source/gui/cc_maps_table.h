@@ -8,7 +8,7 @@ class Connection;
 class Controller;
 
 
-class CcMapsTableListBoxModel : public KmTableListBoxModel {
+class CcMapsTableListBoxModel : public KmTableListBoxModel, public ActionListener {
 public:
   void make_columns(TableHeaderComponent &header) override;
 
@@ -22,6 +22,13 @@ public:
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
 
   void set_connection(Connection *c) { _conn = c; }
+
+  virtual void actionListenerCallback(const String &message) override {
+    if (message == CC_MAP_CHANGED_MESSAGE) {
+      _list_box->updateContent();
+      _list_box->repaint();
+    }
+  }
 
 private:
   Connection *_conn;

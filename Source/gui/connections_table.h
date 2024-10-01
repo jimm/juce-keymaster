@@ -9,7 +9,7 @@ class Connection;
 class ConnectionsTableListBox;
 
 
-class ConnectionsTableListBoxModel : public KmTableListBoxModel {
+class ConnectionsTableListBoxModel : public KmTableListBoxModel, public ActionListener {
 public:
   void make_columns(TableHeaderComponent &header) override;
 
@@ -27,6 +27,13 @@ public:
   int selected_row_num() override { return cursor()->connection_index; }
 
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
+
+  virtual void actionListenerCallback(const String &message) override {
+    if (message == CONNECTION_CHANGED_MESSAGE) {
+      _list_box->updateContent();
+      _list_box->repaint();
+    }
+  }
 
 private:
   Patch *patch() { return cursor()->patch(); }
