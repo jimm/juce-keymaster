@@ -58,7 +58,10 @@ public:
     {
       // This is called when the app is being asked to quit: you can ignore this
       // request and let the app carry on running, or call quit() to allow the app to close.
-      quit();
+      mainWindow->check_ok_to_quit([] (bool ok) {
+        if (ok)
+          quit();
+      });
     }
 
   void anotherInstanceStarted(const String& commandLine) override
@@ -73,7 +76,7 @@ public:
     This class implements the desktop window that contains an instance of
     our MainComponent class.
   */
-  class MainWindow    : public DocumentWindow
+  class MainWindow : public DocumentWindow
   {
   public:
     MainWindow(String name, DeviceManager &device_manager, ApplicationProperties &props)
@@ -84,7 +87,8 @@ public:
         app_properties(props)
       {
         setUsingNativeTitleBar(true);
-        setContentOwned(new MainComponent(device_manager, app_properties), true);
+        main_component = new MainComponent(device_manager, app_properties); 
+        setContentOwned(main_component, true);
 
 #if JUCE_IOS || JUCE_ANDROID
         setFullScreen(true);
@@ -118,8 +122,11 @@ public:
        subclass also calls the superclass's method.
     */
 
+    void check_ok_to_quit(std::function<void(bool)> callback) { main_component->check_ok_to_quit(callback); }
+
   private:
     ApplicationProperties &app_properties;
+    MainComponent *main_component;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
   };

@@ -29,6 +29,8 @@ public:
   bool ok_to_destroy_connection(Patch *patch, Connection *connection);
   bool ok_to_destroy_set_list(SetList *set_list);
 
+  void remove_song_from_set_list(SetList *set_list, Song *song);
+
   void destroy_message(MessageBlock *message);
   void destroy_trigger(Trigger *trigger);
   void destroy_song(Song *song);

@@ -104,14 +104,12 @@ void MainComponent::make_menu_bar() {
   menu_manager.make_menu_bar(this);
 }
 
-void MainComponent::new_project() {
-  saveIfNeededAndUserAgreesAsync([] (SaveResult result) { });
-
+void MainComponent::create_new_project() {
   KeyMaster *old_km = KeyMaster_instance();
   KeyMaster *new_km = new KeyMaster(device_manager);
   new_km->set_file_based_document(this);
   new_km->initialize();
-  setChangedFlag(false);   // initialize will set it to true
+  setChangedFlag(false);   // initialize has set it to true
 
   if (old_km != nullptr) {
     old_km->stop();
@@ -122,16 +120,23 @@ void MainComponent::new_project() {
   update();
 }
 
-void MainComponent::open_project() {
-  saveIfNeededAndUserAgreesAsync([] (FileBasedDocument::SaveResult _) { });
-  loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
-    if ((bool)result)
-      update();
+void MainComponent::new_project() {
+  saveIfNeededAndUserAgreesAsync([this] (SaveResult result) {
+    if (result == SaveResult::savedOk)
+      create_new_project();
   });
 }
 
-void MainComponent::close_project() {
-  // TODO
+void MainComponent::open_project() {
+  // Only load if save is done, so do it in callback
+  saveIfNeededAndUserAgreesAsync([this] (FileBasedDocument::SaveResult save_result) {
+    if (save_result == SaveResult::savedOk) {
+      loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
+        if ((bool)result)
+          update();
+      });
+    }
+  });
 }
 
 void MainComponent::save_project() {
@@ -291,6 +296,14 @@ void MainComponent::midi_monitor() {
 }
 
 // ================ loading and saving ================
+
+void MainComponent::check_ok_to_quit(std::function<void(bool)> callback) {
+  if (!hasChangedSinceSaved())
+    callback(true);
+  saveIfNeededAndUserAgreesAsync([callback] (SaveResult result) {
+    callback(result != SaveResult::failedToWriteToFile);
+  });
+}
 
 Result MainComponent::loadDocument(const File &file) {
   KeyMaster *old_km = KeyMaster_instance();

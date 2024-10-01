@@ -5,6 +5,11 @@
 #include "../km/set_list.h"
 
 class SetListSongsListBox : public KmListBox {
+protected:
+  virtual void popupMenu() override;
+
+  void popup_all_songs_menu();
+  void popup_set_list_menu();
 };
 
 class SetListSongsListBoxModel : public KmListBoxModel {
@@ -23,6 +28,5 @@ public:
 
   int selected_row_num() override { return cursor()->song_index; }
 
-private:
   SetList *set_list() { return cursor()->set_list(); }
 };

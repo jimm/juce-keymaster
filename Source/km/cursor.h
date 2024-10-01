@@ -36,10 +36,10 @@ public:
   MessageBlock *message() const;
   Trigger *trigger() const;
 
-  void next_song(bool send_changed = true);
-  void prev_song(bool send_changed = true);
-  void next_patch(bool send_changed = true);
-  void prev_patch(bool send_changed = true);
+  Song * next_song(bool send_changed = true);
+  Song * prev_song(bool send_changed = true);
+  Patch * next_patch(bool send_changed = true);
+  Patch * prev_patch(bool send_changed = true);
 
   bool has_next_song();
   bool has_prev_song();

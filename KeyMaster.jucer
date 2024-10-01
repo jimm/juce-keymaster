@@ -29,6 +29,8 @@
       <FILE id="XLb80c" name="menu_manager.h" compile="0" resource="0" file="Source/gui/menu_manager.h"/>
       <FILE id="ibUera" name="messages_list_box.h" compile="0" resource="0"
             file="Source/gui/messages_list_box.h"/>
+      <FILE id="vvaa7d" name="set_list_songs_list_box.cpp" compile="1" resource="0"
+            file="Source/gui/set_list_songs_list_box.cpp"/>
       <FILE id="QLqr8Z" name="set_list_songs_list_box.h" compile="0" resource="0"
             file="Source/gui/set_list_songs_list_box.h"/>
       <FILE id="mB2Jwz" name="set_lists_list_box.h" compile="0" resource="0"

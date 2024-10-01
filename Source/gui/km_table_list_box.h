@@ -50,9 +50,6 @@ protected:
 
 class KmTableListBox : public TableListBox, public ActionListener {
 public:
-
-  // void resized() override { setBoundsInset(BorderSize<int>(2)); }
-
   void actionListenerCallback(const String &message) override {
     if (message == "moved") {
       updateContent();

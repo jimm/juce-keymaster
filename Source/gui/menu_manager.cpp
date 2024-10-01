@@ -7,7 +7,6 @@ enum CommandIDs {
   // File
   new_project,
   open_project,
-  close_project,
   save_project,
   save_project_as,
   // Edit
@@ -45,7 +44,6 @@ enum CommandIDs {
 static Array<CommandIDs> file_commands {
   CommandIDs::new_project,
   CommandIDs::open_project,
-  CommandIDs::close_project,
   CommandIDs::__separator__,
   CommandIDs::save_project,
   CommandIDs::save_project_as,
@@ -125,11 +123,9 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     result.addDefaultKeypress('n', ModifierKeys::commandModifier);
     break;
   case CommandIDs::open_project:
-    result.setInfo("Open Project", "Opens an existing project", "File", 0);
+    result.setInfo("Open Project",
+                   "Opens an existing project (closes open one)", "File", 0);
     result.addDefaultKeypress('o', ModifierKeys::commandModifier);
-    break;
-  case CommandIDs::close_project:
-    result.setInfo("Close Project", "Closes the project", "File", 0);
     break;
   case CommandIDs::save_project:
     result.setInfo("Save", "Saves the project", "File", 0);
@@ -275,10 +271,6 @@ bool MenuManager::perform(const InvocationInfo& info) {
   case CommandIDs::open_project:
     handler->open_project();
     break;
-  case CommandIDs::close_project:
-    warn_unimplemented();
-    // handler->close_project();
-    break;
   case CommandIDs::save_project:
     handler->save_project();
     break;
@@ -416,10 +408,4 @@ void MenuManager::resized(Rectangle<int> &area) {
 #ifndef JUCE_MAC
   menu_bar->setBounds(area.removeFromTop(LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
 #endif
-}
-
-void MenuManager::warn_unimplemented() {
-  AlertWindow::showMessageBoxAsync(
-    MessageBoxIconType::WarningIcon, "Not Implemented",
-    "This command has not yet been implemented");
 }

@@ -50,4 +50,12 @@ public:
       repaint();
     }
   }
+
+  virtual void mouseUp(const MouseEvent &event) override {
+    if (event.mouseWasClicked() && event.mods.isRightButtonDown())
+      popupMenu();
+  }
+
+protected:
+  virtual void popupMenu() {};
 };

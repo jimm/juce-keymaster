@@ -90,6 +90,16 @@ void Editor::add_set_list(SetList *set_list) const {
   km->cursor()->init();
 }
 
+void Editor::remove_song_from_set_list(SetList *set_list, Song *song) {
+  if (song == km->cursor()->song()) {
+    Song *next_song = km->cursor()->next_song();
+    if (next_song == nullptr)
+      km->cursor()->prev_song();
+  }
+  set_list->remove_song(song);
+}
+
+
 void Editor::destroy_message(MessageBlock *message) {
   int index = km->messages().indexOf(message);
   km->remove_message(message);

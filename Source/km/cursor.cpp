@@ -84,56 +84,64 @@ Trigger *Cursor::trigger() const {
   return km->triggers()[trigger_index];
 }
 
-void Cursor::next_song(bool send_changed) {
+Song * Cursor::next_song(bool send_changed) {
   if (set_list_index == UNDEFINED)
-    return;
+    return nullptr;
   SetList *sl = set_list();
   if (song_index == sl->songs().size()-1)
-    return;
+    return nullptr;
 
   ++song_index;
   patch_index = 0;
   if (send_changed)
     sendActionMessage(moved);
+
+  return song();
 }
 
-void Cursor::prev_song(bool send_changed) {
+Song * Cursor::prev_song(bool send_changed) {
   if (set_list_index == UNDEFINED || song_index == 0)
-    return;
+    return nullptr;
 
   --song_index;
   patch_index = 0;
   if (send_changed)
     sendActionMessage(moved);
+
+  return song();
 }
 
-void Cursor::next_patch(bool send_changed) {
+Patch * Cursor::next_patch(bool send_changed) {
   Song *s = song();
   if (s == nullptr)
-    return;
+    return nullptr;
 
   if (patch_index == s->patches().size()-1) {
     next_song(send_changed);
-    return;
+    return patch();
   }
 
   ++patch_index;
   if (send_changed)
     sendActionMessage(moved);
+
+  return patch();
 }
 
-void Cursor::prev_patch(bool send_changed) {
+Patch * Cursor::prev_patch(bool send_changed) {
   if (song() == nullptr)
-    return;
+    return nullptr;
 
   if (patch_index == 0) {
     prev_song(send_changed);
-    return;
+    return patch();
   }
 
   --patch_index;
   if (send_changed)
     sendActionMessage(moved);
+
+  return patch();
 }
 
 bool Cursor::has_next_song() {

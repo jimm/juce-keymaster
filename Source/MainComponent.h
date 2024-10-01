@@ -33,7 +33,6 @@ public:
   //==============================================================================
   void new_project();
   void open_project();
-  void close_project();
   void save_project();
   void save_project_as();
   void undo();
@@ -65,6 +64,7 @@ public:
   void midi_monitor();
 
   // ================ loading and saving ================
+  void check_ok_to_quit(std::function<void (bool)> callback);
   String getDocumentTitle() override { return "KeyMaster"; }
   Result loadDocument(const File &file) override;
   Result saveDocument(const File &file) override;
@@ -101,6 +101,8 @@ private:
 
   Label triggers_label;
   TriggersTableListBox triggers;
+
+  void create_new_project();
 
   void make_menu_bar();
 
