@@ -203,9 +203,9 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
   if (_message_filter.filter_out(status, data[1])) {
     // If this is a sysex, send any realtime bytes inside it
     if (msg.isSysEx()) {
-      const uint8 *data = msg.getSysExData();
+      const uint8 *sysex_data = msg.getSysExData();
       for (int i = 0; i < msg.getSysExDataSize(); ++i) {
-        uint8 byte = data[i];
+        uint8 byte = sysex_data[i];
         if (is_realtime(byte))
           midi_out(MidiMessage(byte));
       }

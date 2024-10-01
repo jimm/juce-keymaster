@@ -43,4 +43,5 @@ public:
 
 private:
   KeyMaster *km;
+  Cursor *cursor;
 };

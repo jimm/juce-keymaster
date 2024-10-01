@@ -16,6 +16,8 @@
             file="Source/test/controller_test.h"/>
       <FILE id="BsVg3R" name="cursor_test.cpp" compile="1" resource="0" file="Source/test/cursor_test.cpp"/>
       <FILE id="tURWer" name="cursor_test.h" compile="0" resource="0" file="Source/test/cursor_test.h"/>
+      <FILE id="bUBNTn" name="editor_test.cpp" compile="1" resource="0" file="Source/test/editor_test.cpp"/>
+      <FILE id="DG3k1r" name="editor_test.h" compile="0" resource="0" file="Source/test/editor_test.h"/>
       <FILE id="jQ7AzX" name="keymaster_test.cpp" compile="1" resource="0"
             file="Source/test/keymaster_test.cpp"/>
       <FILE id="Hr4QUi" name="keymaster_test.h" compile="0" resource="0"

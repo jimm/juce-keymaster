@@ -30,7 +30,7 @@ void MessageBlock::from_hex_string(const String &str) {
   for (auto s : tokens)
     data[i++] = (uint8)s.getHexValue32();
 
-  for (int i = 0; i < num_bytes; ++i) {
+  for (i = 0; i < num_bytes; ++i) {
     uint8 byte = data[i];
     uint8 b2, b3;
     if (is_realtime(byte))

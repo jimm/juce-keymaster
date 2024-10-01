@@ -30,13 +30,14 @@ void SetListSongsListBox::popup_all_songs_menu() {
       Editor e;
       Song *song = set_list->songs()[rows[0]];
 
-      e.destroy_song(song);
+      e.remove_song_from_set_list(set_list, song); // destroys the song as well
       updateContent();
       repaint();
     });
   }
 
   menu.showMenuAsync(PopupMenu::Options{}.withTargetComponent(this));
+  // TODO act on the selection
 }
 
 void SetListSongsListBox::popup_set_list_menu() {
@@ -71,4 +72,5 @@ void SetListSongsListBox::popup_set_list_menu() {
   }
 
   menu.showMenuAsync(PopupMenu::Options{}.withTargetComponent(this));
+  // TODO act on the selection
 }
