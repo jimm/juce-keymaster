@@ -30,16 +30,14 @@ public:
   SetList *set_list() const;
   Song *song() const;
   Patch *patch() const;
-
-  // For editing
   Connection *connection() const;
   MessageBlock *message() const;
   Trigger *trigger() const;
 
-  Song * next_song(bool send_changed = true);
-  Song * prev_song(bool send_changed = true);
-  Patch * next_patch(bool send_changed = true);
-  Patch * prev_patch(bool send_changed = true);
+  Song * next_song();
+  Song * prev_song();
+  Patch * next_patch();
+  Patch * prev_patch();
 
   bool has_next_song();
   bool has_prev_song();

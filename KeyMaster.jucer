@@ -33,6 +33,8 @@
             file="Source/gui/set_list_songs_list_box.cpp"/>
       <FILE id="QLqr8Z" name="set_list_songs_list_box.h" compile="0" resource="0"
             file="Source/gui/set_list_songs_list_box.h"/>
+      <FILE id="g7nWda" name="set_lists_list_box.cpp" compile="1" resource="0"
+            file="Source/gui/set_lists_list_box.cpp"/>
       <FILE id="mB2Jwz" name="set_lists_list_box.h" compile="0" resource="0"
             file="Source/gui/set_lists_list_box.h"/>
       <FILE id="bqPIax" name="song_notes_label.h" compile="0" resource="0"

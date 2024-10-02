@@ -52,9 +52,14 @@ public:
         selectRow(selected_row_num);
       repaint();
     }
-    else if (message == "popup") {
-      popupMenu();
+    else if (message == "update:list-box") {
+      updateContent();
+      repaint();
     }
+    else if (message == "popup")
+      popupMenu();
+    else
+      sendActionMessage(message);
   }
 
   virtual void mouseUp(const MouseEvent &event) override {

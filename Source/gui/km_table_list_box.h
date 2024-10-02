@@ -61,9 +61,14 @@ public:
         selectRow(selected_row_num);
       repaint();
     }
-    else if (message == "popup") {
-      popupMenu();
+    else if (message == "update:table-list-box") {
+      updateContent();
+      repaint();
     }
+    else if (message == "popup")
+      popupMenu();
+    else
+      sendActionMessage(message);
   }
 
   virtual void backgroundClicked(const MouseEvent &event) override {

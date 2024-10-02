@@ -19,7 +19,7 @@ public:
   void add_song(Song *song) const;
   void add_patch(Patch *patch) const;
   void add_patch(Patch *patch, Song *song) const;
-  void add_connection(Connection *connection, Patch *patch) const;
+  void add_connection(Patch *patch, Connection *connection) const;
   void add_set_list(SetList *set_list) const;
 
   bool ok_to_destroy_message(MessageBlock *message);

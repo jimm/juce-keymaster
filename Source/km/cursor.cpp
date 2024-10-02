@@ -34,10 +34,10 @@ void Cursor::init() {
   set_list_index = 0;
 
   SetList *sl = set_list();
-  if (sl != nullptr && sl->songs().size() > 0) {
+  if (sl != nullptr && !sl->songs().isEmpty()) {
     song_index = 0;
     Song *s = song();
-    patch_index = (s != nullptr && s->patches().size() > 0) ? 0 : UNDEFINED;
+    patch_index = (s == nullptr || s->patches().isEmpty()) ? UNDEFINED : 0;
   }
   else {
     song_index = UNDEFINED;
@@ -53,7 +53,7 @@ SetList *Cursor::set_list() const {
 
 Song *Cursor::song() const {
   SetList *sl = set_list();
-  if (sl == nullptr || song_index == UNDEFINED || sl->songs().size() == 0)
+  if (sl == nullptr || song_index == UNDEFINED || sl->songs().isEmpty())
     return nullptr;
   return sl->songs()[song_index];
 }
@@ -84,62 +84,59 @@ Trigger *Cursor::trigger() const {
   return km->triggers()[trigger_index];
 }
 
-Song * Cursor::next_song(bool send_changed) {
+Song * Cursor::next_song() {
   if (set_list_index == UNDEFINED)
     return nullptr;
+
   SetList *sl = set_list();
   if (song_index == sl->songs().size()-1)
     return nullptr;
 
   ++song_index;
   patch_index = 0;
-  if (send_changed)
-    sendActionMessage(moved);
+  sendActionMessage(moved);
 
   return song();
 }
 
-Song * Cursor::prev_song(bool send_changed) {
+Song * Cursor::prev_song() {
   if (set_list_index == UNDEFINED || song_index == 0)
     return nullptr;
 
   --song_index;
   patch_index = 0;
-  if (send_changed)
-    sendActionMessage(moved);
+  sendActionMessage(moved);
 
   return song();
 }
 
-Patch * Cursor::next_patch(bool send_changed) {
+Patch * Cursor::next_patch() {
   Song *s = song();
   if (s == nullptr)
     return nullptr;
 
   if (patch_index == s->patches().size()-1) {
-    next_song(send_changed);
+    next_song();
     return patch();
   }
 
   ++patch_index;
-  if (send_changed)
-    sendActionMessage(moved);
+  sendActionMessage(moved);
 
   return patch();
 }
 
-Patch * Cursor::prev_patch(bool send_changed) {
+Patch * Cursor::prev_patch() {
   if (song() == nullptr)
     return nullptr;
 
   if (patch_index == 0) {
-    prev_song(send_changed);
+    prev_song();
     return patch();
   }
 
   --patch_index;
-  if (send_changed)
-    sendActionMessage(moved);
+  sendActionMessage(moved);
 
   return patch();
 }
@@ -173,36 +170,106 @@ bool Cursor::has_prev_patch_in_song() {
 }
 
 void Cursor::jump_to_set_list_index(int i) {
-  if (i < 0 || i >= km->set_lists().size())
+  if (i == set_list_index || i < 0 || i >= km->set_lists().size())
     return;
 
+  auto old_patch = patch();
+  if (old_patch)
+    old_patch->stop();
+
   set_list_index = i;
-  jump_to_song_index(0);
+  auto slist = set_list();
+
+  song_index = slist->songs().isEmpty() ? UNDEFINED : 0;
+  auto s = song();
+  if (s == nullptr) {
+    song_index = patch_index = connection_index = UNDEFINED;
+    sendActionMessage(moved);
+    return;
+  }
+
+  patch_index = s->patches().isEmpty() ? UNDEFINED : 0;
+  if (patch_index == UNDEFINED) {
+    connection_index = UNDEFINED;
+    sendActionMessage(moved);
+    return;
+  }
+
+  auto p = patch();
+  connection_index = p->connections().isEmpty() ? UNDEFINED : 0;
+  p->start();
+  sendActionMessage(moved);
 }
 
 void Cursor::jump_to_song_index(int i) {
-  SetList *slist = set_list();
+  if (i == song_index)
+    return;
+
+  auto slist = set_list();
   if (slist == nullptr || i < 0 || i >= slist->songs().size())
     return;
 
+  auto old_patch = patch();
+  if (old_patch)
+    old_patch->stop();
+
   song_index = i;
-  jump_to_patch_index(0);
+  auto s = song();
+  if (s == nullptr) {
+    song_index = patch_index = connection_index = UNDEFINED;
+    sendActionMessage(moved);
+    return;
+  }
+
+  patch_index = s->patches().isEmpty() ? UNDEFINED : 0;
+  if (patch_index == UNDEFINED) {
+    connection_index = UNDEFINED;
+    sendActionMessage(moved);
+    return;
+  }
+
+  auto p = patch();
+  connection_index = p->connections().isEmpty() ? UNDEFINED : 0;
+  p->start();
+  sendActionMessage(moved);
 }
 
 void Cursor::jump_to_patch_index(int i) {
-  Song *s = song();
+  if (i == patch_index)
+    return;
+
+  auto s = song();
   if (s == nullptr || i < 0 || i >= s->patches().size())
     return;
 
+  auto old_patch = patch();
+  if (old_patch != nullptr)
+    old_patch->stop();
+
   patch_index = i;
+  auto p = patch();
+  connection_index = p->connections().isEmpty() ? UNDEFINED : 0;
+  p->start();
   sendActionMessage(moved);
 }
 
 void Cursor::jump_to_connection_index(int i) {
-  if (i != connection_index) {
-    connection_index = i;
-    sendActionMessage(moved);
-  }
+  if (i == connection_index)
+    return;
+
+  auto p = patch();
+  if (p == nullptr || i < 0 || i >= p->connections().size())
+    return;
+
+  auto old_conn = connection();
+  if (old_conn != nullptr)
+    old_conn->stop();
+
+  connection_index = i;
+  auto conn = connection();
+  if (conn != nullptr)
+    conn->start();
+  sendActionMessage(moved);
 }
 
 void Cursor::jump_to_message_index(int i) {

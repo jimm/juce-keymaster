@@ -302,7 +302,7 @@ void MainComponent::check_ok_to_quit(std::function<void(bool)> callback) {
   if (!hasChangedSinceSaved())
     callback(true);
   saveIfNeededAndUserAgreesAsync([callback] (SaveResult result) {
-    callback(result != SaveResult::failedToWriteToFile);
+    callback(result == SaveResult::savedOk);
   });
 }
 

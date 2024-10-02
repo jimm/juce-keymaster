@@ -25,7 +25,7 @@ void SetListSongsListBox::popup_all_songs_menu() {
 
   auto rows = getSelectedRows();
   if (rows.size() > 0) {
-    menu.addItem("Delete Song", [&] {
+    menu.addItem("Delete Selected Song", [&] {
       Editor e;
       Song *song = set_list->songs()[rows[0]];
 

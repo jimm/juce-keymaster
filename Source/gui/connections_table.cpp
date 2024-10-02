@@ -1,6 +1,7 @@
 #include "../km/consts.h"
 #include "../km/connection.h"
 #include "../km/patch.h"
+#include "../km/editor.h"
 #include "connections_table.h"
 #include "connection_dialog_component.h"
 
@@ -81,6 +82,32 @@ void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const Mou
   Connection *c = p->connections()[row];
   open_connection_editor(p, c)->addActionListener(this);
 }
+
+void ConnectionsTableListBox::popupMenu() {
+  PopupMenu menu;
+  Patch *patch = KeyMaster_instance()->cursor()->patch();
+
+  menu.addItem("Create New Connection", [this, patch] {
+    Editor e;
+    Connection *conn = e.create_connection(nullptr, nullptr);
+    e.add_connection(patch, conn);
+    sendActionMessage("update:table-list-box");
+  });
+
+  auto rows = getSelectedRows();
+  if (rows.size() > 0) {
+    auto conn = patch->connections()[rows[0]];
+    menu.addItem("Delete Selected Connection", [this, patch, conn] {
+      Editor e;
+      e.destroy_connection(patch, conn);
+      sendActionMessage("update:table-list-box");
+    });
+  }
+
+  menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
+}
+
+// ================ helpers ================
 
 String ConnectionsTableListBoxModel::program_str(Connection *c) {
   String str;

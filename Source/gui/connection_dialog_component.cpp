@@ -499,9 +499,9 @@ void ConnectionDialogComponent::add_cc_map() {
 }
 
 void ConnectionDialogComponent::del_cc_map() {
-  int row = _cc_maps_list_box.getSelectedRows()[0];
-  if (row != 0) {
-    Controller *c = _cc_maps_model->nth_cc_map(row);
+  auto rows = _cc_maps_list_box.getSelectedRows();
+  if (rows.size() > 0) {
+    Controller *c = _cc_maps_model->nth_cc_map(rows[0]);
     delete c;
     _cc_maps_list_box.updateContent();
     _cc_maps_list_box.repaint();

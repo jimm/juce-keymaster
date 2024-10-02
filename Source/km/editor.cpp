@@ -76,8 +76,7 @@ void Editor::add_patch(Patch *patch, Song *song) const {
   km->goto_patch(patch);
 }
 
-void Editor::add_connection(Connection *connection, Patch *patch)
-const {
+void Editor::add_connection(Patch *patch, Connection *connection) const {
   if (patch == nullptr)
     return;
 

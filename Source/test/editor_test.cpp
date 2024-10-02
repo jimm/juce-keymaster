@@ -7,10 +7,14 @@ void EditorTest::reload() {
   km = load_test_data(dev_mgr);
   cursor = km->cursor();
   cursor->init();
+  if (e != nullptr)
+    delete e;
+  e = new Editor(km);
 }
 
 void EditorTest::shutdown() {
   delete km;
+  delete e;
 }
 
 void EditorTest::runTest() {
@@ -19,8 +23,6 @@ void EditorTest::runTest() {
 }
 
 void EditorTest::test_remove_song_from_all_songs() {
-  Editor e;
-
   // ================
   beginTest("all_songs: destroyed and cursor unchanged when not current song");
   reload();
@@ -29,7 +31,7 @@ void EditorTest::test_remove_song_from_all_songs() {
   expect(cursor->set_list() == km->all_songs()); // make sure we're on all songs
   Song *delete_me = km->all_songs()->songs()[1];
 
-  e.remove_song_from_set_list(cursor->set_list(), delete_me);
+  e->remove_song_from_set_list(cursor->set_list(), delete_me);
 
   for (auto set_list : km->set_lists())
     for (auto song : set_list->songs())
@@ -40,9 +42,10 @@ void EditorTest::test_remove_song_from_all_songs() {
   beginTest("all_songs: destroyed, cursor moved when current song");
   reload();
 
+  current_song = cursor->song();
   delete_me = current_song;
 
-  e.remove_song_from_set_list(cursor->set_list(), delete_me);
+  e->remove_song_from_set_list(cursor->set_list(), delete_me);
 
   for (auto set_list : km->set_lists())
     for (auto song : set_list->songs())
@@ -51,8 +54,6 @@ void EditorTest::test_remove_song_from_all_songs() {
 }
 
 void EditorTest::test_remove_song_from_set_list() {
-  Editor e;
-
   // ================
   beginTest("set list: removed and cursor unchanged when not current song");
   reload();
@@ -63,7 +64,7 @@ void EditorTest::test_remove_song_from_set_list() {
   Song *current_song = cursor->song();
   Song *delete_me = set_list->songs()[1];
 
-  e.remove_song_from_set_list(set_list, delete_me);
+  e->remove_song_from_set_list(set_list, delete_me);
 
   // make sure was removed
   for (auto song : set_list->songs())
@@ -88,7 +89,7 @@ void EditorTest::test_remove_song_from_set_list() {
   current_song = cursor->song();
   delete_me = current_song;
 
-  e.remove_song_from_set_list(set_list, delete_me);
+  e->remove_song_from_set_list(set_list, delete_me);
 
   // make sure was removed
   for (auto song : set_list->songs())

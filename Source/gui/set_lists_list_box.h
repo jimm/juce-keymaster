@@ -5,6 +5,8 @@
 #include "../km/set_list.h"
 
 class SetListsListBox : public KmListBox {
+protected:
+  virtual void popupMenu() override;
 };
 
 class SetListsListBoxModel : public KmListBoxModel {
