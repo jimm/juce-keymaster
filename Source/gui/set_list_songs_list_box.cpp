@@ -20,8 +20,7 @@ void SetListSongsListBox::popup_all_songs_menu() {
     Editor e;
     Song *song = e.create_song();
     e.add_song(song);
-    updateContent();
-    repaint();
+    sendActionMessage("update:all");
   });
 
   auto rows = getSelectedRows();
@@ -31,13 +30,11 @@ void SetListSongsListBox::popup_all_songs_menu() {
       Song *song = set_list->songs()[rows[0]];
 
       e.remove_song_from_set_list(set_list, song); // destroys the song as well
-      updateContent();
-      repaint();
+      sendActionMessage("update:all");
     });
   }
 
   menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
-  // TODO act on the selection
 }
 
 void SetListSongsListBox::popup_set_list_menu() {
@@ -53,8 +50,7 @@ void SetListSongsListBox::popup_set_list_menu() {
         Editor e;
         set_list->add_song(song);
         km->cursor()->goto_song(song);
-        updateContent();
-        repaint();
+        sendActionMessage("update:all");
       });
     }
   });
@@ -66,11 +62,9 @@ void SetListSongsListBox::popup_set_list_menu() {
 
       e.remove_song_from_set_list(set_list, set_list->songs()[rows[0]]);
       set_list->remove_song(set_list->songs()[rows[0]]);
-      updateContent();
-      repaint();
+      sendActionMessage("update:all");
     });
   }
 
   menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
-  // TODO act on the selection
 }

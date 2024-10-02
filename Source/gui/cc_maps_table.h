@@ -24,10 +24,8 @@ public:
   void set_connection(Connection *c) { _conn = c; }
 
   virtual void actionListenerCallback(const String &message) override {
-    if (message == CC_MAP_CHANGED_MESSAGE) {
-      _list_box->updateContent();
-      _list_box->repaint();
-    }
+    if (message == CC_MAP_CHANGED_MESSAGE)
+      sendActionMessage("update:cc-map");
   }
 
 private:
@@ -38,7 +36,7 @@ private:
 class CcMapsTableListBox : public KmTableListBox {
 public:
   void actionListenerCallback(const String &message) override {
-    if (message == "moved") {
+    if (message == "moved" || message == "update:cc-map") {
       updateContent();
       repaint();
     }

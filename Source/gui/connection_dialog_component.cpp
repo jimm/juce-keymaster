@@ -365,7 +365,6 @@ void ConnectionDialogComponent::init_velocity_curve() {
 void ConnectionDialogComponent::init_cc_maps() {
   _cc_maps_model = new CcMapsTableListBoxModel();
   _cc_maps_model->set_connection(_conn);
-  _cc_maps_model->set_list_box(&_cc_maps_list_box);
   _cc_maps_model->make_columns(_cc_maps_list_box.getHeader());
   _cc_maps_list_box.setModel(_cc_maps_model);
   _cc_maps_list_box.setColour(ListBox::outlineColourId, Colours::grey);
@@ -495,7 +494,8 @@ bool ConnectionDialogComponent::apply() {
 
 void ConnectionDialogComponent::add_cc_map() {
   Controller *c = new Controller(UNDEFINED, 0);
-  open_cc_map_editor(_conn, c)->addActionListener(&_cc_maps_list_box);
+  auto model = static_cast<CcMapsTableListBoxModel*>(_cc_maps_list_box.getTableListBoxModel());
+  open_cc_map_editor(_conn, c)->addActionListener(model);
 }
 
 void ConnectionDialogComponent::del_cc_map() {

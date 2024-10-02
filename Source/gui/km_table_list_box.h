@@ -37,8 +37,6 @@ public:
 
   virtual int selected_row_num() { return -1; }
 
-  void set_list_box(KmTableListBox *list_box) { _list_box = list_box; }
-
   virtual void cellClicked(int row, int col, const MouseEvent &event) override {
     if (event.mouseWasClicked() && event.mods.isRightButtonDown())
       sendActionMessage("popup");
@@ -47,15 +45,13 @@ public:
   }
 
 protected:
-  KmTableListBox *_list_box;
-
   LookAndFeel &_lf { LookAndFeel::getDefaultLookAndFeel() };
 
   Cursor *cursor() { return KeyMaster_instance()->cursor(); }
 };
 
 
-class KmTableListBox : public TableListBox, public ActionListener {
+class KmTableListBox : public TableListBox, public ActionListener, public ActionBroadcaster {
 public:
   void actionListenerCallback(const String &message) override {
     if (message == "moved") {

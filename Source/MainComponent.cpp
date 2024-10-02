@@ -208,7 +208,8 @@ void MainComponent::new_patch() {
 
 void MainComponent::new_connection() {
   Patch *p = KeyMaster_instance()->cursor()->patch();
-  open_connection_editor(p, nullptr)->addActionListener(&connections_table);
+  auto model = static_cast<ConnectionsTableListBoxModel *>(connections_table.getTableListBoxModel());
+  open_connection_editor(p, nullptr)->addActionListener(model);
 }
 
 void MainComponent::new_set_list() {
@@ -354,7 +355,7 @@ void MainComponent::config_list_box(
   box_models.add(model);
   list_box.setModel(model);
   model->addActionListener(&list_box);
-  model->set_list_box(&list_box);
+  list_box.addActionListener(this);
   config_lbox(label_text, label, list_box);
 }
 
@@ -363,9 +364,9 @@ void MainComponent::config_table_list_box(
 {
   table_box_models.add(model);
   list_box.setModel(model);
-  model->addActionListener(&list_box);
-  model->set_list_box(&list_box);
   model->make_columns(list_box.getHeader());
+  model->addActionListener(&list_box);
+  list_box.addActionListener(this);
   config_lbox(label_text, label, list_box);
 }
 
@@ -413,4 +414,11 @@ void MainComponent::make_messages_pane() {
 void MainComponent::make_triggers_pane() {
   auto model = new TriggersTableListBoxModel();
   config_table_list_box("Triggers", triggers_label, triggers, model);
+}
+
+// ================ helpers ================
+
+void MainComponent::actionListenerCallback(const String &message) {
+  if (message == "update:all")
+    update();
 }

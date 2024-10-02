@@ -79,7 +79,7 @@ void ConnectionsTableListBoxModel::paintCell(
 void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
   Patch *p = KeyMaster_instance()->cursor()->patch();
   Connection *c = p->connections()[row];
-  open_connection_editor(p, c)->addActionListener(static_cast<ConnectionsTableListBox *>(_list_box));
+  open_connection_editor(p, c)->addActionListener(this);
 }
 
 String ConnectionsTableListBoxModel::program_str(Connection *c) {

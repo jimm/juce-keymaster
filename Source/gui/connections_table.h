@@ -29,10 +29,8 @@ public:
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
 
   virtual void actionListenerCallback(const String &message) override {
-    if (message == CONNECTION_CHANGED_MESSAGE) {
-      _list_box->updateContent();
-      _list_box->repaint();
-    }
+    if (message == CONNECTION_CHANGED_MESSAGE)
+      sendActionMessage("update:connection");
   }
 
 private:
@@ -45,7 +43,7 @@ private:
 class ConnectionsTableListBox : public KmTableListBox {
 public:
   void actionListenerCallback(const String &message) override {
-    if (message == "moved") {
+    if (message == "moved" || message == "update:connection") {
       updateContent();
       repaint();
     }

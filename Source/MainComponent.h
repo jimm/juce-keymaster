@@ -18,7 +18,7 @@ class KeyMaster;
   This component lives inside our window, and this is where you should put all
   your controls and content.
 */
-class MainComponent : public Component, public FileBasedDocument
+class MainComponent : public Component, public FileBasedDocument, public ActionListener
 {
 public:
   //==============================================================================
@@ -70,6 +70,8 @@ public:
   Result saveDocument(const File &file) override;
   File getLastDocumentOpened() override { return _file; }
   void setLastDocumentOpened(const File &file) override { _file = file; }
+
+  void actionListenerCallback(const String &message) override;
 
 private:
   //==============================================================================
