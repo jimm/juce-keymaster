@@ -6,7 +6,7 @@
 
 class KmListBox;
 
-class KmListBoxModel : public ListBoxModel {
+class KmListBoxModel : public ListBoxModel, public ActionBroadcaster {
 public:
   virtual String &getText(int rowNumber) = 0;
   virtual int getNumRows() override { return 0; }
@@ -32,6 +32,13 @@ public:
 
   void set_list_box(KmListBox *list_box) { _list_box = list_box; }
 
+  virtual void listBoxItemClicked(int row, const MouseEvent &event) override {
+    if (event.mouseWasClicked() && event.mods.isRightButtonDown())
+      sendActionMessage("popup");
+    else
+      ListBoxModel::listBoxItemClicked(row, event);
+  }
+
 protected:
   KmListBox *_list_box;
 
@@ -48,6 +55,9 @@ public:
       if (selected_row_num >= 0 && selected_row_num <= getListBoxModel()->getNumRows())
         selectRow(selected_row_num);
       repaint();
+    }
+    else if (message == "popup") {
+      popupMenu();
     }
   }
 

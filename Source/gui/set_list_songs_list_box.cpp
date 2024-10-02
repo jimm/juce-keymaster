@@ -36,7 +36,7 @@ void SetListSongsListBox::popup_all_songs_menu() {
     });
   }
 
-  menu.showMenuAsync(PopupMenu::Options{}.withTargetComponent(this));
+  menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
   // TODO act on the selection
 }
 
@@ -71,6 +71,6 @@ void SetListSongsListBox::popup_set_list_menu() {
     });
   }
 
-  menu.showMenuAsync(PopupMenu::Options{}.withTargetComponent(this));
+  menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
   // TODO act on the selection
 }

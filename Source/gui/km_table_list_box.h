@@ -6,7 +6,7 @@
 
 class KmTableListBox;
 
-class KmTableListBoxModel : public TableListBoxModel {
+class KmTableListBoxModel : public TableListBoxModel, public ActionBroadcaster {
 public:
   virtual void make_columns(TableHeaderComponent &header) = 0;
 
@@ -39,6 +39,13 @@ public:
 
   void set_list_box(KmTableListBox *list_box) { _list_box = list_box; }
 
+  virtual void cellClicked(int row, int col, const MouseEvent &event) override {
+    if (event.mouseWasClicked() && event.mods.isRightButtonDown())
+      sendActionMessage("popup");
+    else
+      TableListBoxModel::cellClicked(row, col, event);
+  }
+
 protected:
   KmTableListBox *_list_box;
 
@@ -58,5 +65,18 @@ public:
         selectRow(selected_row_num);
       repaint();
     }
+    else if (message == "popup") {
+      popupMenu();
+    }
   }
+
+  virtual void backgroundClicked(const MouseEvent &event) override {
+    if (event.mouseWasClicked() && event.mods.isRightButtonDown())
+      popupMenu();
+    else
+      TableListBox::backgroundClicked(event);
+  }
+
+protected:
+  virtual void popupMenu() {};
 };

@@ -353,6 +353,7 @@ void MainComponent::config_list_box(
 {
   box_models.add(model);
   list_box.setModel(model);
+  model->addActionListener(&list_box);
   model->set_list_box(&list_box);
   config_lbox(label_text, label, list_box);
 }
@@ -362,6 +363,7 @@ void MainComponent::config_table_list_box(
 {
   table_box_models.add(model);
   list_box.setModel(model);
+  model->addActionListener(&list_box);
   model->set_list_box(&list_box);
   model->make_columns(list_box.getHeader());
   config_lbox(label_text, label, list_box);
