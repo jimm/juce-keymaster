@@ -2,25 +2,22 @@
 
 #include <JuceHeader.h>
 #include "../km/connection.h"
-#include "connections_table.h"
+#include "km_dialog_component.h"
 #include "cc_maps_table.h"
-#include "km_table_list_box.h"
 
 class Patch;
 
-class ConnectionDialogComponent : public Component, public ActionBroadcaster {
+class ConnectionDialogComponent : public KmDialogComponent {
 public:
   ConnectionDialogComponent(Patch *p, Connection *c, bool is_new);
+  virtual ~ConnectionDialogComponent() {}
 
-  void resized() override;
-
-  int width();
-  int height();
+  virtual int width() override;
+  virtual int height() override;
 
 private:
   Patch *_patch;
   Connection *_conn;
-  bool _is_new;
 
   Label _input_inst_label { {}, "Input" };
   ComboBox _input_instrument;
@@ -78,6 +75,7 @@ private:
   TextButton _cancel { "Cancel" };
   TextButton _apply { "Apply" };
 
+  virtual void layout(Rectangle<int> &area) override;
   void layout_instrument(
     Rectangle<int> &area, Label &inst_label, ComboBox &inst, Label &chan_label, ComboBox &chan
   );
@@ -104,9 +102,8 @@ private:
   void del_cc_map();
   void update_conn_cc_maps();
 
-  void ok();
-  void cancel();
-  bool apply();
+  virtual void cancel_cleanup() override;
+  virtual bool apply() override;
 };
 
 // If connection is nullptr we create a new one.

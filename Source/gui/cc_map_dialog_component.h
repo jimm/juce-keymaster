@@ -2,25 +2,22 @@
 
 #include <JuceHeader.h>
 #include "../km/connection.h"
-#include "cc_maps_table.h"
-#include "km_table_list_box.h"
+#include "km_dialog_component.h"
 
 class Connection;
 class Controller;
 
-class CcMapDialogComponent : public Component, public ActionBroadcaster {
+class CcMapDialogComponent : public KmDialogComponent {
 public:
   CcMapDialogComponent(Connection *conn, Controller *c, bool is_new);
+  virtual ~CcMapDialogComponent() {}
 
-  void resized() override;
-
-  int width();
-  int height();
+  virtual int width() override;
+  virtual int height() override;
 
 private:
   Connection *_conn;
   Controller *_controller;
-  bool _is_new;
 
   Label _cc_num_label { {}, "Controller Number" };
   TextEditor _cc_num;
@@ -48,15 +45,12 @@ private:
   TextButton _cancel { "Cancel" };
   TextButton _apply { "Apply" };
 
-  void init();
-  void init_text_editor(TextEditor &te, String initial_contents);
+  virtual void layout(Rectangle<int> &area) override;
 
-  void layout(Rectangle<int> &area);
-  void layout_buttons(Rectangle<int> &area);
+  virtual void init() override;
+  virtual void cancel_cleanup() override;
 
-  void ok();
-  void cancel();
-  bool apply();
+  virtual bool apply() override;
 };
 
 // If Controller is nullptr we create a new one.

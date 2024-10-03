@@ -9,6 +9,8 @@ class MessagesListBox : public KmListBox {
 
 class MessagesListBoxModel : public KmListBoxModel {
 public:
+  virtual ~MessagesListBoxModel() {}
+
   virtual int getNumRows() override {
     return messages().size();
   }

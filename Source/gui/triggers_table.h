@@ -11,6 +11,8 @@ class TriggersTableListBox;
 
 class TriggersTableListBoxModel : public KmTableListBoxModel {
 public:
+  virtual ~TriggersTableListBoxModel() {}
+
   void make_columns(TableHeaderComponent &header) override;
 
   int getNumRows() override { return KeyMaster_instance()->triggers().size(); }

@@ -3,22 +3,13 @@
 #include "../km/connection.h"
 #include "../km/controller.h"
 
-#define UNSELECTED (-1)
-
-#define SPACE 12
-#define BETWEEN_ROW_SPACE 20
-#define LABEL_HEIGHT 16
-#define BUTTON_HEIGHT 35
-#define BUTTON_WIDTH 80
-#define DATA_ROW_HEIGHT 20
-
 #define CC_NUM_WIDTH 40
 #define CC_MAP_LABEL_WIDTH 60
 #define FILTER_TOGGLE_HEIGHT 20
 #define DASH_WIDTH 10
 
-#define WINDOW_WIDTH (SPACE + 300 + SPACE)
-#define WINDOW_HEIGHT (SPACE * 6 + BETWEEN_ROW_SPACE * 5 + LABEL_HEIGHT * 4 + FILTER_TOGGLE_HEIGHT * 3 + DATA_ROW_HEIGHT * 3 + BUTTON_HEIGHT)
+#define CONTENT_WIDTH (300)
+#define CONTENT_HEIGHT (SPACE * 4 + BETWEEN_ROW_SPACE * 4 + LABEL_HEIGHT * 4 + FILTER_TOGGLE_HEIGHT * 3 + DATA_ROW_HEIGHT * 3 - SPACE)
 
 CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c)
 {
@@ -41,36 +32,17 @@ CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c)
 
 CcMapDialogComponent::CcMapDialogComponent(
   Connection *conn, Controller *c, bool is_new)
-  : _conn(conn), _controller(c), _is_new(is_new)
+  : KmDialogComponent(is_new), _conn(conn), _controller(c)
 {
   init();
-
-  _ok.onClick = [this] { ok(); };
-  _cancel.onClick = [this] { cancel(); };
-  _apply.onClick = [this] { apply(); };
-
-  addAndMakeVisible(_ok);
-  addAndMakeVisible(_cancel);
-  addAndMakeVisible(_apply);
-
-  setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 int CcMapDialogComponent::width() {
-  return WINDOW_WIDTH;
+  return KmDialogComponent::width() + CONTENT_WIDTH;
 }
 
 int CcMapDialogComponent::height() {
-  return WINDOW_HEIGHT;
-}
-
-void CcMapDialogComponent::resized() {
-  auto area = getLocalBounds();
-  area.reduce(SPACE, SPACE);
-
-  layout(area);
-  area.removeFromTop(BETWEEN_ROW_SPACE * 2);
-  layout_buttons(area);
+  return KmDialogComponent::height() + CONTENT_HEIGHT;
 }
 
 void CcMapDialogComponent::layout(Rectangle<int> &area) {
@@ -110,15 +82,8 @@ void CcMapDialogComponent::layout(Rectangle<int> &area) {
   _dash2.setBounds(row_area.removeFromLeft(DASH_WIDTH));
   row_area.removeFromLeft(SPACE);
   _max_out.setBounds(row_area.removeFromLeft(CC_NUM_WIDTH));
-}
 
-void CcMapDialogComponent::layout_buttons(Rectangle<int> &area) {
-  auto row_area = area.removeFromTop(BUTTON_HEIGHT);
-  _ok.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-  row_area.removeFromRight(SPACE);
-  _apply.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-  row_area.removeFromRight(SPACE);
-  _cancel.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
+  KmDialogComponent::layout(area);
 }
 
 void CcMapDialogComponent::init() {
@@ -148,26 +113,19 @@ void CcMapDialogComponent::init() {
   addAndMakeVisible(_min_max_out_label);
   addAndMakeVisible(_min_out);
   addAndMakeVisible(_max_out);
+
+  KmDialogComponent::init();
 }
 
-void CcMapDialogComponent::ok() {
-  if (apply())
-    static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
-}
-
-void CcMapDialogComponent::cancel() {
-  if (_is_new)
-    delete _conn;
-  static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
+void CcMapDialogComponent::cancel_cleanup() {
+  delete _controller;
 }
 
 bool CcMapDialogComponent::apply() {
-  Array<String> error_msgs;
-
   auto text = _cc_num.getText();
   int cc_num = 0;
   if (text.isEmpty())
-    error_msgs.add("Controller number must be defined");
+    add_error_message("Controller number must be defined");
   else
     cc_num = text.getIntValue();
 
@@ -181,28 +139,19 @@ bool CcMapDialogComponent::apply() {
 
   int min_in = _min_in.getText().getIntValue();
   if (min_in < 0 || min_in > 127)
-    error_msgs.add("Min in must be 0 - 127");
+    add_error_message("Min in must be 0 - 127");
   int max_in = _max_in.getText().getIntValue();
   if (max_in < 0 || max_in > 127)
-    error_msgs.add("Max in must be 0 - 127");
+    add_error_message("Max in must be 0 - 127");
   int min_out = _min_out.getText().getIntValue();
   if (min_out < 0 || min_out > 127)
-    error_msgs.add("Min out must be 0 - 127");
+    add_error_message("Min out must be 0 - 127");
   int max_out = _max_out.getText().getIntValue();
   if (max_out < 0 || max_out > 127)
-    error_msgs.add("Max out must be 0 - 127");
+    add_error_message("Max out must be 0 - 127");
 
-  if (!error_msgs.isEmpty()) {
-    String message = "The following";
-    message << String((error_msgs.size() == 1) ? "error prevents" : "errors prevent");
-    message << " the controller mapping from being saved:\n";
-    for (auto err : error_msgs) {
-      message << "\n- ";
-      message << err;
-    }
-    AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
-                                     "Connection Edit Errors", message,
-                                     "OK", this);
+  if (has_errors()) {
+    display_errors("Controller Mapping");
     return false;
   }
 

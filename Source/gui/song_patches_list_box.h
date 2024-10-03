@@ -9,6 +9,8 @@ class SongPatchesListBox : public KmListBox {
 
 class SongPatchesListBoxModel : public KmListBoxModel {
 public:
+  virtual ~SongPatchesListBoxModel() {}
+
   virtual int getNumRows() override {
     Song *s = song();
     return s ? s->patches().size() : 0;

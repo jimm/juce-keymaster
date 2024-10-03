@@ -21,6 +21,10 @@
             file="Source/gui/connections_table.cpp"/>
       <FILE id="UrMJqx" name="connections_table.h" compile="0" resource="0"
             file="Source/gui/connections_table.h"/>
+      <FILE id="LW1744" name="km_dialog_component.cpp" compile="1" resource="0"
+            file="Source/gui/km_dialog_component.cpp"/>
+      <FILE id="QbmhBO" name="km_dialog_component.h" compile="0" resource="0"
+            file="Source/gui/km_dialog_component.h"/>
       <FILE id="BgxL3U" name="km_list_box.h" compile="0" resource="0" file="Source/gui/km_list_box.h"/>
       <FILE id="ziJXOh" name="km_table_list_box.h" compile="0" resource="0"
             file="Source/gui/km_table_list_box.h"/>

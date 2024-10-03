@@ -10,6 +10,8 @@ class Controller;
 
 class CcMapsTableListBoxModel : public KmTableListBoxModel {
 public:
+  virtual ~CcMapsTableListBoxModel() {}
+
   void make_columns(TableHeaderComponent &header) override;
 
   Controller *nth_cc_map(int n);

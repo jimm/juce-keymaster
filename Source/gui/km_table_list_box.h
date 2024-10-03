@@ -8,6 +8,8 @@ class KmTableListBox;
 
 class KmTableListBoxModel : public TableListBoxModel, public ActionBroadcaster, public ActionListener {
 public:
+  virtual ~KmTableListBoxModel() {}
+
   virtual void make_columns(TableHeaderComponent &header) = 0;
 
   void paintRowBackground(

@@ -8,6 +8,8 @@ class KmListBox;
 
 class KmListBoxModel : public ListBoxModel, public ActionBroadcaster, public ActionListener {
 public:
+  virtual ~KmListBoxModel() {}
+
   virtual String &getText(int rowNumber) = 0;
   virtual int getNumRows() override { return 0; }
 

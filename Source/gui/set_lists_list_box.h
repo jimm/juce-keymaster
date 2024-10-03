@@ -11,6 +11,8 @@ protected:
 
 class SetListsListBoxModel : public KmListBoxModel {
 public:
+  virtual ~SetListsListBoxModel() {}
+
   virtual int getNumRows() override {
     return set_lists().size();
   }

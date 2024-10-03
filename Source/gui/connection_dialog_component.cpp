@@ -7,15 +7,6 @@
 #include "../km/editor.h"
 #include "../km/formatter.h"
 
-#define UNSELECTED (-1)
-
-#define SPACE 12
-#define BETWEEN_ROW_SPACE 20
-#define LABEL_HEIGHT 16
-#define BUTTON_HEIGHT 35
-#define BUTTON_WIDTH 80
-#define DATA_ROW_HEIGHT 20
-
 #define INSTRUMENT_WIDTH 250
 #define CHANNEL_COMBO_WIDTH 125
 #define PROG_LABEL_WIDTH 35
@@ -34,8 +25,8 @@
 #define CC_MAPS_BUTTON_HEIGHT 25
 #define CC_MAPS_BUTTON_WIDTH 40
 
-#define WINDOW_WIDTH (CC_MAPS_TABLE_WIDTH * 2 + SPACE * 2)
-#define WINDOW_HEIGHT (SPACE * 10 + BETWEEN_ROW_SPACE * 8 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT + BUTTON_HEIGHT)
+#define CONTENT_WIDTH (CC_MAPS_TABLE_WIDTH * 2)
+#define CONTENT_HEIGHT (SPACE * 8 + BETWEEN_ROW_SPACE * 7 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT)
 
 ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c)
 {
@@ -60,7 +51,7 @@ ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c)
 
 ConnectionDialogComponent::ConnectionDialogComponent(
   Patch *p, Connection *c, bool is_new)
-  : _patch(p), _conn(c), _is_new(is_new)
+  : KmDialogComponent(is_new), _patch(p), _conn(c)
 {
   init_input();
   init_output();
@@ -74,29 +65,18 @@ ConnectionDialogComponent::ConnectionDialogComponent(
   _add_cc_map.onClick = [this] { add_cc_map(); };
   _del_cc_map.onClick = [this] { del_cc_map(); };
 
-  _ok.onClick = [this] { ok(); };
-  _cancel.onClick = [this] { cancel(); };
-  _apply.onClick = [this] { apply(); };
-
-  addAndMakeVisible(_ok);
-  addAndMakeVisible(_cancel);
-  addAndMakeVisible(_apply);
-
-  setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+  KmDialogComponent::init();
 }
 
 int ConnectionDialogComponent::width() {
-  return WINDOW_WIDTH;
+  return KmDialogComponent::width() + CONTENT_WIDTH;
 }
 
 int ConnectionDialogComponent::height() {
-  return WINDOW_HEIGHT;
+  return KmDialogComponent::height() + CONTENT_HEIGHT;
 }
 
-void ConnectionDialogComponent::resized() {
-  auto area = getLocalBounds();
-  area.reduce(SPACE, SPACE);
-
+void ConnectionDialogComponent::layout(Rectangle<int> &area) {
   layout_instrument(area, _input_inst_label, _input_instrument, _input_chan_label, _input_chan);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
@@ -117,8 +97,7 @@ void ConnectionDialogComponent::resized() {
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_cc_maps(area);
 
-  area.removeFromTop(BETWEEN_ROW_SPACE);
-  layout_buttons(area);
+  KmDialogComponent::layout(area);
 }
 
 void ConnectionDialogComponent::layout_instrument(
@@ -293,7 +272,6 @@ void ConnectionDialogComponent::init_text_editor(TextEditor &te, String initial_
   te.setSelectAllWhenFocused(true);
   te.setEscapeAndReturnKeysConsumed(false);
   te.setColour(TextEditor::outlineColourId, findColour(ComboBox::outlineColourId));
-  // te.setFont(getLookAndFeel().getAlertWindowMessageFont());
   te.setText(initial_contents);
   te.setCaretPosition(initial_contents.length());
   addAndMakeVisible(te);
@@ -368,6 +346,7 @@ void ConnectionDialogComponent::init_cc_maps() {
   _cc_maps_list_box.setModel(_cc_maps_model);
   _cc_maps_list_box.setColour(ListBox::outlineColourId, Colours::grey);
   _cc_maps_list_box.setOutlineThickness(1);
+   _cc_maps_model->addActionListener(&_cc_maps_list_box);
 
   addAndMakeVisible(_cc_maps_label);
   addAndMakeVisible(_cc_maps_list_box);
@@ -375,21 +354,12 @@ void ConnectionDialogComponent::init_cc_maps() {
   addAndMakeVisible(_del_cc_map);
 }
 
-void ConnectionDialogComponent::ok() {
-  if (apply())
-    static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
-}
-
-void ConnectionDialogComponent::cancel() {
-  if (_is_new)
-    delete _conn;
-  static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
+void ConnectionDialogComponent::cancel_cleanup() {
+  delete _conn;
 }
 
 // Displays an alert and returns false if apply fails.
 bool ConnectionDialogComponent::apply() {
-  Array<String> error_msgs;
-
   DeviceManager &dm = KeyMaster_instance()->device_manager();
   int id = _input_instrument.getSelectedId();
   Input::Ptr input = id == UNSELECTED ? nullptr : dm.inputs()[id-1];
@@ -408,25 +378,25 @@ bool ConnectionDialogComponent::apply() {
   auto text = _msb.getText();
   int msb = text.isEmpty() ? UNDEFINED : text.getIntValue();
   if (msb != UNDEFINED && (msb < 0 || msb > 127))
-    error_msgs.add("Bank MSB value must be 0-127");
+    add_error_message("Bank MSB value must be 0-127");
 
   text = _lsb.getText();
   int lsb = text.isEmpty() ? UNDEFINED : text.getIntValue();
   if (lsb != UNDEFINED && (lsb < 0 || lsb > 127))
-    error_msgs.add("Bank LSB value must be 0-127");
+    add_error_message("Bank LSB value must be 0-127");
 
   text = _prog.getText();
   int prog = text.isEmpty() ? UNDEFINED : text.getIntValue();
   if (prog != UNDEFINED && (prog < 0 || prog > 127))
-    error_msgs.add("Program value must be 0-127");
+    add_error_message("Program value must be 0-127");
 
   int zone_low = note_name_to_num(_zone_low.getText());
   if (zone_low < 0 || zone_low > 127)
-    error_msgs.add("Zone low must be 0 (C-1) - 127 (G8)");
+    add_error_message("Zone low must be 0 (C-1) - 127 (G8)");
 
   int zone_high = note_name_to_num(_zone_high.getText());
   if (zone_high < 0 || zone_high > 127)
-    error_msgs.add("Zone high must be 0 (C0) - 127 (G9)");
+    add_error_message("Zone high must be 0 (C0) - 127 (G9)");
 
   int xpose = _xpose.getText().getIntValue();
 
@@ -435,17 +405,8 @@ bool ConnectionDialogComponent::apply() {
   if (id != UNSELECTED)
     curve = KeyMaster_instance()->curves()[id-1];
 
-  if (!error_msgs.isEmpty()) {
-    String message = "The following";
-    message << String((error_msgs.size() == 1) ? "error prevents" : "errors prevent");
-    message << " the connection from being saved:\n";
-    for (auto err : error_msgs) {
-      message << "\n- ";
-      message << err;
-    }
-    AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
-                                     "Connection Edit Errors", message,
-                                     "OK", this);
+  if (has_errors()) {
+    display_errors("Connection");
     return false;
   }
 
@@ -483,7 +444,8 @@ bool ConnectionDialogComponent::apply() {
   _conn->end_changes();
 
   if (_is_new) {
-    _patch->add_connection(_conn);
+    Editor e;
+    e.add_connection(_patch, _conn);
     _is_new = false;
   }
 

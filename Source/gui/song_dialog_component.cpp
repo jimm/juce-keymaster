@@ -4,25 +4,15 @@
 #include "../km/song.h"
 #include "../km/editor.h"
 
-#define UNSELECTED (-1)
-
-#define SPACE 12
-#define BETWEEN_ROW_SPACE 20
-#define LABEL_HEIGHT 16
-#define BUTTON_HEIGHT 35
-#define BUTTON_WIDTH 80
-#define DATA_ROW_HEIGHT 20
-
 #define NAME_WIDTH 300
 #define BPM_LABEL_WIDTH 40
 #define BPM_WIDTH 40
 #define CLOCK_ON_CHECKBOX_WIDTH 150
-
 #define NOTES_WIDTH 300
 #define NOTES_HEIGHT 300
 
-#define WINDOW_WIDTH (SPACE * 2 + NOTES_WIDTH)
-#define WINDOW_HEIGHT (SPACE * 5 + BETWEEN_ROW_SPACE * 3 + LABEL_HEIGHT * 3 + DATA_ROW_HEIGHT * 2 + NOTES_HEIGHT + BUTTON_HEIGHT)
+#define CONTENT_WIDTH (NOTES_WIDTH)
+#define CONTENT_HEIGHT (SPACE * 3 + BETWEEN_ROW_SPACE * 3 + LABEL_HEIGHT * 3 + DATA_ROW_HEIGHT * 2 + NOTES_HEIGHT)
 
 SongDialogComponent * open_song_editor(Song *s)
 {
@@ -45,35 +35,21 @@ SongDialogComponent * open_song_editor(Song *s)
   return cdc;
 }
 
-SongDialogComponent::SongDialogComponent(
-  Song *s, bool is_new)
-  : _song(s), _is_new(is_new)
+SongDialogComponent::SongDialogComponent(Song *s, bool is_new)
+  : KmDialogComponent(is_new), _song(s)
 {
-  init_song();
-
-  _ok.onClick = [this] { ok(); };
-  _cancel.onClick = [this] { cancel(); };
-  _apply.onClick = [this] { apply(); };
-
-  addAndMakeVisible(_ok);
-  addAndMakeVisible(_cancel);
-  addAndMakeVisible(_apply);
-
-  setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+  init();
 }
 
 int SongDialogComponent::width() {
-  return WINDOW_WIDTH;
+  return KmDialogComponent::width() + CONTENT_WIDTH;
 }
 
 int SongDialogComponent::height() {
-  return WINDOW_HEIGHT;
+  return KmDialogComponent::height() + CONTENT_HEIGHT;
 }
 
-void SongDialogComponent::resized() {
-  auto area = getLocalBounds();
-  area.reduce(SPACE, SPACE);
-
+void SongDialogComponent::layout(Rectangle<int> &area) {
   layout_name(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
@@ -82,8 +58,7 @@ void SongDialogComponent::resized() {
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_notes(area);
 
-  area.removeFromTop(BETWEEN_ROW_SPACE);
-  layout_buttons(area);
+  KmDialogComponent::layout(area);
 }
 
 void SongDialogComponent::layout_name(Rectangle<int> &area) {
@@ -113,16 +88,7 @@ void SongDialogComponent::layout_notes(Rectangle<int> &area) {
   _notes.setBounds(row_area.removeFromLeft(NOTES_WIDTH));
 }
 
-void SongDialogComponent::layout_buttons(Rectangle<int> &area) {
-  auto row_area = area.removeFromTop(BUTTON_HEIGHT);
-  _ok.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-  row_area.removeFromRight(SPACE);
-  _apply.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-  row_area.removeFromRight(SPACE);
-  _cancel.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-}
-
-void SongDialogComponent::init_song() {
+void SongDialogComponent::init() {
   _name.setText(_song->name());
   _bpm.setText(String(_song->bpm()));
   _clock_on.setToggleState(_song->clock_on_at_start(), NotificationType::dontSendNotification);
@@ -136,20 +102,14 @@ void SongDialogComponent::init_song() {
   addAndMakeVisible(_clock_on);
   addAndMakeVisible(_notes_label);
   addAndMakeVisible(_notes);
+
+  KmDialogComponent::init();
 }
 
-void SongDialogComponent::ok() {
-  if (apply())
-    static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
+void SongDialogComponent::cancel_cleanup() {
+  delete _song;
 }
 
-void SongDialogComponent::cancel() {
-  if (_is_new)
-    delete _song;
-  static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
-}
-
-// Displays an alert and returns false if apply fails.
 bool SongDialogComponent::apply() {
   _song->set_name(_name.getText());
   _song->set_bpm(_bpm.getText().getFloatValue());

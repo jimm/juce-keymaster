@@ -14,6 +14,8 @@ protected:
 
 class SetListSongsListBoxModel : public KmListBoxModel {
 public:
+  virtual ~SetListSongsListBoxModel() {}
+
   virtual int getNumRows() override {
     return set_list()->songs().size();
   }

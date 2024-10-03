@@ -11,6 +11,8 @@ class ConnectionsTableListBox;
 
 class ConnectionsTableListBoxModel : public KmTableListBoxModel {
 public:
+  virtual ~ConnectionsTableListBoxModel() {}
+
   void make_columns(TableHeaderComponent &header) override;
 
   int getNumRows() override {

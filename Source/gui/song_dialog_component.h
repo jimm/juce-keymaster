@@ -2,22 +2,20 @@
 
 #include <JuceHeader.h>
 #include "../km/song.h"
-#include "km_table_list_box.h"
+#include "km_dialog_component.h"
 
 class Patch;
 
-class SongDialogComponent : public Component, public ActionBroadcaster {
+class SongDialogComponent : public KmDialogComponent {
 public:
   SongDialogComponent(Song *c, bool is_new);
+  virtual ~SongDialogComponent() {}
 
-  void resized() override;
-
-  int width();
-  int height();
+  virtual int width() override;
+  virtual int height() override;
 
 private:
   Song *_song;
-  bool _is_new;
 
   Label _name_label { {}, "Name" };
   TextEditor _name;
@@ -32,20 +30,16 @@ private:
   Label _notes_label { {}, "Notes" };
   TextEditor _notes;
 
-  TextButton _ok { "Ok" };
-  TextButton _cancel { "Cancel" };
-  TextButton _apply { "Apply" };
-
+  virtual void layout(Rectangle<int> &area) override;
   void layout_name(Rectangle<int> &area);
   void layout_clock(Rectangle<int> &area);
   void layout_notes(Rectangle<int> &area);
   void layout_buttons(Rectangle<int> &area);
 
-  void init_song();
+  virtual void init() override;
+  virtual void cancel_cleanup() override;
 
-  void ok();
-  void cancel();
-  bool apply();
+  virtual bool apply() override;
 };
 
 // If song is nullptr we create a new one.
