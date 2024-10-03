@@ -56,8 +56,9 @@ public:
   void actionListenerCallback(const String &message) override {
     if (message == "moved") {
       updateContent();
-      int selected_row_num = ((KmTableListBoxModel *)getListBoxModel())->selected_row_num();
-      if (selected_row_num >= 0 && selected_row_num <= getListBoxModel()->getNumRows())
+      auto model = static_cast<KmTableListBoxModel *>(getTableListBoxModel());
+      int selected_row_num = model->selected_row_num();
+      if (selected_row_num >= 0 && selected_row_num <= model->getNumRows())
         selectRow(selected_row_num);
       repaint();
     }

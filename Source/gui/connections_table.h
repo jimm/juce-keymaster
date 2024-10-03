@@ -30,7 +30,7 @@ public:
 
   virtual void actionListenerCallback(const String &message) override {
     if (message == CONNECTION_CHANGED_MESSAGE)
-      sendActionMessage("update:connection");
+      sendActionMessage("update:table-list-box");
     // If KmTableListBoxModel ever becomes an ActionListener then add call
     // to superclass here
   }
@@ -43,16 +43,6 @@ private:
 
 
 class ConnectionsTableListBox : public KmTableListBox {
-public:
-  void actionListenerCallback(const String &message) override {
-    if (message == "moved" || message == "update:connection") {
-      updateContent();
-      repaint();
-    }
-    else
-      KmTableListBox::actionListenerCallback(message);
-  }
-
 protected:
   virtual void popupMenu() override;
 };

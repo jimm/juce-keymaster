@@ -91,7 +91,8 @@ void ConnectionsTableListBox::popupMenu() {
     Editor e;
     Connection *conn = e.create_connection(nullptr, nullptr);
     e.add_connection(patch, conn);
-    sendActionMessage("update:table-list-box");
+    updateContent();
+    repaint();
   });
 
   auto rows = getSelectedRows();
@@ -100,7 +101,8 @@ void ConnectionsTableListBox::popupMenu() {
     menu.addItem("Delete Selected Connection", [this, patch, conn] {
       Editor e;
       e.destroy_connection(patch, conn);
-      sendActionMessage("update:table-list-box");
+      updateContent();
+      repaint();
     });
   }
 
