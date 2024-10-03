@@ -31,6 +31,8 @@ public:
   virtual void actionListenerCallback(const String &message) override {
     if (message == CONNECTION_CHANGED_MESSAGE)
       sendActionMessage("update:connection");
+    // If KmTableListBoxModel ever becomes an ActionListener then add call
+    // to superclass here
   }
 
 private:
@@ -47,6 +49,8 @@ public:
       updateContent();
       repaint();
     }
+    else
+      KmTableListBox::actionListenerCallback(message);
   }
 
 protected:

@@ -26,6 +26,8 @@ public:
   virtual void actionListenerCallback(const String &message) override {
     if (message == CC_MAP_CHANGED_MESSAGE)
       sendActionMessage("update:cc-map");
+    // If KmTableListBoxModel ever becomes an ActionListener then add call
+    // to superclass here
   }
 
 private:
@@ -40,5 +42,7 @@ public:
       updateContent();
       repaint();
     }
+    else
+      KmTableListBox::actionListenerCallback(message);
   }
 };
