@@ -8,7 +8,7 @@ class Connection;
 class Controller;
 
 
-class CcMapsTableListBoxModel : public KmTableListBoxModel, public ActionListener {
+class CcMapsTableListBoxModel : public KmTableListBoxModel {
 public:
   void make_columns(TableHeaderComponent &header) override;
 
@@ -26,8 +26,8 @@ public:
   virtual void actionListenerCallback(const String &message) override {
     if (message == CC_MAP_CHANGED_MESSAGE)
       sendActionMessage("update:table-list-box");
-    // If KmTableListBoxModel ever becomes an ActionListener then add call
-    // to superclass here
+    else
+      KmTableListBoxModel::actionListenerCallback(message);
   }
 
 private:

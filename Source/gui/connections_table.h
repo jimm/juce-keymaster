@@ -9,7 +9,7 @@ class Connection;
 class ConnectionsTableListBox;
 
 
-class ConnectionsTableListBoxModel : public KmTableListBoxModel, public ActionListener {
+class ConnectionsTableListBoxModel : public KmTableListBoxModel {
 public:
   void make_columns(TableHeaderComponent &header) override;
 
@@ -31,8 +31,8 @@ public:
   virtual void actionListenerCallback(const String &message) override {
     if (message == CONNECTION_CHANGED_MESSAGE)
       sendActionMessage("update:table-list-box");
-    // If KmTableListBoxModel ever becomes an ActionListener then add call
-    // to superclass here
+    else
+      KmTableListBoxModel::actionListenerCallback(message);
   }
 
 private:

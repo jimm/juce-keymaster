@@ -1,4 +1,5 @@
 #include "set_list_songs_list_box.h"
+#include "song_dialog_component.h"
 #include "../km/keymaster.h"
 #include "../km/editor.h"
 
@@ -17,10 +18,7 @@ void SetListSongsListBox::popup_all_songs_menu() {
   SetList *set_list = km->all_songs();
 
   menu.addItem("Create New Song", [this] {
-    Editor e;
-    Song *song = e.create_song();
-    e.add_song(song);
-    sendActionMessage("update:all");
+    open_song_editor(nullptr)->addActionListener(this);
   });
 
   auto rows = getSelectedRows();
@@ -67,4 +65,9 @@ void SetListSongsListBox::popup_set_list_menu() {
   }
 
   menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
+}
+
+void SetListSongsListBoxModel::listBoxItemDoubleClicked(int row, const MouseEvent&) {
+  Song *s = KeyMaster_instance()->cursor()->song();
+  open_song_editor(s)->addActionListener(this);
 }

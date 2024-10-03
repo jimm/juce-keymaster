@@ -13,8 +13,9 @@
 // The JUCE MidiMessage static factory methods require MIDI channels 1-16
 #define JCH(ch) ((ch)+1)
 
-#define CONNECTION_CHANGED_MESSAGE "conn-changed"
-#define CC_MAP_CHANGED_MESSAGE "cc-map-changed"
+#define CONNECTION_CHANGED_MESSAGE "update:table-list-box"
+#define CC_MAP_CHANGED_MESSAGE "update:table-list-box"
+#define SONG_CHANGED_MESSAGE "update:all"
 
 extern const MidiMessage EMPTY_MESSAGE;
 

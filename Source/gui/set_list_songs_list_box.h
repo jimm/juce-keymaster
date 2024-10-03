@@ -26,6 +26,8 @@ public:
     cursor()->jump_to_song_index(lastRowSelected);
   }
 
+  void listBoxItemDoubleClicked(int row, const MouseEvent&) override;
+
   int selected_row_num() override { return cursor()->song_index; }
 
   SetList *set_list() { return cursor()->set_list(); }

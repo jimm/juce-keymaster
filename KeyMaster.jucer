@@ -37,6 +37,10 @@
             file="Source/gui/set_lists_list_box.cpp"/>
       <FILE id="mB2Jwz" name="set_lists_list_box.h" compile="0" resource="0"
             file="Source/gui/set_lists_list_box.h"/>
+      <FILE id="jW4rVJ" name="song_dialog_component.cpp" compile="1" resource="0"
+            file="Source/gui/song_dialog_component.cpp"/>
+      <FILE id="vSok3r" name="song_dialog_component.h" compile="0" resource="0"
+            file="Source/gui/song_dialog_component.h"/>
       <FILE id="bqPIax" name="song_notes_label.h" compile="0" resource="0"
             file="Source/gui/song_notes_label.h"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"

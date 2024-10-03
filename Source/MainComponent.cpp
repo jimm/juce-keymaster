@@ -4,6 +4,7 @@
 #include "km/keymaster.h"
 #include "km/storage.h"
 #include "gui/connection_dialog_component.h"
+#include "gui/song_dialog_component.h"
 
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
@@ -186,14 +187,7 @@ void MainComponent::new_trigger() {
 }
 
 void MainComponent::new_song() {
-  Editor e;
-  Song *s = e.create_song();
-  // TODO open editor
-  e.add_song(s);
-
-  set_list_songs.updateContent();
-  song_patches.updateContent();
-  connections_table.updateContent();
+  open_song_editor(nullptr)->addActionListener(this);
 }
 
 void MainComponent::new_patch() {

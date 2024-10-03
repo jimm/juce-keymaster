@@ -93,6 +93,7 @@ void ConnectionsTableListBox::popupMenu() {
     e.add_connection(patch, conn);
     updateContent();
     repaint();
+    open_connection_editor(patch, conn)->addActionListener(this);
   });
 
   auto rows = getSelectedRows();
