@@ -2,21 +2,20 @@
 
 #include <JuceHeader.h>
 #include "../km/connection.h"
-#include "km_dialog_component.h"
+#include "km_editor.h"
 #include "cc_maps_table.h"
 
 class Patch;
 
-class ConnectionDialogComponent : public KmDialogComponent {
+class ConnectionEditor : public KmEditor {
 public:
-  ConnectionDialogComponent(Patch *p, Connection *c, bool is_new);
-  virtual ~ConnectionDialogComponent() {}
+  ConnectionEditor(Connection *c, bool is_new);
+  virtual ~ConnectionEditor() {}
 
   virtual int width() override;
   virtual int height() override;
 
 private:
-  Patch *_patch;
   Connection *_conn;
 
   Label _input_inst_label { {}, "Input" };
@@ -107,4 +106,4 @@ private:
 };
 
 // If connection is nullptr we create a new one.
-ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c);
+ConnectionEditor * open_connection_editor(Connection *c);

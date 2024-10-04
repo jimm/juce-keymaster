@@ -1,11 +1,11 @@
-#include "km_dialog_component.h"
+#include "km_editor.h"
 
-KmDialogComponent::KmDialogComponent(bool is_new)
+KmEditor::KmEditor(bool is_new)
   : _is_new(is_new)
 {
 }
 
-void KmDialogComponent::init() {
+void KmEditor::init() {
   _ok.onClick = [this] { ok(); };
   _cancel.onClick = [this] { cancel(); };
   _apply.onClick = [this] { apply(); };
@@ -17,13 +17,13 @@ void KmDialogComponent::init() {
   setSize(width(), height());
 }
 
-void KmDialogComponent::resized() {
+void KmEditor::resized() {
   auto area = getLocalBounds();
   area.reduce(SPACE, SPACE);
   layout(area);
 }
 
-void KmDialogComponent::layout(Rectangle<int> &area) {
+void KmEditor::layout(Rectangle<int> &area) {
   area.removeFromTop(BETWEEN_ROW_SPACE);
 
   auto row_area = area.removeFromTop(BUTTON_HEIGHT);
@@ -34,18 +34,18 @@ void KmDialogComponent::layout(Rectangle<int> &area) {
   _cancel.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
 }
 
-void KmDialogComponent::ok() {
+void KmEditor::ok() {
   if (apply())
     static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
 }
 
-void KmDialogComponent::cancel() {
+void KmEditor::cancel() {
   if (_is_new)
     cancel_cleanup();
   static_cast<DialogWindow*>(getParentComponent())->closeButtonPressed();
 }
 
-void KmDialogComponent::display_errors(String thing_name) {
+void KmEditor::display_errors(String thing_name) {
   String message = "The following";
   message << String((error_messages.size() == 1) ? "error prevents" : "errors prevent");
   message << " the " << thing_name.toLowerCase() << " from being saved:\n";

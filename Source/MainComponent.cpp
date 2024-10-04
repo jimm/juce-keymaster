@@ -3,8 +3,8 @@
 #include "km/editor.h"
 #include "km/keymaster.h"
 #include "km/storage.h"
-#include "gui/connection_dialog_component.h"
-#include "gui/song_dialog_component.h"
+#include "gui/connection_editor.h"
+#include "gui/song_editor.h"
 
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
@@ -201,8 +201,7 @@ void MainComponent::new_patch() {
 }
 
 void MainComponent::new_connection() {
-  Patch *p = KeyMaster_instance()->cursor()->patch();
-  open_connection_editor(p, nullptr)->addActionListener(&connections_table);
+  open_connection_editor(nullptr)->addActionListener(&connections_table);
 }
 
 void MainComponent::new_set_list() {

@@ -6,25 +6,22 @@
               bundleIdentifier="jimm.KeyMaster" cppLanguageStandard="20">
   <MAINGROUP id="vDaUrm" name="KeyMaster">
     <GROUP id="{9BE1D933-937C-5CFF-F347-C7F459F49700}" name="gui">
-      <FILE id="aMXRzP" name="cc_map_dialog_component.cpp" compile="1" resource="0"
-            file="Source/gui/cc_map_dialog_component.cpp"/>
-      <FILE id="iMYcB3" name="cc_map_dialog_component.h" compile="0" resource="0"
-            file="Source/gui/cc_map_dialog_component.h"/>
+      <FILE id="KfVFPo" name="cc_map_editor.cpp" compile="1" resource="0"
+            file="Source/gui/cc_map_editor.cpp"/>
+      <FILE id="sQ0F49" name="cc_map_editor.h" compile="0" resource="0" file="Source/gui/cc_map_editor.h"/>
       <FILE id="c5Syva" name="cc_maps_table.cpp" compile="1" resource="0"
             file="Source/gui/cc_maps_table.cpp"/>
       <FILE id="vr38ws" name="cc_maps_table.h" compile="0" resource="0" file="Source/gui/cc_maps_table.h"/>
-      <FILE id="dsM425" name="connection_dialog_component.cpp" compile="1"
-            resource="0" file="Source/gui/connection_dialog_component.cpp"/>
-      <FILE id="yP8oSL" name="connection_dialog_component.h" compile="0"
-            resource="0" file="Source/gui/connection_dialog_component.h"/>
+      <FILE id="O1skj4" name="connection_editor.cpp" compile="1" resource="0"
+            file="Source/gui/connection_editor.cpp"/>
+      <FILE id="oZD7Wl" name="connection_editor.h" compile="0" resource="0"
+            file="Source/gui/connection_editor.h"/>
       <FILE id="VlgiOB" name="connections_table.cpp" compile="1" resource="0"
             file="Source/gui/connections_table.cpp"/>
       <FILE id="UrMJqx" name="connections_table.h" compile="0" resource="0"
             file="Source/gui/connections_table.h"/>
-      <FILE id="LW1744" name="km_dialog_component.cpp" compile="1" resource="0"
-            file="Source/gui/km_dialog_component.cpp"/>
-      <FILE id="QbmhBO" name="km_dialog_component.h" compile="0" resource="0"
-            file="Source/gui/km_dialog_component.h"/>
+      <FILE id="XG3kUy" name="km_editor.cpp" compile="1" resource="0" file="Source/gui/km_editor.cpp"/>
+      <FILE id="eFm7L1" name="km_editor.h" compile="0" resource="0" file="Source/gui/km_editor.h"/>
       <FILE id="BgxL3U" name="km_list_box.h" compile="0" resource="0" file="Source/gui/km_list_box.h"/>
       <FILE id="ziJXOh" name="km_table_list_box.h" compile="0" resource="0"
             file="Source/gui/km_table_list_box.h"/>
@@ -41,10 +38,8 @@
             file="Source/gui/set_lists_list_box.cpp"/>
       <FILE id="mB2Jwz" name="set_lists_list_box.h" compile="0" resource="0"
             file="Source/gui/set_lists_list_box.h"/>
-      <FILE id="jW4rVJ" name="song_dialog_component.cpp" compile="1" resource="0"
-            file="Source/gui/song_dialog_component.cpp"/>
-      <FILE id="vSok3r" name="song_dialog_component.h" compile="0" resource="0"
-            file="Source/gui/song_dialog_component.h"/>
+      <FILE id="vos7Xo" name="song_editor.cpp" compile="1" resource="0" file="Source/gui/song_editor.cpp"/>
+      <FILE id="GnYiXL" name="song_editor.h" compile="0" resource="0" file="Source/gui/song_editor.h"/>
       <FILE id="bqPIax" name="song_notes_label.h" compile="0" resource="0"
             file="Source/gui/song_notes_label.h"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"

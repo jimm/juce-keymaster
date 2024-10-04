@@ -1,4 +1,4 @@
-#include "song_dialog_component.h"
+#include "song_editor.h"
 #include "../km/consts.h"
 #include "../km/keymaster.h"
 #include "../km/song.h"
@@ -14,7 +14,7 @@
 #define CONTENT_WIDTH (NOTES_WIDTH)
 #define CONTENT_HEIGHT (SPACE * 3 + BETWEEN_ROW_SPACE * 3 + LABEL_HEIGHT * 3 + DATA_ROW_HEIGHT * 2 + NOTES_HEIGHT)
 
-SongDialogComponent * open_song_editor(Song *s)
+SongEditor * open_song_editor(Song *s)
 {
   bool is_new = s == nullptr;
   if (is_new) {
@@ -27,7 +27,7 @@ SongDialogComponent * open_song_editor(Song *s)
   opts.dialogBackgroundColour =
     LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
   opts.resizable = false;
-  auto cdc = new SongDialogComponent(s, is_new);
+  auto cdc = new SongEditor(s, is_new);
   opts.content.setOwned(cdc);
   auto dialog_win = opts.launchAsync();
   if (dialog_win != nullptr)
@@ -35,21 +35,21 @@ SongDialogComponent * open_song_editor(Song *s)
   return cdc;
 }
 
-SongDialogComponent::SongDialogComponent(Song *s, bool is_new)
-  : KmDialogComponent(is_new), _song(s)
+SongEditor::SongEditor(Song *s, bool is_new)
+  : KmEditor(is_new), _song(s)
 {
   init();
 }
 
-int SongDialogComponent::width() {
-  return KmDialogComponent::width() + CONTENT_WIDTH;
+int SongEditor::width() {
+  return KmEditor::width() + CONTENT_WIDTH;
 }
 
-int SongDialogComponent::height() {
-  return KmDialogComponent::height() + CONTENT_HEIGHT;
+int SongEditor::height() {
+  return KmEditor::height() + CONTENT_HEIGHT;
 }
 
-void SongDialogComponent::layout(Rectangle<int> &area) {
+void SongEditor::layout(Rectangle<int> &area) {
   layout_name(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
@@ -58,17 +58,17 @@ void SongDialogComponent::layout(Rectangle<int> &area) {
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_notes(area);
 
-  KmDialogComponent::layout(area);
+  KmEditor::layout(area);
 }
 
-void SongDialogComponent::layout_name(Rectangle<int> &area) {
+void SongEditor::layout_name(Rectangle<int> &area) {
   _name_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
   area.removeFromTop(SPACE);
   auto row_area = area.removeFromTop(DATA_ROW_HEIGHT);
   _name.setBounds(row_area.removeFromLeft(NAME_WIDTH));
 }
 
-void SongDialogComponent::layout_clock(Rectangle<int> &area) {
+void SongEditor::layout_clock(Rectangle<int> &area) {
   _clock_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
 
   area.removeFromTop(SPACE);
@@ -80,7 +80,7 @@ void SongDialogComponent::layout_clock(Rectangle<int> &area) {
   _clock_on.setBounds(row_area.removeFromLeft(CLOCK_ON_CHECKBOX_WIDTH));
 }
 
-void SongDialogComponent::layout_notes(Rectangle<int> &area) {
+void SongEditor::layout_notes(Rectangle<int> &area) {
   _notes_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
 
   area.removeFromTop(SPACE);
@@ -88,7 +88,7 @@ void SongDialogComponent::layout_notes(Rectangle<int> &area) {
   _notes.setBounds(row_area.removeFromLeft(NOTES_WIDTH));
 }
 
-void SongDialogComponent::init() {
+void SongEditor::init() {
   _name.setText(_song->name());
   _bpm.setText(String(_song->bpm()));
   _clock_on.setToggleState(_song->clock_on_at_start(), NotificationType::dontSendNotification);
@@ -103,14 +103,14 @@ void SongDialogComponent::init() {
   addAndMakeVisible(_notes_label);
   addAndMakeVisible(_notes);
 
-  KmDialogComponent::init();
+  KmEditor::init();
 }
 
-void SongDialogComponent::cancel_cleanup() {
+void SongEditor::cancel_cleanup() {
   delete _song;
 }
 
-bool SongDialogComponent::apply() {
+bool SongEditor::apply() {
   _song->set_name(_name.getText());
   _song->set_bpm(_bpm.getText().getFloatValue());
   _song->set_clock_on_at_start(_clock_on.getToggleState());

@@ -3,7 +3,7 @@
 #include "../km/patch.h"
 #include "../km/editor.h"
 #include "connections_table.h"
-#include "connection_dialog_component.h"
+#include "connection_editor.h"
 
 void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
   header.addColumn("Input", 1, 75);
@@ -83,10 +83,10 @@ void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const Mou
 
 void ConnectionsTableListBox::popupMenu() {
   PopupMenu menu;
-  Patch *patch = KeyMaster_instance()->cursor()->patch();
+  auto patch = KeyMaster_instance()->cursor()->patch();
 
-  menu.addItem("Create New Connection", [this, patch] {
-    open_connection_editor(patch, nullptr)->addActionListener(this);
+  menu.addItem("Create New Connection", [this] {
+    open_connection_editor(nullptr)->addActionListener(this);
   });
 
   auto rows = getSelectedRows();
@@ -108,7 +108,7 @@ void ConnectionsTableListBox::actionListenerCallback(const String &message) {
     auto model = static_cast<ConnectionsTableListBoxModel *>(getTableListBoxModel());
     Patch *p = KeyMaster_instance()->cursor()->patch();
     Connection *c = p->connections()[model->selected_row_num()];
-    open_connection_editor(p, c)->addActionListener(this);
+    open_connection_editor(c)->addActionListener(this);
   }
   else
     KmTableListBox::actionListenerCallback(message);

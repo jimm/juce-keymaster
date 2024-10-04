@@ -1,5 +1,5 @@
-#include "connection_dialog_component.h"
-#include "cc_map_dialog_component.h"
+#include "connection_editor.h"
+#include "cc_map_editor.h"
 #include "../km/consts.h"
 #include "../km/keymaster.h"
 #include "../km/patch.h"
@@ -28,7 +28,7 @@
 #define CONTENT_WIDTH (CC_MAPS_TABLE_WIDTH * 2)
 #define CONTENT_HEIGHT (SPACE * 8 + BETWEEN_ROW_SPACE * 7 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT)
 
-ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c)
+ConnectionEditor * open_connection_editor(Connection *c)
 {
   bool is_new = c == nullptr;
   if (is_new) {
@@ -41,7 +41,7 @@ ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c)
   opts.dialogBackgroundColour =
     LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
   opts.resizable = false;
-  auto cdc = new ConnectionDialogComponent(p, c, is_new);
+  auto cdc = new ConnectionEditor(c, is_new);
   opts.content.setOwned(cdc);
   auto dialog_win = opts.launchAsync();
   if (dialog_win != nullptr)
@@ -49,9 +49,9 @@ ConnectionDialogComponent * open_connection_editor(Patch *p, Connection *c)
   return cdc;
 }
 
-ConnectionDialogComponent::ConnectionDialogComponent(
-  Patch *p, Connection *c, bool is_new)
-  : KmDialogComponent(is_new), _patch(p), _conn(c)
+ConnectionEditor::ConnectionEditor(
+  Connection *c, bool is_new)
+  : KmEditor(is_new), _conn(c)
 {
   init_input();
   init_output();
@@ -65,18 +65,18 @@ ConnectionDialogComponent::ConnectionDialogComponent(
   _add_cc_map.onClick = [this] { add_cc_map(); };
   _del_cc_map.onClick = [this] { del_cc_map(); };
 
-  KmDialogComponent::init();
+  KmEditor::init();
 }
 
-int ConnectionDialogComponent::width() {
-  return KmDialogComponent::width() + CONTENT_WIDTH;
+int ConnectionEditor::width() {
+  return KmEditor::width() + CONTENT_WIDTH;
 }
 
-int ConnectionDialogComponent::height() {
-  return KmDialogComponent::height() + CONTENT_HEIGHT;
+int ConnectionEditor::height() {
+  return KmEditor::height() + CONTENT_HEIGHT;
 }
 
-void ConnectionDialogComponent::layout(Rectangle<int> &area) {
+void ConnectionEditor::layout(Rectangle<int> &area) {
   layout_instrument(area, _input_inst_label, _input_instrument, _input_chan_label, _input_chan);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
@@ -97,10 +97,10 @@ void ConnectionDialogComponent::layout(Rectangle<int> &area) {
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_cc_maps(area);
 
-  KmDialogComponent::layout(area);
+  KmEditor::layout(area);
 }
 
-void ConnectionDialogComponent::layout_instrument(
+void ConnectionEditor::layout_instrument(
   Rectangle<int> &area, Label &inst_label, ComboBox &inst, Label &chan_label, ComboBox &chan
 ) {
   auto row_area = area.removeFromTop(LABEL_HEIGHT);
@@ -115,7 +115,7 @@ void ConnectionDialogComponent::layout_instrument(
   chan.setBounds(row_area.removeFromLeft(CHANNEL_COMBO_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_program(Rectangle<int> &area) {
+void ConnectionEditor::layout_program(Rectangle<int> &area) {
   _prog_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
 
   area.removeFromTop(SPACE);
@@ -135,7 +135,7 @@ void ConnectionDialogComponent::layout_program(Rectangle<int> &area) {
   _prog.setBounds(row_area.removeFromLeft(PROG_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_zone(Rectangle<int> &area) {
+void ConnectionEditor::layout_zone(Rectangle<int> &area) {
   _zone_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
 
   area.removeFromTop(SPACE);
@@ -147,7 +147,7 @@ void ConnectionDialogComponent::layout_zone(Rectangle<int> &area) {
   _zone_high.setBounds(row_area.removeFromLeft(ZONE_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_xpose_and_velocity_curve(Rectangle<int> &area) {
+void ConnectionEditor::layout_xpose_and_velocity_curve(Rectangle<int> &area) {
   auto row_area = area.removeFromTop(LABEL_HEIGHT);
   _xpose_label.setBounds(row_area.removeFromLeft(XPOSE_COLUMN_WIDTH));
   row_area.removeFromLeft(SPACE);
@@ -160,7 +160,7 @@ void ConnectionDialogComponent::layout_xpose_and_velocity_curve(Rectangle<int> &
   _vc.setBounds(row_area.removeFromLeft(VCURVE_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_toggle_row(
+void ConnectionEditor::layout_toggle_row(
   Rectangle<int> &area, ToggleButton &left, ToggleButton &right)
 {
   auto row_area = area.removeFromTop(MESSAGE_FILTER_CHECKBOX_HEIGHT);
@@ -169,7 +169,7 @@ void ConnectionDialogComponent::layout_toggle_row(
   right.setBounds(row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_message_filters(Rectangle<int> &area) {
+void ConnectionEditor::layout_message_filters(Rectangle<int> &area) {
   _filters_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
   area.removeFromTop(SPACE);
 
@@ -184,7 +184,7 @@ void ConnectionDialogComponent::layout_message_filters(Rectangle<int> &area) {
   _filt_reset.setBounds(row_area.removeFromLeft(MESSAGE_FILTER_CHECKBOX_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_cc_maps(Rectangle<int> &area) {
+void ConnectionEditor::layout_cc_maps(Rectangle<int> &area) {
   _cc_maps_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
   area.removeFromTop(SPACE);
   _cc_maps_list_box.setBounds(area.removeFromTop(CC_MAPS_TABLE_HEIGHT));
@@ -196,7 +196,7 @@ void ConnectionDialogComponent::layout_cc_maps(Rectangle<int> &area) {
   _del_cc_map.setBounds(row_area.removeFromLeft(CC_MAPS_BUTTON_WIDTH));
 }
 
-void ConnectionDialogComponent::layout_buttons(Rectangle<int> &area) {
+void ConnectionEditor::layout_buttons(Rectangle<int> &area) {
   auto row_area = area.removeFromTop(BUTTON_HEIGHT);
   _ok.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
   row_area.removeFromRight(SPACE);
@@ -205,7 +205,7 @@ void ConnectionDialogComponent::layout_buttons(Rectangle<int> &area) {
   _cancel.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
 }
 
-void ConnectionDialogComponent::init_input() {
+void ConnectionEditor::init_input() {
   _input_instrument.addItem("Select input instrument", UNSELECTED);
   int i = 0;
   for (auto inp : KeyMaster_instance()->device_manager().inputs()) {
@@ -231,7 +231,7 @@ void ConnectionDialogComponent::init_input() {
   addAndMakeVisible(_input_chan);
 }
 
-void ConnectionDialogComponent::init_output() {
+void ConnectionEditor::init_output() {
   _output_instrument.addItem("Select output instrument", UNSELECTED);
   int i = 0;
   for (auto outp : KeyMaster_instance()->device_manager().outputs()) {
@@ -257,7 +257,7 @@ void ConnectionDialogComponent::init_output() {
   addAndMakeVisible(_output_chan);;
 }
 
-void ConnectionDialogComponent::init_prog() {
+void ConnectionEditor::init_prog() {
   init_text_editor(_msb, _conn->program_bank_msb() == UNDEFINED ? "" : String(_conn->program_bank_msb()));
   init_text_editor(_lsb, _conn->program_bank_lsb() == UNDEFINED ? "" : String(_conn->program_bank_lsb()));
   init_text_editor(_prog, _conn->program_prog() == UNDEFINED ? "" : String(_conn->program_prog()));
@@ -268,7 +268,7 @@ void ConnectionDialogComponent::init_prog() {
   addAndMakeVisible(_prog_field_label);
 }
 
-void ConnectionDialogComponent::init_text_editor(TextEditor &te, String initial_contents) {
+void ConnectionEditor::init_text_editor(TextEditor &te, String initial_contents) {
   te.setSelectAllWhenFocused(true);
   te.setEscapeAndReturnKeysConsumed(false);
   te.setColour(TextEditor::outlineColourId, findColour(ComboBox::outlineColourId));
@@ -277,7 +277,7 @@ void ConnectionDialogComponent::init_text_editor(TextEditor &te, String initial_
   addAndMakeVisible(te);
 }
 
-void ConnectionDialogComponent::init_zone() {
+void ConnectionEditor::init_zone() {
   init_text_editor(_zone_low, MidiMessage::getMidiNoteName(_conn->zone_low(), true, true, 4));
   init_text_editor(_zone_high, MidiMessage::getMidiNoteName(_conn->zone_high(), true, true, 4));
 
@@ -285,13 +285,13 @@ void ConnectionDialogComponent::init_zone() {
   addAndMakeVisible(_zone_between);
 }
 
-void ConnectionDialogComponent::init_xpose() {
+void ConnectionEditor::init_xpose() {
   init_text_editor(_xpose, String(_conn->xpose()));
 
   addAndMakeVisible(_xpose_label);
 }
 
-void ConnectionDialogComponent::init_message_filters() {
+void ConnectionEditor::init_message_filters() {
   auto &mf = _conn->message_filter();
 
   auto ignore = NotificationType::dontSendNotification;
@@ -325,7 +325,7 @@ void ConnectionDialogComponent::init_message_filters() {
   addAndMakeVisible(_filt_reset);
 }
 
-void ConnectionDialogComponent::init_velocity_curve() {
+void ConnectionEditor::init_velocity_curve() {
   _vc.addItem("None (Linear)", UNSELECTED);
   _vc.setSelectedId(UNSELECTED);
   int i = 0;
@@ -339,7 +339,7 @@ void ConnectionDialogComponent::init_velocity_curve() {
   addAndMakeVisible(_vc);
 }
 
-void ConnectionDialogComponent::init_cc_maps() {
+void ConnectionEditor::init_cc_maps() {
   _cc_maps_model = new CcMapsTableListBoxModel();
   _cc_maps_model->set_connection(_conn);
   _cc_maps_model->make_columns(_cc_maps_list_box.getHeader());
@@ -354,12 +354,12 @@ void ConnectionDialogComponent::init_cc_maps() {
   addAndMakeVisible(_del_cc_map);
 }
 
-void ConnectionDialogComponent::cancel_cleanup() {
+void ConnectionEditor::cancel_cleanup() {
   delete _conn;
 }
 
 // Displays an alert and returns false if apply fails.
-bool ConnectionDialogComponent::apply() {
+bool ConnectionEditor::apply() {
   DeviceManager &dm = KeyMaster_instance()->device_manager();
   int id = _input_instrument.getSelectedId();
   Input::Ptr input = id == UNSELECTED ? nullptr : dm.inputs()[id-1];
@@ -444,11 +444,8 @@ bool ConnectionDialogComponent::apply() {
   _conn->end_changes();
 
   if (_is_new) {
-    DBG("adding conn to patch!");
     Editor e;
-    e.add_connection(_patch, _conn);
-    if (_patch == nullptr)        // conn being created in new song with no patch
-      _patch = cursor()->patch(); // patch was created by add_connection
+    e.add_connection(KeyMaster_instance()->cursor()->patch(), _conn);
     _is_new = false;
     sendActionMessage("update:all");
   }
@@ -458,12 +455,12 @@ bool ConnectionDialogComponent::apply() {
   return true;
 }
 
-void ConnectionDialogComponent::add_cc_map() {
+void ConnectionEditor::add_cc_map() {
   Controller *c = new Controller(UNDEFINED, 0);
   open_cc_map_editor(_conn, c)->addActionListener(&_cc_maps_list_box);
 }
 
-void ConnectionDialogComponent::del_cc_map() {
+void ConnectionEditor::del_cc_map() {
   auto rows = _cc_maps_list_box.getSelectedRows();
   if (rows.size() > 0) {
     Controller *c = _cc_maps_model->nth_cc_map(rows[0]);
@@ -473,7 +470,7 @@ void ConnectionDialogComponent::del_cc_map() {
   }
 }
 
-void ConnectionDialogComponent::update_conn_cc_maps() {
+void ConnectionEditor::update_conn_cc_maps() {
   int num_cc_maps = _cc_maps_model->getNumRows();
   for (int i = 0; i < num_cc_maps; ++i) {
     auto controller = _cc_maps_model->nth_cc_map(i);

@@ -1,5 +1,5 @@
 #include "set_list_songs_list_box.h"
-#include "song_dialog_component.h"
+#include "song_editor.h"
 #include "../km/keymaster.h"
 #include "../km/editor.h"
 

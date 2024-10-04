@@ -11,10 +11,10 @@
 #define BUTTON_WIDTH 80
 #define DATA_ROW_HEIGHT 20
 
-class KmDialogComponent : public Component, public ActionBroadcaster {
+class KmEditor : public Component, public ActionBroadcaster {
 public:
-  KmDialogComponent(bool is_new);
-  virtual ~KmDialogComponent() {}
+  KmEditor(bool is_new);
+  virtual ~KmEditor() {}
 
   virtual int width() { return SPACE * 2; }
   virtual int height() { return SPACE * 2 + BETWEEN_ROW_SPACE + BUTTON_HEIGHT; }

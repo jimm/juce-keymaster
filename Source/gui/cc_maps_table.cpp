@@ -2,7 +2,7 @@
 #include "../km/controller.h"
 #include "../km/connection.h"
 #include "cc_maps_table.h"
-#include "cc_map_dialog_component.h"
+#include "cc_map_editor.h"
 
 Controller * CcMapsTableListBoxModel::nth_cc_map(int n) {
   int count = 0;

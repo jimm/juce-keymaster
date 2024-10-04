@@ -2,15 +2,15 @@
 
 #include <JuceHeader.h>
 #include "../km/connection.h"
-#include "km_dialog_component.h"
+#include "km_editor.h"
 
 class Connection;
 class Controller;
 
-class CcMapDialogComponent : public KmDialogComponent {
+class CcMapEditor : public KmEditor {
 public:
-  CcMapDialogComponent(Connection *conn, Controller *c, bool is_new);
-  virtual ~CcMapDialogComponent() {}
+  CcMapEditor(Connection *conn, Controller *c, bool is_new);
+  virtual ~CcMapEditor() {}
 
   virtual int width() override;
   virtual int height() override;
@@ -54,4 +54,4 @@ private:
 };
 
 // If Controller is nullptr we create a new one.
-CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c);
+CcMapEditor * open_cc_map_editor(Connection *conn, Controller *c);

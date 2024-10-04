@@ -2,14 +2,14 @@
 
 #include <JuceHeader.h>
 #include "../km/song.h"
-#include "km_dialog_component.h"
+#include "km_editor.h"
 
 class Patch;
 
-class SongDialogComponent : public KmDialogComponent {
+class SongEditor : public KmEditor {
 public:
-  SongDialogComponent(Song *c, bool is_new);
-  virtual ~SongDialogComponent() {}
+  SongEditor(Song *c, bool is_new);
+  virtual ~SongEditor() {}
 
   virtual int width() override;
   virtual int height() override;
@@ -43,4 +43,4 @@ private:
 };
 
 // If song is nullptr we create a new one.
-SongDialogComponent * open_song_editor(Song *s);
+SongEditor * open_song_editor(Song *s);

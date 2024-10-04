@@ -1,4 +1,4 @@
-#include "cc_map_dialog_component.h"
+#include "cc_map_editor.h"
 #include "../km/keymaster.h"
 #include "../km/connection.h"
 #include "../km/controller.h"
@@ -11,7 +11,7 @@
 #define CONTENT_WIDTH (300)
 #define CONTENT_HEIGHT (SPACE * 4 + BETWEEN_ROW_SPACE * 4 + LABEL_HEIGHT * 4 + FILTER_TOGGLE_HEIGHT * 3 + DATA_ROW_HEIGHT * 3 - SPACE)
 
-CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c)
+CcMapEditor * open_cc_map_editor(Connection *conn, Controller *c)
 {
   bool is_new = c == nullptr;
   if (is_new)
@@ -22,7 +22,7 @@ CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c)
   opts.dialogBackgroundColour =
     LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId);
   opts.resizable = false;
-  auto cmdc = new CcMapDialogComponent(conn, c, is_new);
+  auto cmdc = new CcMapEditor(conn, c, is_new);
   opts.content.setOwned(cmdc);
   auto dialog_win = opts.launchAsync();
   if (dialog_win != nullptr)
@@ -30,22 +30,22 @@ CcMapDialogComponent * open_cc_map_editor(Connection *conn, Controller *c)
   return cmdc;
 }
 
-CcMapDialogComponent::CcMapDialogComponent(
+CcMapEditor::CcMapEditor(
   Connection *conn, Controller *c, bool is_new)
-  : KmDialogComponent(is_new), _conn(conn), _controller(c)
+  : KmEditor(is_new), _conn(conn), _controller(c)
 {
   init();
 }
 
-int CcMapDialogComponent::width() {
-  return KmDialogComponent::width() + CONTENT_WIDTH;
+int CcMapEditor::width() {
+  return KmEditor::width() + CONTENT_WIDTH;
 }
 
-int CcMapDialogComponent::height() {
-  return KmDialogComponent::height() + CONTENT_HEIGHT;
+int CcMapEditor::height() {
+  return KmEditor::height() + CONTENT_HEIGHT;
 }
 
-void CcMapDialogComponent::layout(Rectangle<int> &area) {
+void CcMapEditor::layout(Rectangle<int> &area) {
   _cc_num_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
 
   area.removeFromTop(SPACE);
@@ -83,10 +83,10 @@ void CcMapDialogComponent::layout(Rectangle<int> &area) {
   row_area.removeFromLeft(SPACE);
   _max_out.setBounds(row_area.removeFromLeft(CC_NUM_WIDTH));
 
-  KmDialogComponent::layout(area);
+  KmEditor::layout(area);
 }
 
-void CcMapDialogComponent::init() {
+void CcMapEditor::init() {
   _cc_num.setText(String(_controller->cc_num()));
   if (_controller->translated_cc_num() != UNDEFINED)
     _translated_cc_num.setText(String(_controller->translated_cc_num()));
@@ -114,14 +114,14 @@ void CcMapDialogComponent::init() {
   addAndMakeVisible(_min_out);
   addAndMakeVisible(_max_out);
 
-  KmDialogComponent::init();
+  KmEditor::init();
 }
 
-void CcMapDialogComponent::cancel_cleanup() {
+void CcMapEditor::cancel_cleanup() {
   delete _controller;
 }
 
-bool CcMapDialogComponent::apply() {
+bool CcMapEditor::apply() {
   auto text = _cc_num.getText();
   int cc_num = 0;
   if (text.isEmpty())
