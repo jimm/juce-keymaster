@@ -202,8 +202,7 @@ void MainComponent::new_patch() {
 
 void MainComponent::new_connection() {
   Patch *p = KeyMaster_instance()->cursor()->patch();
-  auto model = static_cast<ConnectionsTableListBoxModel *>(connections_table.getTableListBoxModel());
-  open_connection_editor(p, nullptr)->addActionListener(model);
+  open_connection_editor(p, nullptr)->addActionListener(&connections_table);
 }
 
 void MainComponent::new_set_list() {

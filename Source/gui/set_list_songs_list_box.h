@@ -4,14 +4,6 @@
 #include "km_list_box.h"
 #include "../km/set_list.h"
 
-class SetListSongsListBox : public KmListBox {
-protected:
-  virtual void popupMenu() override;
-
-  void popup_all_songs_menu();
-  void popup_set_list_menu();
-};
-
 class SetListSongsListBoxModel : public KmListBoxModel {
 public:
   virtual ~SetListSongsListBoxModel() {}
@@ -33,4 +25,15 @@ public:
   int selected_row_num() override { return cursor()->song_index; }
 
   SetList *set_list() { return cursor()->set_list(); }
+};
+
+class SetListSongsListBox : public KmListBox {
+public:
+  virtual void actionListenerCallback(const String &message) override;
+
+protected:
+  virtual void popupMenu() override;
+
+  void popup_all_songs_menu();
+  void popup_set_list_menu();
 };

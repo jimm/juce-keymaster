@@ -6,7 +6,7 @@
 
 class KmTableListBox;
 
-class KmTableListBoxModel : public TableListBoxModel, public ActionBroadcaster, public ActionListener {
+class KmTableListBoxModel : public TableListBoxModel, public ActionBroadcaster {
 public:
   virtual ~KmTableListBoxModel() {}
 
@@ -46,10 +46,6 @@ public:
       TableListBoxModel::cellClicked(row, col, event);
   }
 
-  virtual void actionListenerCallback(const String &message) override {
-    sendActionMessage(message);
-  }
-
 protected:
   LookAndFeel &_lf { LookAndFeel::getDefaultLookAndFeel() };
 
@@ -59,7 +55,7 @@ protected:
 
 class KmTableListBox : public TableListBox, public ActionBroadcaster, public ActionListener {
 public:
-  void actionListenerCallback(const String &message) override {
+  virtual void actionListenerCallback(const String &message) override {
     if (message == "moved") {
       updateContent();
       auto model = static_cast<KmTableListBoxModel *>(getTableListBoxModel());

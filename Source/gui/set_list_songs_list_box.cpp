@@ -3,6 +3,10 @@
 #include "../km/keymaster.h"
 #include "../km/editor.h"
 
+void SetListSongsListBoxModel::listBoxItemDoubleClicked(int row, const MouseEvent&) {
+  sendActionMessage("open:song-editor");
+}
+
 void SetListSongsListBox::popupMenu() {
   KeyMaster *km = KeyMaster_instance();
 
@@ -67,7 +71,10 @@ void SetListSongsListBox::popup_set_list_menu() {
   menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
 }
 
-void SetListSongsListBoxModel::listBoxItemDoubleClicked(int row, const MouseEvent&) {
-  Song *s = KeyMaster_instance()->cursor()->song();
-  open_song_editor(s)->addActionListener(this);
+void SetListSongsListBox::actionListenerCallback(const String &message) {
+  if (message == "open:song-editor") {
+    Song *s = KeyMaster_instance()->cursor()->song();
+    open_song_editor(s)->addActionListener(this);
+  }
+  else KmListBox::actionListenerCallback(message);
 }

@@ -23,19 +23,18 @@ public:
 
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
 
+  Connection *connection() { return _conn; }
   void set_connection(Connection *c) { _conn = c; }
 
-  virtual void actionListenerCallback(const String &message) override {
-    if (message == CC_MAP_CHANGED_MESSAGE)
-      sendActionMessage("update:table-list-box");
-    else
-      KmTableListBoxModel::actionListenerCallback(message);
-  }
+  Controller *double_clicked_controller() { return _double_clicked_controller; }
 
 private:
   Connection *_conn;
+  Controller *_double_clicked_controller;
 };
 
 
 class CcMapsTableListBox : public KmTableListBox {
+public:
+  virtual void actionListenerCallback(const String &message) override;
 };

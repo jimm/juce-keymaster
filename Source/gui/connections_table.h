@@ -30,13 +30,6 @@ public:
 
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
 
-  virtual void actionListenerCallback(const String &message) override {
-    if (message == CONNECTION_CHANGED_MESSAGE)
-      sendActionMessage("update:table-list-box");
-    else
-      KmTableListBoxModel::actionListenerCallback(message);
-  }
-
 private:
   Patch *patch() { return cursor()->patch(); }
   String program_str(Connection *c);
@@ -45,6 +38,8 @@ private:
 
 
 class ConnectionsTableListBox : public KmTableListBox {
+public:
+  virtual void actionListenerCallback(const String &message) override;
 protected:
   virtual void popupMenu() override;
 };

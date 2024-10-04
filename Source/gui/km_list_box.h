@@ -6,7 +6,7 @@
 
 class KmListBox;
 
-class KmListBoxModel : public ListBoxModel, public ActionBroadcaster, public ActionListener {
+class KmListBoxModel : public ListBoxModel, public ActionBroadcaster {
 public:
   virtual ~KmListBoxModel() {}
 
@@ -39,10 +39,6 @@ public:
       ListBoxModel::listBoxItemClicked(row, event);
   }
 
-  virtual void actionListenerCallback(const String &message) override {
-    sendActionMessage(message);
-  }
-
 protected:
   Cursor *cursor() { return KeyMaster_instance()->cursor(); }
 };
@@ -50,7 +46,7 @@ protected:
 
 class KmListBox : public ListBox, public ActionBroadcaster, public ActionListener {
 public:
-  void actionListenerCallback(const String &message) override {
+  virtual void actionListenerCallback(const String &message) override {
     if (message == "moved") {
       updateContent();
       int selected_row_num = ((KmListBoxModel *)getListBoxModel())->selected_row_num();

@@ -455,8 +455,7 @@ bool ConnectionDialogComponent::apply() {
 
 void ConnectionDialogComponent::add_cc_map() {
   Controller *c = new Controller(UNDEFINED, 0);
-  auto model = static_cast<CcMapsTableListBoxModel*>(_cc_maps_list_box.getTableListBoxModel());
-  open_cc_map_editor(_conn, c)->addActionListener(model);
+  open_cc_map_editor(_conn, c)->addActionListener(&_cc_maps_list_box);
 }
 
 void ConnectionDialogComponent::del_cc_map() {

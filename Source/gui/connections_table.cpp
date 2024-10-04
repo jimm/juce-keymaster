@@ -78,9 +78,7 @@ void ConnectionsTableListBoxModel::paintCell(
 }
 
 void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
-  Patch *p = KeyMaster_instance()->cursor()->patch();
-  Connection *c = p->connections()[row];
-  open_connection_editor(p, c)->addActionListener(this);
+  sendActionMessage("open:connection-editor");
 }
 
 void ConnectionsTableListBox::popupMenu() {
@@ -108,6 +106,17 @@ void ConnectionsTableListBox::popupMenu() {
   }
 
   menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
+}
+
+void ConnectionsTableListBox::actionListenerCallback(const String &message) {
+  if (message == "open:connection-editor") {
+    auto model = static_cast<ConnectionsTableListBoxModel *>(getTableListBoxModel());
+    Patch *p = KeyMaster_instance()->cursor()->patch();
+    Connection *c = p->connections()[model->selected_row_num()];
+    open_connection_editor(p, c)->addActionListener(this);
+  }
+  else
+    KmTableListBox::actionListenerCallback(message);
 }
 
 // ================ helpers ================

@@ -78,5 +78,15 @@ void CcMapsTableListBoxModel::paintCell(
 }
 
 void CcMapsTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
-  open_cc_map_editor(_conn, nth_cc_map(row))->addActionListener(this);
+  _double_clicked_controller = nth_cc_map(row);
+  sendActionMessage("open:cc-map-editor");
+}
+
+void CcMapsTableListBox::actionListenerCallback(const String &message) {
+  if (message == "open:cc-map-editor") {
+    auto model = static_cast<CcMapsTableListBoxModel *>(getTableListBoxModel());
+    open_cc_map_editor(model->connection(), model->double_clicked_controller())->addActionListener(this);
+  }
+  else
+    KmTableListBox::actionListenerCallback(message);
 }
