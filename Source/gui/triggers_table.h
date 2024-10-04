@@ -4,11 +4,6 @@
 #include "km_table_list_box.h"
 #include "../km/keymaster.h"
 
-class Patch;
-class Trigger;
-class TriggersTableListBox;
-
-
 class TriggersTableListBoxModel : public KmTableListBoxModel {
 public:
   virtual ~TriggersTableListBoxModel() {}
@@ -25,6 +20,8 @@ public:
 
   int selected_row_num() override { return cursor()->trigger_index; }
 
+  virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
+
 private:
   String input_string(Trigger *t);
   String action_string(Trigger *t);
@@ -33,10 +30,8 @@ private:
 
 class TriggersTableListBox : public KmTableListBox {
 public:
-  void actionListenerCallback(const String &message) override {
-    if (message == "moved") {
-      updateContent();
-      repaint();
-    }
-  }
+  virtual void actionListenerCallback(const String &message) override;
+
+protected:
+  virtual void popupMenu() override;
 };

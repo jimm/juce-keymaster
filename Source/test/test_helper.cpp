@@ -1,6 +1,7 @@
 #include "test_helper.h"
 #include "../km/keymaster.h"
 #include "../km/storage.h"
+#include "../km/utils.h"
 
 KeyMaster *load_test_data(DeviceManager &dev_mgr, String data_file_path) {
   KeyMaster *old_km = KeyMaster_instance();
@@ -31,10 +32,8 @@ KeyMaster *load_test_data(DeviceManager &dev_mgr, String data_file_path) {
   return new_km;
 }
 
-bool mm_eq(MidiMessage a, MidiMessage b) {
-  bool eq = a.getRawDataSize() == b.getRawDataSize()
-    && std::memcmp(a.getRawData(), b.getRawData(), (size_t)a.getRawDataSize()) == 0;
-  if (eq)
+bool mm_eq(MidiMessage &a, MidiMessage &b) {
+  if (mm_equal(a, b))
     return true;
 
   int a_size = a.getRawDataSize();

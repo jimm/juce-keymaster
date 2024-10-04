@@ -206,7 +206,7 @@ void ConnectionEditor::init_input() {
     ++i;
   }
   if (_input_instrument.getSelectedId() == 0)
-    _input_instrument.setSelectedId(1);
+    _input_instrument.setSelectedId(UNSELECTED);
 
   _input_chan.addItem("All Channels", CONNECTION_ALL_CHANNELS);
   for (i = 1; i <= MIDI_CHANNELS; ++i)
@@ -232,7 +232,7 @@ void ConnectionEditor::init_output() {
     ++i;
   }
   if (_output_instrument.getSelectedId() == 0)
-    _output_instrument.setSelectedId(1);
+    _output_instrument.setSelectedId(UNSELECTED);
 
   _output_chan.addItem("Input Channel", CONNECTION_ALL_CHANNELS);
   for (i = 1; i <= MIDI_CHANNELS; ++i)

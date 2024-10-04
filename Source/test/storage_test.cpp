@@ -56,7 +56,8 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   // keys
   t = km->triggers()[0];
   expect(t->name() == "panic");
-  expect(t->trigger_key_code() == 340);
+  expect(t->has_trigger_key_press());
+  expect(t->trigger_key_press().getKeyCode() == 340);
   expect(mm_eq(t->trigger_message(), EMPTY_MESSAGE));
   expect(t->output_message() == nullptr);
   expect(t->action() == TriggerAction::PANIC);

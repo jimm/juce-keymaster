@@ -50,6 +50,10 @@
             file="Source/gui/song_notes_label.h"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"
             file="Source/gui/song_patches_list_box.h"/>
+      <FILE id="SzgRL7" name="trigger_editor.cpp" compile="1" resource="0"
+            file="Source/gui/trigger_editor.cpp"/>
+      <FILE id="PFzRwz" name="trigger_editor.h" compile="0" resource="0"
+            file="Source/gui/trigger_editor.h"/>
       <FILE id="rf9LwO" name="triggers_table.cpp" compile="1" resource="0"
             file="Source/gui/triggers_table.cpp"/>
       <FILE id="XyyIwU" name="triggers_table.h" compile="0" resource="0"
@@ -104,6 +108,8 @@
       <FILE id="rpW7C8" name="storage.h" compile="0" resource="0" file="Source/km/storage.h"/>
       <FILE id="gnAuDW" name="trigger.cpp" compile="1" resource="0" file="Source/km/trigger.cpp"/>
       <FILE id="DSrSrp" name="trigger.h" compile="0" resource="0" file="Source/km/trigger.h"/>
+      <FILE id="Abk6Tk" name="utils.cpp" compile="1" resource="0" file="Source/km/utils.cpp"/>
+      <FILE id="QTBeec" name="utils.h" compile="0" resource="0" file="Source/km/utils.h"/>
     </GROUP>
     <GROUP id="{639E9FB2-0D21-EE57-B418-7882CB5C8D3F}" name="Source">
       <FILE id="b8evKl" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>

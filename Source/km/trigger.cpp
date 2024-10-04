@@ -3,21 +3,20 @@
 #include "consts.h"
 #include "trigger.h"
 #include "keymaster.h"
+#include "utils.h"
 
 Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock *out_msg)
   : DBObj(id), Nameable(name),
     _trigger_input(nullptr),
-    _trigger_key_code(UNDEFINED),
     _trigger_message(ACTIVE_SENSE),
     _action(ta),
-    _output_message(out_msg),
-    _trigger_message_num_bytes(0)
+    _output_message(out_msg)
 {
 }
 
-void Trigger::set_trigger_key_code(int key_code) {
-  if (_trigger_key_code != key_code) {
-    _trigger_key_code = key_code;
+void Trigger::set_trigger_key_press(const KeyPress &key_press) {
+  if (_trigger_key_press != key_press) {
+    _trigger_key_press = key_press;
     KeyMaster_instance()->changed();
   }
 }
@@ -29,7 +28,6 @@ void Trigger::set_trigger_key_code(int key_code) {
 void Trigger::set_trigger_message(Input::Ptr input, MidiMessage message) {
   _trigger_input = input;
   _trigger_message = message;
-  _trigger_message_num_bytes = message.getRawDataSize();
   KeyMaster_instance()->changed();
 }
 
@@ -50,20 +48,17 @@ void Trigger::set_output_message(MessageBlock *msg) {
 bool Trigger::signal_message(Input::Ptr input, const MidiMessage& message) {
   if (input != _trigger_input
       || !input->is_running()
-      || message.getRawDataSize() != _trigger_message_num_bytes
-      || memcmp(message.getRawData(), _trigger_message.getRawData(), (size_t)_trigger_message_num_bytes) != 0)
+      || !mm_equal(message, _trigger_message))
     return false;
 
   perform_action();
   return true;
 }
 
-bool Trigger::signal_key(int key_code) {
-  if (key_code != _trigger_key_code)
-    return false;
-
-  perform_action();
-  return true;
+bool Trigger::keyPressed(const KeyPress &key, Component *) {
+  if (_trigger_key_press == key)
+    perform_action();
+  return false;                 // pass the key through
 }
 
 void Trigger::perform_action() {

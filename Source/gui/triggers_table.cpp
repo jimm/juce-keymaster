@@ -2,7 +2,9 @@
 #include "../km/device_manager.h"
 #include "../km/keymaster.h"
 #include "../km/trigger.h"
+#include "../km/editor.h"
 #include "triggers_table.h"
+#include "trigger_editor.h"
 
 void TriggersTableListBoxModel::make_columns(TableHeaderComponent &header) {
   header.addColumn("Key", 1, 15);
@@ -21,9 +23,8 @@ void TriggersTableListBoxModel::paintCell(
   String str;
   switch (columnId) {
   case 1:                       // key
-    if (t->trigger_key_code() != UNDEFINED)
-      str << KeyPress(t->trigger_key_code(), ModifierKeys(), juce_wchar(t->trigger_key_code()))
-        .getTextDescription();
+    if (t->has_trigger_key_press())
+      str << t->trigger_key_press().getTextDescription();
     break;
   case 2:                       // input
     str = input_string(t);
@@ -70,4 +71,39 @@ String TriggersTableListBoxModel::action_string(Trigger *t) {
     error_msg << "error: trigger has illegal action " << t->action();
     Logger::writeToLog(error_msg);
     return "";
+}
+
+void TriggersTableListBoxModel::cellDoubleClicked(int row, int col, const MouseEvent&) {
+  sendActionMessage("open:trigger-editor");
+}
+
+void TriggersTableListBox::popupMenu() {
+  PopupMenu menu;
+
+  menu.addItem("Create New Trigger", [this] {
+    open_trigger_editor(nullptr)->addActionListener(this);
+  });
+
+  auto rows = getSelectedRows();
+  if (rows.size() > 0) {
+    auto trigger = KeyMaster_instance()->triggers()[rows[0]];
+    menu.addItem("Delete Selected Trigger", [this, trigger] {
+      Editor e;
+      e.destroy_trigger(trigger);
+      updateContent();
+      repaint();
+    });
+  }
+
+  menu.showMenuAsync(PopupMenu::Options{}.withMousePosition());
+}
+
+void TriggersTableListBox::actionListenerCallback(const String &message) {
+  if (message == "open:trigger-editor") {
+    auto model = static_cast<TriggersTableListBoxModel *>(getTableListBoxModel());
+    auto trigger = KeyMaster_instance()->triggers()[model->selected_row_num()];
+    open_trigger_editor(trigger)->addActionListener(this);
+  }
+  else
+    KmTableListBox::actionListenerCallback(message);
 }

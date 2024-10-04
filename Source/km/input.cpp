@@ -37,7 +37,6 @@ void Input::midi_in(const MidiMessage &message) {
   if (km->cursor() == nullptr) // we might get MIDI before we're fully constructed
     return;
 
-  // TODO listen for program changes and jump to song
   for (auto &trigger : km->triggers())
     trigger->signal_message(this, message);
 

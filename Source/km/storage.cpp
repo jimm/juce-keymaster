@@ -136,7 +136,7 @@ void Storage::load_triggers(var triggers) {
       t->set_trigger_message(input, mblock.midi_messages()[0]);
     }
     if (vmsg.hasProperty("key_code"))
-      t->set_trigger_key_code((int)vmsg.getProperty("key_code", v));
+      t->set_trigger_key_press(KeyPress((int)vmsg.getProperty("key_code", v)));
     if (vmsg.hasProperty("output_message_id"))
       t->set_output_message(find_message_by_id("trigger", t->id(), (int)vmsg.getProperty("output_message_id", v)));
     km->triggers().add(t);
@@ -372,8 +372,8 @@ var Storage::triggers() {
                      var(String::toHexString(trigger->trigger_message().getRawData(),
                                              trigger->trigger_message().getRawDataSize())));
     }
-    if (trigger->trigger_key_code() != UNDEFINED)
-      t->setProperty("key_code", var(trigger->trigger_key_code()));
+    if (trigger->has_trigger_key_press())
+      t->setProperty("key_code", var(trigger->trigger_key_press().getKeyCode()));
     if (trigger->output_message())
       t->setProperty("output_message_id", var(trigger->output_message()->id()));
     triggers.add(var(t.get()));
