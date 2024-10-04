@@ -122,6 +122,6 @@ bool SongDialogComponent::apply() {
     _is_new = false;
   }
 
-  sendActionMessage(SONG_CHANGED_MESSAGE);
+  sendActionMessage("update:all");
   return true;
 }

@@ -86,12 +86,7 @@ void ConnectionsTableListBox::popupMenu() {
   Patch *patch = KeyMaster_instance()->cursor()->patch();
 
   menu.addItem("Create New Connection", [this, patch] {
-    Editor e;
-    Connection *conn = e.create_connection(nullptr, nullptr);
-    e.add_connection(patch, conn);
-    updateContent();
-    repaint();
-    open_connection_editor(patch, conn)->addActionListener(this);
+    open_connection_editor(patch, nullptr)->addActionListener(this);
   });
 
   auto rows = getSelectedRows();

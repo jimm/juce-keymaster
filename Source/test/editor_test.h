@@ -14,13 +14,15 @@ public:
 
 private:
   DeviceManager dev_mgr;
-  KeyMaster *km;
+  KeyMaster *km = nullptr;
   Cursor *cursor;
   Editor *e;
 
+  void reset();
   void reload();
   void test_remove_song_from_all_songs();
   void test_remove_song_from_set_list();
+  void test_create();
 };
 
 static EditorTest editor_test;

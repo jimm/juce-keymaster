@@ -166,6 +166,6 @@ bool CcMapDialogComponent::apply() {
   _conn->end_changes();
 
   _is_new = false;
-  sendActionMessage(CC_MAP_CHANGED_MESSAGE);
+  sendActionMessage("update:table-list-box");
   return true;
 }

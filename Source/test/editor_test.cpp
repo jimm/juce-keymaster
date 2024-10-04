@@ -3,8 +3,8 @@
 #include "../km/editor.h"
 #include "../km/keymaster.h"
 
-void EditorTest::reload() {
-  km = load_test_data(dev_mgr);
+void EditorTest::reset() {
+  km = KeyMaster_instance();
   cursor = km->cursor();
   cursor->init();
   if (e != nullptr)
@@ -12,14 +12,24 @@ void EditorTest::reload() {
   e = new Editor(km);
 }
 
+void EditorTest::reload() {
+  if (km != nullptr)
+    delete km;
+  km = load_test_data(dev_mgr);
+  reset();
+}
+
 void EditorTest::shutdown() {
-  delete km;
-  delete e;
+  if (km != nullptr)
+    delete km;
+  if (e != nullptr)
+    delete e;
 }
 
 void EditorTest::runTest() {
   test_remove_song_from_all_songs();
   test_remove_song_from_set_list();
+  test_create();
 }
 
 void EditorTest::test_remove_song_from_all_songs() {
@@ -103,4 +113,30 @@ void EditorTest::test_remove_song_from_set_list() {
   expect(found);
 
   expect(cursor->song() != current_song, "should have moved");
+}
+
+void EditorTest::test_create() {
+  beginTest("new conn when no song or patch yet");
+  if (km != nullptr)
+    delete km;
+  km = new KeyMaster(dev_mgr);
+  reset();
+
+  // precondition checks
+  expect(km == KeyMaster_instance());
+  expect(km->all_songs() != nullptr);
+  expect(km->all_songs()->songs().isEmpty());
+
+  auto conn = e->create_connection(nullptr, nullptr);
+  e->add_connection(nullptr, conn);
+
+  expect(km->all_songs()->songs().size() == 1);
+
+  auto song = km->cursor()->song();
+  expect(song != nullptr);
+  expect(!song->patches().isEmpty());
+
+  auto patch = km->cursor()->patch();
+  expect(patch == song->patches()[0]);
+  expect(conn == patch->connections()[0]);
 }

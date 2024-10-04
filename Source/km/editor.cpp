@@ -9,28 +9,28 @@ Editor::Editor(KeyMaster *key_master)
   cursor = km->cursor();
 }
 
-MessageBlock *Editor::create_message() {
+MessageBlock *Editor::create_message() const {
   return new MessageBlock(UNDEFINED_ID, "New Message");
 }
 
-Trigger *Editor::create_trigger() {
+Trigger *Editor::create_trigger() const {
   return new Trigger(UNDEFINED_ID, "New Trigger", TriggerAction::NEXT_PATCH, nullptr);
 }
 
-Song *Editor::create_song() {
+Song *Editor::create_song() const {
   return new Song(UNDEFINED_ID, "New Song");
 }
 
-Patch *Editor::create_patch() {
+Patch *Editor::create_patch() const {
   return new Patch(UNDEFINED_ID, "New Patch");
 }
 
-Connection *Editor::create_connection(Input::Ptr input, Output::Ptr output)
+Connection *Editor::create_connection(Input::Ptr input, Output::Ptr output) const
 {
   return new Connection(UNDEFINED_ID, input, CONNECTION_ALL_CHANNELS, output, CONNECTION_ALL_CHANNELS);
 }
 
-SetList *Editor::create_set_list() {
+SetList *Editor::create_set_list() const {
   return new SetList(UNDEFINED_ID, "New Set List");
 }
 
@@ -72,13 +72,19 @@ void Editor::add_patch(Patch *patch) const {
 }
 
 void Editor::add_patch(Patch *patch, Song *song) const {
+  if (song == nullptr) {
+    song = create_song();
+    add_song(song);
+  }
   song->patches().add(patch);
   km->goto_patch(patch);
 }
 
 void Editor::add_connection(Patch *patch, Connection *connection) const {
-  if (patch == nullptr)
-    return;
+  if (patch == nullptr) {
+    patch = create_patch();
+    add_patch(patch, cursor->song());
+  }
 
   patch->add_connection(connection);
   cursor->connection_index = patch->connections().size() - 1;
@@ -90,7 +96,7 @@ void Editor::add_set_list(SetList *set_list) const {
   cursor->init();
 }
 
-void Editor::remove_song_from_set_list(SetList *set_list, Song *song) {
+void Editor::remove_song_from_set_list(SetList *set_list, Song *song) const {
   // If all songs, destroy the song completely
   if (set_list == km->all_songs()) {
     destroy_song(song);
@@ -107,14 +113,14 @@ void Editor::remove_song_from_set_list(SetList *set_list, Song *song) {
 }
 
 
-void Editor::destroy_message(MessageBlock *message) {
+void Editor::destroy_message(MessageBlock *message) const {
   int index = km->messages().indexOf(message);
   km->remove_message(message);
   if (index >= km->messages().size())
     cursor->message_index = km->messages().size() - 1;
 }
 
-void Editor::destroy_trigger(Trigger *trigger) {
+void Editor::destroy_trigger(Trigger *trigger) const {
   int index = km->triggers().indexOf(trigger);
   km->remove_trigger(trigger);
   if (index >= km->triggers().size())
@@ -122,7 +128,7 @@ void Editor::destroy_trigger(Trigger *trigger) {
 }
 
 // Returns true if `message` is not used anywhere.
-bool Editor::ok_to_destroy_message(MessageBlock *message) {
+bool Editor::ok_to_destroy_message(MessageBlock *message) const {
   if (message == nullptr)
     return false;
 
@@ -138,30 +144,30 @@ bool Editor::ok_to_destroy_message(MessageBlock *message) {
   return true;
 }
 
-bool Editor::ok_to_destroy_trigger(Trigger *trigger) {
+bool Editor::ok_to_destroy_trigger(Trigger *trigger) const {
   return true;
 }
 
-bool Editor::ok_to_destroy_song(Song *song) {
+bool Editor::ok_to_destroy_song(Song *song) const {
   return true;
 }
 
-bool Editor::ok_to_destroy_patch(Song *song, Patch *patch) {
+bool Editor::ok_to_destroy_patch(Song *song, Patch *patch) const {
   return song != nullptr;
 }
 
-bool Editor::ok_to_destroy_connection(Patch *patch, Connection *connection) {
+bool Editor::ok_to_destroy_connection(Patch *patch, Connection *connection) const {
   return patch != nullptr && connection != nullptr;
 }
 
-bool Editor::ok_to_destroy_set_list(SetList *set_list) {
+bool Editor::ok_to_destroy_set_list(SetList *set_list) const {
   return set_list != nullptr
     && set_list != km->all_songs();
 }
 
 // Destroys the song and removes it from all set lists. If it is the current
 // song, calls move_away_from_song() first.
-void Editor::destroy_song(Song *song) {
+void Editor::destroy_song(Song *song) const {
   move_away_from_song(song);
   for (auto &set_list : km->set_lists())
     set_list->remove_song(song);
@@ -172,7 +178,7 @@ void Editor::destroy_song(Song *song) {
     cursor->patch()->start();
 }
 
-void Editor::destroy_patch(Song *song, Patch *patch) {
+void Editor::destroy_patch(Song *song, Patch *patch) const {
   if (cursor->patch())
     cursor->patch()->stop();
 
@@ -183,14 +189,14 @@ void Editor::destroy_patch(Song *song, Patch *patch) {
     cursor->patch()->start();
 }
 
-void Editor::destroy_connection(Patch *patch, Connection *connection) {
+void Editor::destroy_connection(Patch *patch, Connection *connection) const {
   int index = cursor->connection_index;
   patch->remove_connection(connection);
   if (index >= patch->connections().size())
     cursor->connection_index = patch->connections().size() - 1;
 }
 
-void Editor::destroy_set_list(SetList *set_list) {
+void Editor::destroy_set_list(SetList *set_list) const {
   if (set_list == cursor->set_list())
     cursor->goto_set_list("All Songs");
   km->remove_set_list(set_list);
@@ -200,7 +206,7 @@ void Editor::destroy_set_list(SetList *set_list) {
 // the next song (see comment though) or, if there isn't one, the prev song.
 // If both those fail (this is the only song in the current set list) then
 // reinits the cursor.
-void Editor::move_away_from_song(Song *song) {
+void Editor::move_away_from_song(Song *song) const {
   if (song != cursor->song())
     return;
 
@@ -225,7 +231,7 @@ void Editor::move_away_from_song(Song *song) {
 // the next patch or, if there isn't one, the prev patch. If both those fail
 // (this is the only patch in the current song) then calls
 // move_away_from_song.
-void Editor::move_away_from_patch(Song *song, Patch *patch) {
+void Editor::move_away_from_patch(Song *song, Patch *patch) const {
   if (patch != cursor->patch())
     return;
 

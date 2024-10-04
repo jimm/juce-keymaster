@@ -444,12 +444,17 @@ bool ConnectionDialogComponent::apply() {
   _conn->end_changes();
 
   if (_is_new) {
+    DBG("adding conn to patch!");
     Editor e;
     e.add_connection(_patch, _conn);
+    if (_patch == nullptr)        // conn being created in new song with no patch
+      _patch = cursor()->patch(); // patch was created by add_connection
     _is_new = false;
+    sendActionMessage("update:all");
   }
+  else
+    sendActionMessage("update:table-list-box");
 
-  sendActionMessage(CONNECTION_CHANGED_MESSAGE);
   return true;
 }
 
