@@ -92,6 +92,9 @@ void SongEditor::init() {
   _name.setText(_song->name());
   _bpm.setText(String(_song->bpm()));
   _clock_on.setToggleState(_song->clock_on_at_start(), NotificationType::dontSendNotification);
+  _notes.setMultiLine(true);
+  _notes.setReturnKeyStartsNewLine(true);
+  _notes.setCaretVisible(true);
   _notes.setText(_song->notes());
 
   addAndMakeVisible(_name_label);

@@ -27,8 +27,10 @@ void MessageBlock::from_hex_string(const String &str) {
   int num_bytes = tokens.size();
   uint8 *data = (uint8 *)malloc(size_t(num_bytes));
   int i = 0;
-  for (auto s : tokens)
+  for (auto s : tokens) {
     data[i++] = (uint8)s.getHexValue32();
+    // FIXME if value is > 255 that's an error
+  }
 
   for (i = 0; i < num_bytes; ++i) {
     uint8 byte = data[i];
@@ -69,6 +71,7 @@ void MessageBlock::from_hex_string(const String &str) {
         break;
       }
     }
+    // FIXME if i >= num_bytes that's an error
   }
 
   KeyMaster_instance()->changed();

@@ -84,7 +84,6 @@ private:
   void layout_message_filters(Rectangle<int> &area);
   void layout_toggle_row(Rectangle<int> &area, ToggleButton &left, ToggleButton &right);
   void layout_cc_maps(Rectangle<int> &area);
-  void layout_buttons(Rectangle<int> &area);
 
   void init_input();
   void init_output();

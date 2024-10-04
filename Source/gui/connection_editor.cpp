@@ -196,15 +196,6 @@ void ConnectionEditor::layout_cc_maps(Rectangle<int> &area) {
   _del_cc_map.setBounds(row_area.removeFromLeft(CC_MAPS_BUTTON_WIDTH));
 }
 
-void ConnectionEditor::layout_buttons(Rectangle<int> &area) {
-  auto row_area = area.removeFromTop(BUTTON_HEIGHT);
-  _ok.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-  row_area.removeFromRight(SPACE);
-  _apply.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-  row_area.removeFromRight(SPACE);
-  _cancel.setBounds(row_area.removeFromRight(BUTTON_WIDTH));
-}
-
 void ConnectionEditor::init_input() {
   _input_instrument.addItem("Select input instrument", UNSELECTED);
   int i = 0;

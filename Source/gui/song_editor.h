@@ -34,7 +34,6 @@ private:
   void layout_name(Rectangle<int> &area);
   void layout_clock(Rectangle<int> &area);
   void layout_notes(Rectangle<int> &area);
-  void layout_buttons(Rectangle<int> &area);
 
   virtual void init() override;
   virtual void cancel_cleanup() override;
