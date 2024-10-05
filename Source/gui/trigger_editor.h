@@ -27,7 +27,7 @@ private:
   Label _input_and_message_label { {}, "Trigger Input and Message" };
   Label _input_label { {}, "Input" };
   ComboBox _input;
-  Label _message_label { {}, "Message" };
+  Label _message_label { {}, "MIDI" };
   Label _message { {}, "(None)" };
   TextButton _learn { "Learn" };
 

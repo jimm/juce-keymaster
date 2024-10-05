@@ -4,9 +4,6 @@
 #include "km_list_box.h"
 #include "../km/song.h"
 
-class SongPatchesListBox : public KmListBox {
-};
-
 class SongPatchesListBoxModel : public KmListBoxModel {
 public:
   virtual ~SongPatchesListBoxModel() {}
@@ -24,8 +21,18 @@ public:
     cursor()->jump_to_patch_index(lastRowSelected);
   }
 
+  virtual void listBoxItemDoubleClicked(int row, const MouseEvent&) override;
+
   int selected_row_num() override { return cursor()->patch_index; }
 
 private:
   Song *song() { return cursor()->song(); }
+};
+
+class SongPatchesListBox : public KmListBox {
+public:
+  virtual void actionListenerCallback(const String &message) override;
+
+protected:
+  virtual void popupMenu() override;
 };

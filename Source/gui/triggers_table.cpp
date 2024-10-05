@@ -10,7 +10,7 @@ void TriggersTableListBoxModel::make_columns(TableHeaderComponent &header) {
   auto props = TableHeaderComponent::ColumnPropertyFlags::notSortable;
   header.addColumn("Key", 1, 15, 15, -1, props);
   header.addColumn("Input", 2, 75, 75, -1, props);
-  header.addColumn("Trigger", 3, 75, 75, -1, props);
+  header.addColumn("MIDI", 3, 75, 75, -1, props);
   header.addColumn("Action / Message", 4, 75, 75, -1, props);
   header.setStretchToFitActive(true);
 }

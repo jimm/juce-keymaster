@@ -61,15 +61,13 @@ void MainComponent::resized()
 
   Grid top_grid;
   top_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
-  top_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(2)) };
+  top_grid.templateColumns = { Track(Fr(2)), Track(Fr(2)), Track(Fr(3)) };
   top_grid.items = {
     // top row labels
     GridItem(set_list_songs_label), GridItem(song_patches_label), GridItem(song_notes_label),
     // top row components
     GridItem(set_list_songs), GridItem(song_patches), GridItem(song_notes),
   };
-  // USE THIS BEFORE PERFORM LAYOUT?
-  // top_grid.setGap(Px(4));
   top_grid.performLayout(top_area);
 
   Grid middle_grid;

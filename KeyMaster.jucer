@@ -36,6 +36,9 @@
             file="Source/gui/messages_list_box.cpp"/>
       <FILE id="ibUera" name="messages_list_box.h" compile="0" resource="0"
             file="Source/gui/messages_list_box.h"/>
+      <FILE id="EJUIUE" name="patch_editor.cpp" compile="1" resource="0"
+            file="Source/gui/patch_editor.cpp"/>
+      <FILE id="Be4LaY" name="patch_editor.h" compile="0" resource="0" file="Source/gui/patch_editor.h"/>
       <FILE id="vvaa7d" name="set_list_songs_list_box.cpp" compile="1" resource="0"
             file="Source/gui/set_list_songs_list_box.cpp"/>
       <FILE id="QLqr8Z" name="set_list_songs_list_box.h" compile="0" resource="0"
@@ -48,6 +51,8 @@
       <FILE id="GnYiXL" name="song_editor.h" compile="0" resource="0" file="Source/gui/song_editor.h"/>
       <FILE id="bqPIax" name="song_notes_label.h" compile="0" resource="0"
             file="Source/gui/song_notes_label.h"/>
+      <FILE id="pUfxBV" name="song_patches_list_box.cpp" compile="1" resource="0"
+            file="Source/gui/song_patches_list_box.cpp"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"
             file="Source/gui/song_patches_list_box.h"/>
       <FILE id="SzgRL7" name="trigger_editor.cpp" compile="1" resource="0"
