@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "consts.h"
 #include "instrument.h"
+#include "midi_message_learner.h"
 
 class Patch;
 
@@ -19,6 +20,9 @@ public:
   virtual void stop() override;
   bool is_running() override { return (bool)device; }
 
+  // The next incoming message is sent to the learner
+  void learn(MidiMessageLearner *learner) { message_learner = learner; }
+
   void midi_in(const MidiMessage &msg);
 
   void send_pending_offs();
@@ -29,6 +33,7 @@ private:
   std::unique_ptr<MidiInput> device;
   Patch *note_off_patches[MIDI_CHANNELS][NOTES_PER_CHANNEL];
   Patch *sustain_off_patches[MIDI_CHANNELS];
+  MidiMessageLearner *message_learner;
 
   void initialize();
   Patch *patch_for_message(const MidiMessage &msg);

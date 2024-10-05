@@ -164,7 +164,7 @@ void Editor::destroy_patch(Song *song, Patch *patch) const {
 
   // Tell all inputs to deal with hanging notes and sustains now
   for (auto inp : KeyMaster_instance()->device_manager().inputs())
-    inp.patch_being_deleted(patch);
+    inp->patch_being_deleted(patch);
 
   move_away_from_patch(song, patch);
   song->remove_patch(patch);

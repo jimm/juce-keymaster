@@ -1,12 +1,15 @@
 #include "keymaster.h"
 #include "input.h"
 
+#define is_realtime(b) ((b) >= 0xf8)
+
 Input::Input() {
   initialize();
 }
 
 Input::Input(MidiDeviceInfo device_info, MidiInputCallback *listener)
-  : Instrument(device_info), device(MidiInput::openDevice(info.identifier, listener))
+  : Instrument(device_info), device(MidiInput::openDevice(info.identifier, listener)),
+    message_learner(nullptr)
 {
   initialize();
 }
@@ -53,6 +56,11 @@ void Input::midi_in(const MidiMessage &message) {
   Patch *p = patch_for_message(message);
   if (p != nullptr)
     p->midi_in(this, message);
+
+  if (message_learner != nullptr && message_learner->wants_message(message)) {
+    message_learner->learnMidiMessage(message);
+    message_learner = nullptr;
+  }
 }
 
 // Note off and sustain off messages must be sent to the same patch as the
@@ -121,7 +129,7 @@ void Input::send_pending_offs() {
 // Sends all pending offs meant for patch p.
 void Input::patch_being_deleted(Patch *p) {
   for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
-    auth patch = sustain_off_patches[chan];
+    auto patch = sustain_off_patches[chan];
     if (patch == p) {
       p->midi_in(this, MidiMessage::controllerEvent(JCH(chan), CC_SUSTAIN, 0));
       sustain_off_patches[chan] = nullptr;

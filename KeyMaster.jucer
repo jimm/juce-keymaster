@@ -94,6 +94,10 @@
             file="Source/km/message_filter.cpp"/>
       <FILE id="VuaWaq" name="message_filter.h" compile="0" resource="0"
             file="Source/km/message_filter.h"/>
+      <FILE id="Nxpmr6" name="midi_message_learner.cpp" compile="1" resource="0"
+            file="Source/km/midi_message_learner.cpp"/>
+      <FILE id="tp8ZWi" name="midi_message_learner.h" compile="0" resource="0"
+            file="Source/km/midi_message_learner.h"/>
       <FILE id="bV5W6P" name="nameable.cpp" compile="1" resource="0" file="Source/km/nameable.cpp"/>
       <FILE id="ekPF4B" name="nameable.h" compile="0" resource="0" file="Source/km/nameable.h"/>
       <FILE id="zEbbRN" name="output.cpp" compile="1" resource="0" file="Source/km/output.cpp"/>
