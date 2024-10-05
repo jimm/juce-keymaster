@@ -6,7 +6,7 @@ DeviceManager::~DeviceManager() {
   _outputs.clear();
 }
 
-void DeviceManager::handleIncomingMidiMessage (MidiInput *source, const MidiMessage &message) {
+void DeviceManager::handleIncomingMidiMessage(MidiInput *source, const MidiMessage &message) {
   Input::Ptr input = find_input(source->getIdentifier());
   input->midi_in(message);
 }

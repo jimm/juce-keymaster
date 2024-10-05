@@ -24,9 +24,15 @@ void Input::initialize() {
   start();
 }
 
+void Input::start() {
+  device->start();
+}
+
 void Input::stop() {
-  if (device)
+  if (device) {
     send_pending_offs();
+    device->stop();
+  }
 }
 
 void Input::midi_in(const MidiMessage &message) {

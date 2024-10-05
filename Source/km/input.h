@@ -15,7 +15,8 @@ public:
   Input(MidiDeviceInfo device_info, MidiInputCallback *listener);
   virtual ~Input() override;
 
-  void stop() override;
+  virtual void start() override;
+  virtual void stop() override;
   bool is_running() override { return (bool)device; }
 
   void midi_in(const MidiMessage &msg);
