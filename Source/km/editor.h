@@ -23,10 +23,6 @@ public:
   void add_set_list(SetList *set_list) const;
 
   bool ok_to_destroy_message(MessageBlock *message) const;
-  bool ok_to_destroy_trigger(Trigger *trigger) const;
-  bool ok_to_destroy_song(Song *song) const;
-  bool ok_to_destroy_patch(Song *song, Patch *patch) const;
-  bool ok_to_destroy_connection(Patch *patch, Connection *connection) const;
   bool ok_to_destroy_set_list(SetList *set_list) const;
 
   void remove_song_from_set_list(SetList *set_list, Song *song) const;

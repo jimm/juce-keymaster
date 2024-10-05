@@ -22,6 +22,8 @@ public:
 
   void send_pending_offs();
 
+  void patch_being_deleted(Patch *p);
+
 private:
   std::unique_ptr<MidiInput> device;
   Patch *note_off_patches[MIDI_CHANNELS][NOTES_PER_CHANNEL];

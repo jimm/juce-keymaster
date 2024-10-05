@@ -63,7 +63,6 @@ void SetListSongsListBox::popup_set_list_menu() {
       Editor e;
 
       e.remove_song_from_set_list(set_list, set_list->songs()[rows[0]]);
-      set_list->remove_song(set_list->songs()[rows[0]]);
       sendActionMessage("update:all");
     });
   }

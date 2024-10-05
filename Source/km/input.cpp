@@ -45,7 +45,8 @@ void Input::midi_in(const MidiMessage &message) {
   // that to the same patch as that used by the corresponding note on or
   // sustain on.
   Patch *p = patch_for_message(message);
-  p->midi_in(this, message);
+  if (p != nullptr)
+    p->midi_in(this, message);
 }
 
 // Note off and sustain off messages must be sent to the same patch as the
@@ -105,6 +106,24 @@ void Input::send_pending_offs() {
     for (int note = 0; note < NOTES_PER_CHANNEL; ++note) {
       if (note_off_patches[chan][note] != nullptr) {
         note_off_patches[chan][note]->midi_in(this, MidiMessage::noteOff(JCH(chan), note, (uint8)64));
+        note_off_patches[chan][note] = nullptr;
+      }
+    }
+  }
+}
+
+// Sends all pending offs meant for patch p.
+void Input::patch_being_deleted(Patch *p) {
+  for (int chan = 0; chan < MIDI_CHANNELS; ++chan) {
+    auth patch = sustain_off_patches[chan];
+    if (patch == p) {
+      p->midi_in(this, MidiMessage::controllerEvent(JCH(chan), CC_SUSTAIN, 0));
+      sustain_off_patches[chan] = nullptr;
+    }
+    for (int note = 0; note < NOTES_PER_CHANNEL; ++note) {
+      patch = note_off_patches[chan][note];
+      if (patch == p) {
+        p->midi_in(this, MidiMessage::noteOff(JCH(chan), note, (uint8)64));
         note_off_patches[chan][note] = nullptr;
       }
     }

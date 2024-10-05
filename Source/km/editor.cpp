@@ -103,12 +103,8 @@ void Editor::remove_song_from_set_list(SetList *set_list, Song *song) const {
     return;
   }
 
-  if (song == cursor->song()) {
-    Song *next_song = cursor->next_song();
-    if (next_song == nullptr)
-      cursor->prev_song();
-  }
-
+  if (song == cursor->song())
+    move_away_from_song(song);
   set_list->remove_song(song);
 }
 
@@ -144,22 +140,6 @@ bool Editor::ok_to_destroy_message(MessageBlock *message) const {
   return true;
 }
 
-bool Editor::ok_to_destroy_trigger(Trigger *trigger) const {
-  return true;
-}
-
-bool Editor::ok_to_destroy_song(Song *song) const {
-  return true;
-}
-
-bool Editor::ok_to_destroy_patch(Song *song, Patch *patch) const {
-  return song != nullptr;
-}
-
-bool Editor::ok_to_destroy_connection(Patch *patch, Connection *connection) const {
-  return patch != nullptr && connection != nullptr;
-}
-
 bool Editor::ok_to_destroy_set_list(SetList *set_list) const {
   return set_list != nullptr
     && set_list != km->all_songs();
@@ -181,6 +161,10 @@ void Editor::destroy_song(Song *song) const {
 void Editor::destroy_patch(Song *song, Patch *patch) const {
   if (cursor->patch())
     cursor->patch()->stop();
+
+  // Tell all inputs to deal with hanging notes and sustains now
+  for (auto inp : KeyMaster_instance()->device_manager().inputs())
+    inp.patch_being_deleted(patch);
 
   move_away_from_patch(song, patch);
   song->remove_patch(patch);
