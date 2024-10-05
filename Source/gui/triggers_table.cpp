@@ -7,10 +7,11 @@
 #include "trigger_editor.h"
 
 void TriggersTableListBoxModel::make_columns(TableHeaderComponent &header) {
-  header.addColumn("Key", 1, 15);
-  header.addColumn("Input", 2, 75);
-  header.addColumn("Trigger", 3, 75);
-  header.addColumn("Action / Message", 4, 75);
+  auto props = TableHeaderComponent::ColumnPropertyFlags::notSortable;
+  header.addColumn("Key", 1, 15, 15, -1, props);
+  header.addColumn("Input", 2, 75, 75, -1, props);
+  header.addColumn("Trigger", 3, 75, 75, -1, props);
+  header.addColumn("Action / Message", 4, 75, 75, -1, props);
   header.setStretchToFitActive(true);
 }
 

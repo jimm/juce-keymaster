@@ -6,15 +6,16 @@
 #include "connection_editor.h"
 
 void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
-  header.addColumn("Input", 1, 75);
-  header.addColumn("Chan", 2, 20, 20);
-  header.addColumn("Output", 3, 75);
-  header.addColumn("Chan", 4, 25, 25);
-  header.addColumn("Zone", 5, 30);
-  header.addColumn("Xpose", 6, 18, 18);
-  header.addColumn("Prog", 7, 50);
-  header.addColumn("Curve", 8, 20, 20);
-  header.addColumn("CC Filts/Maps", 9, 200);
+  auto props = TableHeaderComponent::ColumnPropertyFlags::notSortable;
+  header.addColumn("Input", 1, 75, 75, -1, props);
+  header.addColumn("Chan", 2, 20, 20, -1, props);
+  header.addColumn("Output", 3, 75, 75, -1, props);
+  header.addColumn("Chan", 4, 25, 25, -1, props);
+  header.addColumn("Zone", 5, 30, 30, -1, props);
+  header.addColumn("Xpose", 6, 18, 18, -1, props);
+  header.addColumn("Prog", 7, 50, 50, -1, props);
+  header.addColumn("Curve", 8, 20, 20, -1, props);
+  header.addColumn("CC Filts/Maps", 9, 200, 200, 200, props);
   header.setStretchToFitActive(true);
 }
 

@@ -61,7 +61,7 @@ void MainComponent::resized()
 
   Grid top_grid;
   top_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
-  top_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
+  top_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(2)) };
   top_grid.items = {
     // top row labels
     GridItem(set_list_songs_label), GridItem(song_patches_label), GridItem(song_notes_label),
@@ -80,7 +80,7 @@ void MainComponent::resized()
 
   Grid bottom_grid;
   bottom_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
-  bottom_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
+  bottom_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(2)) };
   bottom_grid.items = {
     // bottom row labels
     GridItem(set_lists_label), GridItem(messages_label), GridItem(triggers_label),

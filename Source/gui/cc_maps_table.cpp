@@ -25,15 +25,16 @@ int CcMapsTableListBoxModel::getNumRows() {
 }
 
 void CcMapsTableListBoxModel::make_columns(TableHeaderComponent &header) {
-  header.addColumn("CC In", 1, 20);
-  header.addColumn("CC Out", 2, 20);
-  header.addColumn("Filtered", 3, 20);
-  header.addColumn("Pass 0", 4, 20);
-  header.addColumn("Pass 127", 5, 20);
-  header.addColumn("Min In", 6, 20);
-  header.addColumn("Max In", 7, 20);
-  header.addColumn("Min Out", 8, 20);
-  header.addColumn("Max Out", 9, 20);
+  auto props = TableHeaderComponent::ColumnPropertyFlags::notSortable;
+  header.addColumn("CC In", 1, 20, 20, -1, props);
+  header.addColumn("CC Out", 2, 20, 20, -1, props);
+  header.addColumn("Filtered", 3, 20, 20, -1, props);
+  header.addColumn("Pass 0", 4, 20, 20, -1, props);
+  header.addColumn("Pass 127", 5, 20, 20, -1, props);
+  header.addColumn("Min In", 6, 20, 20, -1, props);
+  header.addColumn("Max In", 7, 20, 20, -1, props);
+  header.addColumn("Min Out", 8, 20, 20, -1, props);
+  header.addColumn("Max Out", 9, 20, 20, -1, props);
   header.setStretchToFitActive(true);
 }
 
