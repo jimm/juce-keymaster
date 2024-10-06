@@ -34,7 +34,7 @@ KeyMaster *Storage::load(bool testing) {
   }
 
   auto nullish = var();
-  Array<var> arr { nullish };
+  Array<var> arr;
   auto nullish_arr = var(arr);
 
   load_schema_version(data.getProperty("schema_version", nullish)); // TODO check version

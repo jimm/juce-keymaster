@@ -8,7 +8,6 @@ class Patch;
 class Connection;
 class ConnectionsTableListBox;
 
-
 class ConnectionsTableListBoxModel : public KmTableListBoxModel {
 public:
   virtual ~ConnectionsTableListBoxModel() {}

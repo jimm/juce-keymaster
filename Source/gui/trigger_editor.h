@@ -5,8 +5,6 @@
 #include "../km/midi_message_learner.h"
 #include "km_editor.h"
 
-class Patch;
-
 class TriggerEditor : public KmEditor, public MidiMessageLearner, public ActionListener {
 public:
   TriggerEditor(Trigger *t, bool is_new);

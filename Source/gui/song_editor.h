@@ -4,8 +4,6 @@
 #include "../km/song.h"
 #include "km_editor.h"
 
-class Patch;
-
 class SongEditor : public KmEditor {
 public:
   SongEditor(Song *c, bool is_new);

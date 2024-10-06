@@ -28,7 +28,8 @@ void Input::initialize() {
 }
 
 void Input::start() {
-  device->start();
+  if (device)
+    device->start();
 }
 
 void Input::stop() {
@@ -43,7 +44,7 @@ void Input::midi_in(const MidiMessage &message) {
     return;
 
   KeyMaster *km = KeyMaster_instance();
-  if (km->cursor() == nullptr) // we might get MIDI before we're fully constructed
+  if (km == nullptr || km->cursor() == nullptr) // we might get MIDI before we're fully constructed
     return;
 
   for (auto &trigger : km->triggers())

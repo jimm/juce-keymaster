@@ -5,8 +5,6 @@
 #include "km_editor.h"
 #include "cc_maps_table.h"
 
-class Patch;
-
 class ConnectionEditor : public KmEditor {
 public:
   ConnectionEditor(Connection *c, bool is_new);

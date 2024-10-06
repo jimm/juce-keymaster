@@ -75,5 +75,6 @@ void SetListSongsListBox::actionListenerCallback(const String &message) {
     Song *s = KeyMaster_instance()->cursor()->song();
     open_song_editor(s)->addActionListener(this);
   }
-  else KmListBox::actionListenerCallback(message);
+  else
+    KmListBox::actionListenerCallback(message);
 }
