@@ -36,8 +36,10 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
 
 MainComponent::~MainComponent()
 {
-  if (KeyMaster_instance())
+  if (KeyMaster_instance()) {
+    KeyMaster_instance()->cursor()->removeAllActionListeners();
     delete KeyMaster_instance();
+  }
 }
 
 void MainComponent::paint(Graphics& g)

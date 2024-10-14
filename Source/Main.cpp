@@ -87,8 +87,8 @@ public:
         app_properties(props)
       {
         setUsingNativeTitleBar(true);
-        main_component = new MainComponent(device_manager, app_properties); 
-        setContentOwned(main_component, true);
+        main_component = std::unique_ptr<MainComponent>(new MainComponent(device_manager, app_properties));
+        setContentOwned(main_component.get(), true);
 
 #if JUCE_IOS || JUCE_ANDROID
         setFullScreen(true);
@@ -126,7 +126,7 @@ public:
 
   private:
     ApplicationProperties &app_properties;
-    MainComponent *main_component;
+    std::unique_ptr<MainComponent> main_component;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
   };

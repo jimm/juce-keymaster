@@ -67,6 +67,8 @@ public:
   virtual void mouseUp(const MouseEvent &event) override {
     if (event.mouseWasClicked() && event.mods.isRightButtonDown())
       popupMenu();
+    else
+      ListBox::mouseUp(event);
   }
 
 protected:

@@ -8,7 +8,7 @@
 #define MESSAGE_MENU_WIDTH 200
 
 #define CONTENT_WIDTH (NAME_WIDTH)
-#define CONTENT_HEIGHT (SPACE * 3 + DATA_ROW_HEIGHT * 3 + BETWEEN_ROW_SPACE * 2)
+#define CONTENT_HEIGHT (SPACE * 3 + LABEL_HEIGHT * 3 + DATA_ROW_HEIGHT * 3 + BETWEEN_ROW_SPACE * 2)
 
 PatchEditor * open_patch_editor(Patch *p)
 {
