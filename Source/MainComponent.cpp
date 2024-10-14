@@ -11,11 +11,28 @@
 
 MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &props)
   : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
-    device_manager(dev_mgr)
+    device_manager(dev_mgr), app_properties(props)
 {
-  KeyMaster *km = new KeyMaster(device_manager); // side-effect: KeyMaster static instance set
+  KeyMaster *km = nullptr;
+
+  auto settings = app_properties.getUserSettings();
+  if (settings->containsKey("km.file")) {
+    File file(settings->getValue("km.file"));
+    Storage s(device_manager, file);
+    km = s.load();
+    if (s.has_error()) {
+      // TODO display error
+      delete km;
+      km = nullptr;
+    }
+  }
+
+  if (km == nullptr) {
+    km = new KeyMaster(device_manager);
+    km->initialize();
+  }
+
   km->set_file_based_document(this);
-  km->initialize();        // generate default curves and initial song/patch
   setChangedFlag(false);   // initialize will set it to true
   km->start();
 
@@ -28,7 +45,6 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
   make_triggers_pane();
   make_connections_pane();
 
-  auto settings = props.getUserSettings();
   auto width = settings->getIntValue("window.width", DEFAULT_WINDOW_WIDTH);
   auto height = settings->getIntValue("window.height", DEFAULT_WINDOW_HEIGHT);
   setSize(width, height);
@@ -133,15 +149,23 @@ void MainComponent::open_project() {
   saveIfNeededAndUserAgreesAsync([this] (FileBasedDocument::SaveResult save_result) {
     if (save_result == SaveResult::savedOk) {
       loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
-        if ((bool)result)
+        if ((bool)result) {
+          auto settings = app_properties.getUserSettings();
+          settings->setValue("km.file", getFile().getFullPathName());
           update();
+        }
       });
     }
   });
 }
 
 void MainComponent::save_project() {
-  saveAsync(true, true, [this] (FileBasedDocument::SaveResult _) { } );
+  saveAsync(true, true, [this] (FileBasedDocument::SaveResult save_result) {
+    if (save_result == SaveResult::savedOk) {
+      auto settings = app_properties.getUserSettings();
+      settings->setValue("km.file", getFile().getFullPathName());
+    }
+  } );
 }
 
 void MainComponent::save_project_as() {

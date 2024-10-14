@@ -76,6 +76,7 @@ public:
 private:
   //==============================================================================
   DeviceManager &device_manager;
+  ApplicationProperties &app_properties;
   File _file;
 
   MenuManager menu_manager;
