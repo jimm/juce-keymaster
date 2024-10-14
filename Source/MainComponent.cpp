@@ -315,11 +315,14 @@ void MainComponent::midi_monitor() {
 // ================ loading and saving ================
 
 void MainComponent::check_ok_to_quit(std::function<void(bool)> callback) {
-  if (!hasChangedSinceSaved())
+  if (hasChangedSinceSaved()) {
+    saveIfNeededAndUserAgreesAsync([callback] (SaveResult result) {
+      callback(result == SaveResult::savedOk);
+    });
+  }
+  else {
     callback(true);
-  saveIfNeededAndUserAgreesAsync([callback] (SaveResult result) {
-    callback(result == SaveResult::savedOk);
-  });
+  }
 }
 
 Result MainComponent::loadDocument(const File &file) {

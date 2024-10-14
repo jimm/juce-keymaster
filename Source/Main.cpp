@@ -107,6 +107,10 @@ public:
         setVisible(true);
       }
 
+    ~MainWindow() {
+      main_component = nullptr;
+    }
+
     void closeButtonPressed() override
       {
         // This is called when the user tries to close this window. Here, we'll just
