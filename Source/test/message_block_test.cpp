@@ -9,25 +9,27 @@ void MessageBlockTest::runTest() {
 
 void MessageBlockTest::test_from_hex_string() {
   beginTest("from hex string");
+
   MessageBlock m(UNDEFINED_ID, "");
+  MidiMessage msg, expected;
   uint8 sysex_data[3] = {0, 1, 2};
 
   m.from_hex_string("f6");
   expectEquals(m.midi_messages().size(), 1);
-  expect(mm_eq(m.midi_messages()[0], MidiMessage(0xf6)));
+  expect(mm_eq(msg = m.midi_messages()[0], expected = MidiMessage(0xf6)));
 
   m.from_hex_string("b3 12 34");
   expectEquals(m.midi_messages().size(), 1);
-  expect(mm_eq(m.midi_messages()[0], MidiMessage(0xb3, 0x12, 0x34)));
+  expect(mm_eq(msg = m.midi_messages()[0], expected = MidiMessage(0xb3, 0x12, 0x34)));
 
   // also tests parsing of editable version (newlines)
   m.from_hex_string("b3 12 34 f6 f0 00 01 02 f7 92 80 ff\n82 80 ff");
   expectEquals(m.midi_messages().size(), 5);
-  expect(mm_eq(m.midi_messages()[0], MidiMessage(0xb3, 0x12, 0x34)));
-  expect(mm_eq(m.midi_messages()[1], MidiMessage(0xf6)));
-  expect(mm_eq(m.midi_messages()[2], MidiMessage::createSysExMessage(sysex_data, 3)));
-  expect(mm_eq(m.midi_messages()[3], MidiMessage(0x92, 0x80, 0xff)));
-  expect(mm_eq(m.midi_messages()[4], MidiMessage(0x82, 0x80, 0xff)));
+  expect(mm_eq(msg = m.midi_messages()[0], expected = MidiMessage(0xb3, 0x12, 0x34)));
+  expect(mm_eq(msg = m.midi_messages()[1], expected = MidiMessage(0xf6)));
+  expect(mm_eq(msg = m.midi_messages()[2], expected = MidiMessage::createSysExMessage(sysex_data, 3)));
+  expect(mm_eq(msg = m.midi_messages()[3], expected = MidiMessage(0x92, 0x80, 0xff)));
+  expect(mm_eq(msg = m.midi_messages()[4], expected = MidiMessage(0x82, 0x80, 0xff)));
 }
 
 void MessageBlockTest::test_to_hex_string() {

@@ -27,7 +27,7 @@ public:
                  int min_in, int max_in,
                  int min_out, int max_out);
 
-  // Returns an ACTIVE_SENS message if nothing should be sent.
+  // Returns EMPTY_MESSAGE if nothing should be sent.
   MidiMessage process(const MidiMessage &msg, int output_channel);
 
 private:

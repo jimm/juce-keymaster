@@ -22,7 +22,7 @@ typedef enum TriggerAction {
 class Trigger : public DBObj, public Nameable, public KeyListener {
 public:
   Trigger(DBObjID id, const String &name, TriggerAction action, MessageBlock *output);
-  ~Trigger() {}
+  virtual ~Trigger() override {}
 
   inline Input::Ptr trigger_input() { return _trigger_input; }
   inline KeyPress & trigger_key_press() { return _trigger_key_press; }

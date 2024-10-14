@@ -63,6 +63,7 @@ private:
 
   void test_channels_test();
   void test_pc_test();
+  void test_pb_test();
   void test_filter_and_modify_test();
   void test_editing_when_not_running();
   void test_editing_when_running();

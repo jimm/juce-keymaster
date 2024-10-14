@@ -32,6 +32,10 @@
       <FILE id="HnFyQW" name="test_helper.cpp" compile="1" resource="0" file="Source/test/test_helper.cpp"/>
       <FILE id="JQPAHz" name="test_helper.h" compile="0" resource="0" file="Source/test/test_helper.h"/>
       <FILE id="sIRprU" name="testdata.kmst" compile="0" resource="1" file="Source/test/testdata.kmst"/>
+      <FILE id="yzYTg3" name="understanding_test.cpp" compile="1" resource="0"
+            file="Source/test/understanding_test.cpp"/>
+      <FILE id="EihPp9" name="understanding_test.h" compile="0" resource="0"
+            file="Source/test/understanding_test.h"/>
     </GROUP>
     <GROUP id="{6B97B8E9-F772-9A2A-7F62-28BEC2B37207}" name="km">
       <FILE id="fwkLY5" name="clock.cpp" compile="1" resource="0" file="Source/km/clock.cpp"/>
@@ -68,6 +72,10 @@
             file="Source/km/message_filter.cpp"/>
       <FILE id="sCvROu" name="message_filter.h" compile="0" resource="0"
             file="Source/km/message_filter.h"/>
+      <FILE id="fMeVPh" name="midi_message_learner.cpp" compile="1" resource="0"
+            file="Source/km/midi_message_learner.cpp"/>
+      <FILE id="at8ZgS" name="midi_message_learner.h" compile="0" resource="0"
+            file="Source/km/midi_message_learner.h"/>
       <FILE id="diJeso" name="nameable.cpp" compile="1" resource="0" file="Source/km/nameable.cpp"/>
       <FILE id="iEPOus" name="nameable.h" compile="0" resource="0" file="Source/km/nameable.h"/>
       <FILE id="JZZOPO" name="output.cpp" compile="1" resource="0" file="Source/km/output.cpp"/>
@@ -82,6 +90,8 @@
       <FILE id="JLOzNr" name="storage.h" compile="0" resource="0" file="Source/km/storage.h"/>
       <FILE id="ZaBrOz" name="trigger.cpp" compile="1" resource="0" file="Source/km/trigger.cpp"/>
       <FILE id="TIrQAP" name="trigger.h" compile="0" resource="0" file="Source/km/trigger.h"/>
+      <FILE id="RIhkuf" name="utils.cpp" compile="1" resource="0" file="Source/km/utils.cpp"/>
+      <FILE id="h3EGPS" name="utils.h" compile="0" resource="0" file="Source/km/utils.h"/>
     </GROUP>
     <GROUP id="{22894462-E1A9-036F-ED94-B51A50C87552}" name="Source">
       <FILE id="aTZqrU" name="TestMain.cpp" compile="1" resource="0" file="Source/TestMain.cpp"/>

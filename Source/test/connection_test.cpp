@@ -21,6 +21,7 @@ void ConnectionTest::shutdown() {
 void ConnectionTest::runTest() {
   test_channels_test();
   test_pc_test();
+  test_pb_test();
   test_filter_and_modify_test();
   test_editing_when_not_running();
   test_editing_when_running();
@@ -50,6 +51,7 @@ void ConnectionTest::test_channels_test() {
 
 void ConnectionTest::test_pc_test() {
   TestConnection conn(input_ptr, 0, output_ptr, 1);
+  MidiMessage msg, expected;
 
   beginTest("start sends pc");
 
@@ -57,11 +59,24 @@ void ConnectionTest::test_pc_test() {
   conn.start();
   expect(conn.program_change_send_channel() == 1);
   expect_sent_count(1, conn);
-  expect(mm_eq(SENT(0), MidiMessage::programChange(JCH(1), 123)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::programChange(JCH(1), 123)));
+}
+
+void ConnectionTest::test_pb_test() {
+  TestConnection conn(input_ptr, 0, output_ptr, 1);
+  MidiMessage msg, expected;
+
+  beginTest("pitch bend sends right number of bytes");
+
+  conn.start();
+  conn.midi_in(input_ptr, MidiMessage::pitchWheel(JCH(0), (5 << 7) + 64));
+  expect_sent_count(1, conn);
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage(PITCH_BEND + JCH(0), 64, 5)));
 }
 
 void ConnectionTest::test_filter_and_modify_test() {
   TestConnection conn(input_ptr, 0, output_ptr, 0);
+  MidiMessage msg, expected;
 
   beginTest("filter and modify");
 
@@ -77,7 +92,7 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.set_input_chan(CONNECTION_ALL_CHANNELS);
   conn.midi_in(input_ptr, MidiMessage::noteOn(JCH(3), 64, (uint8)127));
   expect_sent_count(1, conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0), 64, (uint8)127))); /* mutated to output chan */
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0), 64, (uint8)127))); /* mutated to output chan */
 
   // allow all chans in and out
   conn.reset();
@@ -85,7 +100,7 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.set_output_chan(CONNECTION_ALL_CHANNELS);
   conn.midi_in(input_ptr, MidiMessage::noteOn(JCH(3), 64, (uint8)127));
   expect_sent_count(1, conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(3), 64, (uint8)127))); /* out chan not changed */
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(3), 64, (uint8)127))); /* out chan not changed */
 
   // all chans filter controller
   conn.reset();
@@ -104,7 +119,7 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.cc_map(64)->set_range(false, false, 1, 127, 1, 126);
   conn.midi_in(input_ptr, MidiMessage(CONTROLLER + 3, 64, 127));
   expect_sent_count(1, conn);
-  expect(mm_eq(SENT(0), MidiMessage(CONTROLLER + 3, 64, 126))); /* out value clamped */
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage(CONTROLLER + 3, 64, 126))); /* out value clamped */
 
   // !xpose
   conn.reset();
@@ -116,9 +131,9 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.midi_in(input_ptr, MidiMessage::noteOn(JCH(0), 64, (uint8)127));
 
   expect_sent_count(3, conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
-  expect(mm_eq(SENT(1), MidiMessage::noteOn(JCH(0), 64+12, (uint8)127)));
-  expect(mm_eq(SENT(2), MidiMessage::noteOn(JCH(0), 64-12, (uint8)127)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
+  expect(mm_eq(msg = SENT(1), expected = MidiMessage::noteOn(JCH(0), 64+12, (uint8)127)));
+  expect(mm_eq(msg = SENT(2), expected = MidiMessage::noteOn(JCH(0), 64-12, (uint8)127)));
 
 
   // xpose out of range filters out note
@@ -129,7 +144,7 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.midi_in(input_ptr, MidiMessage::noteOn(JCH(0), 64, (uint8)127));
 
   expect_sent_count(1, conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
 
 
   Curve *exp = new Curve(UNDEFINED_ID, "Exponential", "exp");
@@ -150,7 +165,7 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.midi_in(input_ptr, MidiMessage::noteOff(JCH(0), 64, (uint8)64));
 
   expect_sent_count(4, conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0),  64, (uint8)64)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0),  64, (uint8)64)));
   expect(SENT(1).getVelocity() == (uint8)32); // exponential
   expect(SENT(2).getVelocity() == (uint8)84); // inverse exponential
   expect(SENT(3).getVelocity() == (uint8)84);
@@ -166,8 +181,8 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.midi_in(input_ptr, MidiMessage::noteOff(JCH(0), 76, (uint8)127));
 
   expect_sent_count(2, conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0), 48, (uint8)127)));
-  expect(mm_eq(SENT(1), MidiMessage::noteOff(JCH(0), 48, (uint8)127)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0), 48, (uint8)127)));
+  expect(mm_eq(msg = SENT(1), expected = MidiMessage::noteOff(JCH(0), 48, (uint8)127)));
 
 
   // zone poly pressure
@@ -179,7 +194,7 @@ void ConnectionTest::test_filter_and_modify_test() {
   conn.midi_in(input_ptr, MidiMessage::aftertouchChange(JCH(0), 76, 127));
 
   expect_sent_count(1, conn);
-  expect(mm_eq(SENT(0), MidiMessage::aftertouchChange(JCH(0), 48, 127)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::aftertouchChange(JCH(0), 48, 127)));
 
 
   // cc processed
@@ -213,38 +228,38 @@ void ConnectionTest::test_filter_and_modify_test() {
   // filter sysex, but realtime bytes inside will be sent
   expect(mf.sysex() == false); // check default value
 
-  for (auto msg : messages)
-    conn.midi_in(input_ptr, msg);
+  for (auto m : messages)
+    conn.midi_in(input_ptr, m);
 
   expect_sent_count(messages.size(), conn); // +1 for clock, -1 for filtered sysex
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
-  expect(mm_eq(SENT(2), MidiMessage(CLOCK)));
-  expect(mm_eq(SENT(conn.sent.size() - 1), messages.getLast()));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
+  expect(mm_eq(msg = SENT(2), expected = MidiMessage(CLOCK)));
+  expect(mm_eq(msg = SENT(conn.sent.size() - 1), expected = messages.getLast()));
   
   // pass through sysex
   mf.set_sysex(true);
 
   conn.sent.clear();
-  for (auto msg : messages)
-    conn.midi_in(input_ptr, msg);
+  for (auto m : messages)
+    conn.midi_in(input_ptr, m);
 
   // we expect same number because clock is inside sysex, and whole sysex
   // including clock is sent as one message
   expect_sent_count(messages.size(), conn);
-  expect(mm_eq(SENT(0), MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::noteOn(JCH(0), 64, (uint8)127)));
   expect(SENT(2).isSysEx());
-  expect(mm_eq(SENT(conn.sent.size() - 1), messages.getLast()));
+  expect(mm_eq(msg = SENT(conn.sent.size() - 1), expected = messages.getLast()));
   
   // filter note on and off
   mf.set_note(false);
 
   conn.sent.clear();
-  for (auto msg : messages)
-    conn.midi_in(input_ptr, msg);
+  for (auto m : messages)
+    conn.midi_in(input_ptr, m);
 
   expect_sent_count(messages.size() - 2, conn);
-  expect(mm_eq(SENT(0), MidiMessage::midiStart()));
-  expect(mm_eq(SENT(conn.sent.size() - 2), MidiMessage::channelPressureChange(JCH(0), 64)));
+  expect(mm_eq(msg = SENT(0), expected = MidiMessage::midiStart()));
+  expect(mm_eq(msg = SENT(conn.sent.size() - 2), expected = MidiMessage::channelPressureChange(JCH(0), 64)));
 }
 
 void ConnectionTest::test_editing_when_not_running() {
@@ -298,3 +313,4 @@ void ConnectionTest::expect_sent_count(int expected, TestConnection &conn) {
 
   expect(expected == num_sent, s);
 }
+

@@ -244,10 +244,15 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
       midi_out(MidiMessage(status, data[1], data[2]));
     }
     break;
-  case PROGRAM_CHANGE: case CHANNEL_PRESSURE: case PITCH_BEND:
+  case PROGRAM_CHANGE: case CHANNEL_PRESSURE:
     if (_output_chan != CONNECTION_ALL_CHANNELS)
       status = uint8(high_nibble + _output_chan);
     midi_out(MidiMessage(status, data[1]));
+    break;
+  case PITCH_BEND:
+    if (_output_chan != CONNECTION_ALL_CHANNELS)
+      status = uint8(high_nibble + _output_chan);
+    midi_out(MidiMessage(status, data[1], data[2]));
     break;
   default:
     midi_out(msg);

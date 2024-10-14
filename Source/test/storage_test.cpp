@@ -24,6 +24,8 @@ void StorageTest::runTest() {
 }
 
 void StorageTest::test_load(String data_file_path, bool call_begin_test) {
+  MidiMessage m, expected;
+
   km = load_test_data(dev_mgr, data_file_path);
 
   // ==== load messages
@@ -33,18 +35,18 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
 
   MessageBlock *msg = km->messages()[0];
   expect(msg->name() == "Tune Request");
-  expect(mm_eq(msg->midi_messages()[0], MidiMessage(0xf6)));
+  expect(mm_eq(m = msg->midi_messages()[0], expected = MidiMessage(0xf6)));
 
   msg = km->messages()[1];
   expect(msg->name() == "Multiple Note-Offs");
-  expect(mm_eq(msg->midi_messages()[0], MidiMessage::noteOff(JCH(0), 64, (uint8)64)));
-  expect(mm_eq(msg->midi_messages()[1], MidiMessage::noteOff(JCH(1), 64, (uint8)65)));
-  expect(mm_eq(msg->midi_messages()[2], MidiMessage::noteOff(JCH(2), 42, (uint8)127)));
+  expect(mm_eq(m = msg->midi_messages()[0], expected = MidiMessage::noteOff(JCH(0), 64, (uint8)64)));
+  expect(mm_eq(m = msg->midi_messages()[1], expected = MidiMessage::noteOff(JCH(1), 64, (uint8)65)));
+  expect(mm_eq(m = msg->midi_messages()[2], expected = MidiMessage::noteOff(JCH(2), 42, (uint8)127)));
 
   msg = km->messages()[4];
   expect(msg->name() == "All Volumes Up");
   for (int chan = 0; chan < 16; ++chan)
-    expect(mm_eq(msg->midi_messages()[chan], MidiMessage::controllerEvent(JCH(chan), 7, 127)));
+    expect(mm_eq(m = msg->midi_messages()[chan], expected = MidiMessage::controllerEvent(JCH(chan), 7, 127)));
 
   // ==== load triggers
   if (call_begin_test)
@@ -58,20 +60,20 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   expect(t->name() == "panic");
   expect(t->has_trigger_key_press());
   expect(t->trigger_key_press().getKeyCode() == 340);
-  expect(mm_eq(t->trigger_message(), EMPTY_MESSAGE));
+  expect(mm_eq(m = t->trigger_message(), expected = EMPTY_MESSAGE));
   expect(t->output_message() == nullptr);
   expect(t->action() == TriggerAction::PANIC);
 
   t = km->triggers()[2];
   expect(t->name() == "next song");
-  expect(mm_eq(t->trigger_message(), MidiMessage(0xb0, 0x32, 0x7f)));
+  expect(mm_eq(m = t->trigger_message(), expected = MidiMessage(0xb0, 0x32, 0x7f)));
   expect(t->action() == TriggerAction::NEXT_SONG);
   expect(t->output_message() == nullptr);
 
   t = km->triggers().getLast();
   expect(t->name() == "send tune request message");
   expect(t->action() == TriggerAction::MESSAGE);
-  expect(mm_eq(t->trigger_message(), MidiMessage(0xb0, 0x36, 0x7f)));
+  expect(mm_eq(m = t->trigger_message(), expected = MidiMessage(0xb0, 0x36, 0x7f)));
   expect(t->output_message() != nullptr);
   expect(t->output_message()->name() == "Tune Request");
 
