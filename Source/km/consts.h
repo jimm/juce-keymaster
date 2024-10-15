@@ -7,8 +7,6 @@
 #define UNDEFINED (-1)
 #define UNDEFINED_ID (-1L)
 #define CONNECTION_ALL_CHANNELS (-1)
-#define INSTRUMENT_TYPE_INPUT 0
-#define INSTRUMENT_TYPE_OUTPUT 1
 
 // The JUCE MidiMessage static factory methods require MIDI channels 1-16
 #define JCH(ch) ((ch)+1)

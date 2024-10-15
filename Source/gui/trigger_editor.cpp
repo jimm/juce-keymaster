@@ -202,19 +202,26 @@ void TriggerEditor::init_action() {
   _action.addItem("Super Panic", TriggerAction::SUPER_PANIC + 1);
   _action.addItem("Toggle Clock On/Off", TriggerAction::TOGGLE_CLOCK + 1);
 
+  int selected_message_id = -1;
   if (!KeyMaster_instance()->messages().isEmpty()) {
-    _action.addSeparator();
+    PopupMenu submenu;
     int i = MSG_ID_OFFSET;
+
     for (auto msg : KeyMaster_instance()->messages()) {
-      _action.addItem(msg->name(), i);
-      if (msg == _trigger->output_message())
-        _action.setSelectedId(i);
+      bool is_selected = msg == _trigger->output_message();
+      submenu.addItem(i, msg->name(), true, is_selected);
+      if (is_selected)
+        selected_message_id = i;
       ++i;
     }
+
+    _action.getRootMenu()->addSubMenu("Send Message", submenu);
   }
-  if (_trigger->action() != TriggerAction::MESSAGE)
+
+  if (_trigger->action() == TriggerAction::MESSAGE)
+    _action.setSelectedId(selected_message_id);
+  else
     _action.setSelectedId(_trigger->action() + 1);
-  // messages already handled when adding messages to the menu
 
   addAndMakeVisible(_action_label);
   addAndMakeVisible(_action);

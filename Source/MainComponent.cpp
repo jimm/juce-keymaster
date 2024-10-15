@@ -8,38 +8,13 @@
 
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
+static const char * const KM_FILE_PROPS_KEY = "km.file";
 
 MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &props)
   : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
     device_manager(dev_mgr), app_properties(props)
 {
-  KeyMaster *km = nullptr;
-
-  auto settings = app_properties.getUserSettings();
-  if (settings->containsKey("km.file")) {
-    DBG(settings->getValue("km.file")); // DEBUG
-    File file(settings->getValue("km.file"));
-    Storage s(device_manager, file);
-    km = s.load();
-    if (s.has_error()) {
-      DBG("error, opening alert window");
-      AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
-                                       "Error loading KeyMaster file",
-                                       s.error(),
-                                       "OK");
-      delete km;
-      km = nullptr;
-    }
-  }
-
-  if (km == nullptr) {
-    km = new KeyMaster(device_manager);
-    km->initialize();
-  }
-
-  km->set_file_based_document(this);
-  setChangedFlag(false);   // initialize will set it to true
-  km->start();
+  load_or_create_keymaster();
 
   make_menu_bar();
   make_set_list_songs_pane();
@@ -50,6 +25,7 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
   make_triggers_pane();
   make_connections_pane();
 
+  auto settings = props.getUserSettings();
   auto width = settings->getIntValue("window.width", DEFAULT_WINDOW_WIDTH);
   auto height = settings->getIntValue("window.height", DEFAULT_WINDOW_HEIGHT);
   setSize(width, height);
@@ -120,6 +96,42 @@ void MainComponent::update() {
   triggers.updateContent();
 }
 
+// ================ initial load ================
+
+
+void MainComponent::load_or_create_keymaster() {
+  KeyMaster *km = nullptr;
+
+  auto settings = app_properties.getUserSettings();
+  if (settings->containsKey(KM_FILE_PROPS_KEY)) {
+    File file(settings->getValue(KM_FILE_PROPS_KEY));
+    if (!file.exists())
+      settings->removeValue(KM_FILE_PROPS_KEY);
+    else {
+      Storage s(device_manager, file);
+      km = s.load();
+      if (s.has_error()) {
+        DBG("error, opening alert window");
+        AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
+                                         "Error loading KeyMaster file",
+                                         s.error(),
+                                         "OK");
+        delete km;
+        km = nullptr;
+      }
+    }
+  }
+
+  if (km == nullptr) {
+    km = new KeyMaster(device_manager);
+    km->initialize();
+  }
+
+  km->set_file_based_document(this);
+  setChangedFlag(false);   // initialize will set it to true
+  km->start();
+}
+
 // ================ menu ================
 
 void MainComponent::make_menu_bar() {
@@ -156,7 +168,7 @@ void MainComponent::open_project() {
       loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
         if ((bool)result) {
           auto settings = app_properties.getUserSettings();
-          settings->setValue("km.file", getFile().getFullPathName());
+          settings->setValue(KM_FILE_PROPS_KEY, getFile().getFullPathName());
           update();
         }
       });
@@ -168,7 +180,7 @@ void MainComponent::save_project() {
   saveAsync(true, true, [this] (FileBasedDocument::SaveResult save_result) {
     if (save_result == SaveResult::savedOk) {
       auto settings = app_properties.getUserSettings();
-      settings->setValue("km.file", getFile().getFullPathName());
+      settings->setValue(KM_FILE_PROPS_KEY, getFile().getFullPathName());
     }
   } );
 }

@@ -105,6 +105,7 @@ private:
   Label triggers_label;
   TriggersTableListBox triggers;
 
+  void load_or_create_keymaster();
   void create_new_project();
 
   void make_menu_bar();

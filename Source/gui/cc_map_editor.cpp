@@ -174,8 +174,6 @@ bool CcMapEditor::apply() {
 }
 
 void CcMapEditor::set_filtered_enabled() {
-  DBG("set_filtered_enabled");  // DEBUG
-
   bool enabled = !_filtered.getToggleState(); // disable if filtered
 
   _translated_cc_num_label.setEnabled(enabled);
