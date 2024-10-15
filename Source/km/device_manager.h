@@ -26,9 +26,7 @@ private:
   ReferenceCountedArray<Input> _inputs;
   std::map<String, Input::Ptr> _identifier_to_input;
   ReferenceCountedArray<Output> _outputs;
-
-  // MidiDeviceListConnection connection = MidiDeviceListConnection::make(
-  //   [this] { update_devices(); });
+  std::map<String, Output::Ptr> _identifier_to_output;
 
   void handleIncomingMidiMessage (MidiInput *source, const MidiMessage &message) override;
 

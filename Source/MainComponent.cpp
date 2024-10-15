@@ -111,7 +111,6 @@ void MainComponent::load_or_create_keymaster() {
       Storage s(device_manager, file);
       km = s.load();
       if (s.has_error()) {
-        DBG("error, opening alert window");
         AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
                                          "Error loading KeyMaster file",
                                          s.error(),

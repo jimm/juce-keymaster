@@ -47,9 +47,8 @@ Input::Ptr DeviceManager::find_or_create_input(const MidiDeviceInfo info) {
 }
 
 Output::Ptr DeviceManager::find_output(const String &identifier) {
-  for (auto output : _outputs)
-    if (output->info.identifier == identifier)
-      return output;
+  if (_identifier_to_output.contains(identifier))
+    return _identifier_to_output[identifier];
   return nullptr;
 }
 
@@ -62,6 +61,7 @@ Output::Ptr DeviceManager::find_or_create_output(const MidiDeviceInfo info) {
   if (output == nullptr) {
     output = new Output(info);
     _outputs.add(output);
+    _identifier_to_output[info.identifier] = output;
   }
   return output;
 }
