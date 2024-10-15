@@ -17,11 +17,16 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
 
   auto settings = app_properties.getUserSettings();
   if (settings->containsKey("km.file")) {
+    DBG(settings->getValue("km.file")); // DEBUG
     File file(settings->getValue("km.file"));
     Storage s(device_manager, file);
     km = s.load();
     if (s.has_error()) {
-      // TODO display error
+      DBG("error, opening alert window");
+      AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
+                                       "Error loading KeyMaster file",
+                                       s.error(),
+                                       "OK");
       delete km;
       km = nullptr;
     }
