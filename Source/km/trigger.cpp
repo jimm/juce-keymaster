@@ -14,7 +14,7 @@ Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock 
 {
 }
 
-void Trigger::set_trigger_key_press(const KeyPress &key_press) {
+void Trigger::set_trigger_key_press(const KeyPress key_press) {
   if (_trigger_key_press != key_press) {
     _trigger_key_press = key_press;
     KeyMaster_instance()->changed();

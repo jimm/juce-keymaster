@@ -25,7 +25,7 @@ void TriggersTableListBoxModel::paintCell(
   switch (columnId) {
   case 1:                       // key
     if (t->has_trigger_key_press())
-      str << t->trigger_key_press().getTextDescription();
+      str << t->trigger_key_press().getTextDescriptionWithIcons();
     break;
   case 2:                       // input
     str = input_string(t);

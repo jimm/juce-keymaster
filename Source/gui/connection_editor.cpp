@@ -61,6 +61,7 @@ ConnectionEditor::ConnectionEditor(
   init_message_filters();
   init_velocity_curve();
   init_cc_maps();
+  update_enabled_states();
 
   _add_cc_map.onClick = [this] { add_cc_map(); };
   _del_cc_map.onClick = [this] { del_cc_map(); };
@@ -216,6 +217,8 @@ void ConnectionEditor::init_input() {
   else
     _input_chan.setSelectedId(_conn->input_chan() + 1);
 
+  _input_chan.addActionListener(this);
+
   addAndMakeVisible(_input_inst_label);
   addAndMakeVisible(_input_instrument);
   addAndMakeVisible(_input_chan_label);
@@ -241,6 +244,8 @@ void ConnectionEditor::init_output() {
     _output_chan.setSelectedId(CONNECTION_ALL_CHANNELS);
   else
     _output_chan.setSelectedId(_conn->output_chan() + 1);
+
+  _output_chan.addActionListener(this);
 
   addAndMakeVisible(_output_inst_label);
   addAndMakeVisible(_output_instrument);
@@ -343,6 +348,20 @@ void ConnectionEditor::init_cc_maps() {
   addAndMakeVisible(_cc_maps_list_box);
   addAndMakeVisible(_add_cc_map);
   addAndMakeVisible(_del_cc_map);
+}
+
+void ConnectionEditor::update_enabled_states() {
+  bool enable =
+    _input_chan.getSelectedId() != CONNECTION_ALL_CHANNELS ||
+    _output_chan.getSelectedId() != CONNECTION_ALL_CHANNELS;
+
+  _prog_label.setEnabled(enable);
+  _msb_label.setEnabled(enable);
+  _msb.setEnabled(enable);
+  _lsb_label.setEnabled(enable);
+  _lsb.setEnabled(enable);
+  _prog_field_label.setEnabled(enable);
+  _prog.setEnabled(enable);
 }
 
 void ConnectionEditor::cancel_cleanup() {
@@ -489,4 +508,9 @@ void ConnectionEditor::update_conn_cc_maps() {
       _conn->set_cc_map(i, nullptr); // takes care of deleting old one
     }
   }
+}
+
+void ConnectionEditor::actionListenerCallback(const String &message) {
+  if (message == "combo:changed")
+    update_enabled_states();
 }

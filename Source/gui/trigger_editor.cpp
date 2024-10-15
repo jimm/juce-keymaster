@@ -6,6 +6,8 @@
 #include "../km/utils.h"
 
 #define FIELD_WIDTH 200
+#define KEY_LEARNER_WIDTH 60
+#define KEY_LEARNER_BUTTON_WIDTH 100
 #define INPUT_MESSAGE_LABEL_WIDTH 60
 #define INPUT_MESSAGE_WIDTH 240
 #define LEARN_BUTTON_WIDTH 60
@@ -14,6 +16,33 @@
 #define CONTENT_HEIGHT (SPACE * 4 + BETWEEN_ROW_SPACE * 2 + LABEL_HEIGHT * 3 + DATA_ROW_HEIGHT * 4)
 
 #define MSG_ID_OFFSET 100
+
+KeyLearner::KeyLearner() : Label("", ""), _learning(false) {
+}
+
+void KeyLearner::start_learning() {
+  _learning = true;
+  setWantsKeyboardFocus(true);
+  enterModalState();
+}
+
+void KeyLearner::set_key(const KeyPress &key) {
+  _key = key;
+  setText(_key.isValid() ? _key.getTextDescriptionWithIcons() : "",
+          NotificationType::dontSendNotification);
+}
+
+bool KeyLearner::keyPressed(const KeyPress &key) {
+  if (!_learning)
+    return false;
+
+  _learning = false;
+  exitModalState();
+  setWantsKeyboardFocus(false);
+  set_key(key);
+  sendActionMessage("key:learned");
+  return true;
+}
 
 TriggerEditor * open_trigger_editor(Trigger *t)
 {
@@ -66,8 +95,13 @@ void TriggerEditor::layout(Rectangle<int> &area) {
 void TriggerEditor::layout_key(Rectangle<int> &area) {
   _key_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
   area.removeFromTop(SPACE);
+
   auto row_area = area.removeFromTop(DATA_ROW_HEIGHT);
-  _key.setBounds(row_area.removeFromLeft(FIELD_WIDTH));
+  _key.setBounds(row_area.removeFromLeft(KEY_LEARNER_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _key_learn.setBounds(row_area.removeFromLeft(KEY_LEARNER_BUTTON_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _key_erase.setBounds(row_area.removeFromLeft(KEY_LEARNER_BUTTON_WIDTH));
 }
 
 void TriggerEditor::layout_input_and_message(Rectangle<int> &area) {
@@ -86,7 +120,7 @@ void TriggerEditor::layout_input_and_message(Rectangle<int> &area) {
   _message.setBounds(row_area.removeFromLeft(INPUT_MESSAGE_WIDTH));
 
   row_area.removeFromLeft(SPACE);
-  _learn.setBounds(row_area.removeFromLeft(LEARN_BUTTON_WIDTH));
+  _message_learn.setBounds(row_area.removeFromLeft(LEARN_BUTTON_WIDTH));
 }
 
 void TriggerEditor::layout_action(Rectangle<int> &area) {
@@ -105,15 +139,28 @@ void TriggerEditor::init() {
 }
 
 void TriggerEditor::init_key() {
-  _key.setText(
-    _trigger->has_trigger_key_press()
-      ? _trigger->trigger_key_press().getTextDescription()
-      : "(Not set)",
-    NotificationType::dontSendNotification
-  );
+  _key.set_key(_trigger->trigger_key_press());
+  _key.addActionListener(this);
+
+  _key_learn.onClick = [this] {
+    auto inp = selected_input();
+    if (inp != nullptr) {
+      _key_learn.setButtonText("Press a Key...");
+      _key.start_learning();
+    }
+  };
+
+  _key_erase.onClick = [this] {
+    _key.set_key(KeyPress());
+    _key_erase.setEnabled(false);
+  };
+
+  _key_erase.setEnabled(_key.key().isValid());
 
   addAndMakeVisible(_key_label);
   addAndMakeVisible(_key);
+  addAndMakeVisible(_key_learn);
+  addAndMakeVisible(_key_erase);
 }
 
 void TriggerEditor::init_input_and_message() {
@@ -130,10 +177,10 @@ void TriggerEditor::init_input_and_message() {
 
   _input_trigger_message = _trigger->trigger_message();
   draw_input_message();
-  _learn.onClick = [this] {
+  _message_learn.onClick = [this] {
     auto inp = selected_input();
     if (inp != nullptr) {
-      _learn.setButtonText("Listening...");
+      _message_learn.setButtonText("Listening...");
       inp->learn(this);
     }
   };
@@ -143,7 +190,7 @@ void TriggerEditor::init_input_and_message() {
   addAndMakeVisible(_input);
   addAndMakeVisible(_message_label);
   addAndMakeVisible(_message);
-  addAndMakeVisible(_learn);
+  addAndMakeVisible(_message_learn);
 }
   
 void TriggerEditor::init_action() {
@@ -178,13 +225,6 @@ void TriggerEditor::cancel_cleanup() {
 }
 
 bool TriggerEditor::apply() {
-  auto text = _key.getText();
-  KeyPress kp { UNDEFINED };
-  if (!text.isEmpty() && text != "(Not set)") {
-    auto temp_kp = KeyPress::createFromDescription(_key.getText());
-    kp = temp_kp;
-  }
-
   Input::Ptr inp = selected_input();
 
   TriggerAction action;
@@ -197,7 +237,7 @@ bool TriggerEditor::apply() {
   else
     action = static_cast<TriggerAction>(action_id - 1);
 
-  _trigger->set_trigger_key_press(kp);
+  _trigger->set_trigger_key_press(_key.key());
   _trigger->set_trigger_message(inp, _input_trigger_message);
   _trigger->set_action(action);
   _trigger->set_output_message(output_message);
@@ -228,12 +268,16 @@ void TriggerEditor::draw_input_message() {
 
 void TriggerEditor::learnMidiMessage(const MidiMessage &message) {
   _input_trigger_message = message;
-  sendActionMessage("learning:done");
+  sendActionMessage("message-learning:done");
 }
 
 void TriggerEditor::actionListenerCallback(const String &message) {
-  if (message == "learning:done") {
+  if (message == "message-learning:done") {
     draw_input_message();
-    _learn.setButtonText("Learn");
+    _message_learn.setButtonText("Learn");
+  }
+  else if (message == "key:learned") {
+    _key_learn.setButtonText("Set Key");
+    _key_erase.setEnabled(_key.key().isValid());
   }
 }

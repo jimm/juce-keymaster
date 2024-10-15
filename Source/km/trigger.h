@@ -26,12 +26,13 @@ public:
 
   inline Input::Ptr trigger_input() { return _trigger_input; }
   inline KeyPress & trigger_key_press() { return _trigger_key_press; }
-  inline bool has_trigger_key_press() { return _trigger_key_press.getKeyCode() != UNDEFINED; }
+  inline bool has_trigger_key_press() { return _trigger_key_press.isValid(); }
   inline MidiMessage trigger_message() { return _trigger_message; }
   inline TriggerAction action() { return _action; }
   inline MessageBlock *output_message() { return _output_message; }
 
-  void set_trigger_key_press(const KeyPress & key_press);
+  // To erase trigger key press, pass in KeyPress() with no key code
+  void set_trigger_key_press(const KeyPress key_press);
   // To erase trigger message, make input == nullptr
   void set_trigger_message(Input::Ptr input, MidiMessage message);
   void set_action(TriggerAction action);
@@ -43,7 +44,7 @@ public:
 
 private:
   Input::Ptr _trigger_input;    // might be nullptr
-  KeyPress _trigger_key_press { UNDEFINED };
+  KeyPress _trigger_key_press;
   MidiMessage _trigger_message; // might be EMPTY_MESSAGE
   TriggerAction _action;
   MessageBlock *_output_message;

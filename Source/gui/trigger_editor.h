@@ -5,6 +5,21 @@
 #include "../km/midi_message_learner.h"
 #include "km_editor.h"
 
+class KeyLearner : public Label, public ActionBroadcaster {
+public:
+  KeyLearner();
+
+  void start_learning();
+  KeyPress & key() { return _key; }
+  void set_key(const KeyPress &key);
+
+  virtual bool keyPressed(const KeyPress &key) override;
+
+private:
+  bool _learning;
+  KeyPress _key;
+};
+
 class TriggerEditor : public KmEditor, public MidiMessageLearner, public ActionListener {
 public:
   TriggerEditor(Trigger *t, bool is_new);
@@ -20,14 +35,16 @@ private:
   Trigger *_trigger;
 
   Label _key_label { {}, "Trigger Key" };
-  Label _key { {}, "(No key assigned)" };
+  KeyLearner _key;
+  TextButton _key_learn { "Set Key" };
+  TextButton _key_erase { "Remove Key" };
 
   Label _input_and_message_label { {}, "Trigger Input and Message" };
   Label _input_label { {}, "Input" };
   ComboBox _input;
   Label _message_label { {}, "MIDI" };
   Label _message { {}, "(None)" };
-  TextButton _learn { "Learn" };
+  TextButton _message_learn { "Learn" };
 
   Label _action_label { {}, "Action" };
   ComboBox _action;

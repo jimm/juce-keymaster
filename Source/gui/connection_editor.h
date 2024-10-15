@@ -5,13 +5,20 @@
 #include "km_editor.h"
 #include "cc_maps_table.h"
 
-class ConnectionEditor : public KmEditor {
+class NotifyingComboBox : public ComboBox, public ActionBroadcaster {
+public:
+  virtual void valueChanged(Value &value) override { sendActionMessage("combo:changed"); }
+};
+
+class ConnectionEditor : public KmEditor, public ActionListener {
 public:
   ConnectionEditor(Connection *c, bool is_new);
   virtual ~ConnectionEditor() {}
 
   virtual int width() override;
   virtual int height() override;
+
+  virtual void actionListenerCallback(const String &message) override;
 
 private:
   Connection *_conn;
@@ -20,13 +27,13 @@ private:
   ComboBox _input_instrument;
 
   Label _input_chan_label { {}, "Input Chan" };
-  ComboBox _input_chan;
+  NotifyingComboBox _input_chan;
 
   Label _output_inst_label { {}, "Output" };
   ComboBox _output_instrument;
 
   Label _output_chan_label { {}, "Output Chan" };
-  ComboBox _output_chan;
+  NotifyingComboBox _output_chan;
 
   Label _prog_label { {}, "Program Change (ignored if in chan = All and out chan = Input)" };
   Label _msb_label { {}, "MSB:" };
@@ -93,6 +100,8 @@ private:
   void init_cc_maps();
 
   void init_text_editor(TextEditor &te, String initial_contents);
+
+  void update_enabled_states();
 
   void add_cc_map();
   void del_cc_map();
