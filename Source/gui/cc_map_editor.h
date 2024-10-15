@@ -7,13 +7,15 @@
 class Connection;
 class Controller;
 
-class CcMapEditor : public KmEditor {
+class CcMapEditor : public KmEditor, public Button::Listener {
 public:
   CcMapEditor(Connection *conn, Controller *c, bool is_new);
   virtual ~CcMapEditor() {}
 
   virtual int width() override;
   virtual int height() override;
+
+  virtual void buttonClicked(Button *) override { set_filtered_enabled(); }
 
 private:
   Connection *_conn;
@@ -49,6 +51,8 @@ private:
 
   virtual void init() override;
   virtual void cancel_cleanup() override;
+
+  void set_filtered_enabled();
 
   virtual bool apply() override;
 };

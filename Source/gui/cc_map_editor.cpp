@@ -99,6 +99,9 @@ void CcMapEditor::init() {
   _min_out.setText(String(_controller->min_out()));
   _max_out.setText(String(_controller->max_out()));
 
+  _filtered.addListener(this);
+  set_filtered_enabled();
+
   addAndMakeVisible(_cc_num_label);
   addAndMakeVisible(_cc_num);
   addAndMakeVisible(_translated_cc_num_label);
@@ -168,4 +171,26 @@ bool CcMapEditor::apply() {
   _is_new = false;
   sendActionMessage("update:table-list-box");
   return true;
+}
+
+void CcMapEditor::set_filtered_enabled() {
+  DBG("set_filtered_enabled");  // DEBUG
+
+  bool enabled = !_filtered.getToggleState(); // disable if filtered
+
+  _translated_cc_num_label.setEnabled(enabled);
+  _translated_cc_num.setEnabled(enabled);
+
+  _pass_through_0.setEnabled(enabled);
+  _pass_through_127.setEnabled(enabled);
+
+  _min_max_in_label.setEnabled(enabled);
+  _dash1.setEnabled(enabled);
+  _min_in.setEnabled(enabled);
+  _max_in.setEnabled(enabled);
+  
+  _min_max_out_label.setEnabled(enabled);
+  _dash2.setEnabled(enabled);
+  _min_out.setEnabled(enabled);
+  _max_out.setEnabled(enabled);
 }
