@@ -2,7 +2,8 @@
 
 > Please note: this README is copied from the C++ version of KeyMaster that
 > uses wxWidgets and PortMidi. I'll have to update it for this JUCE version,
-> though the features will be largely the same.
+> though the features will be largely the same. The Wiki also needs to be
+> copied and updated.
 
 KeyMaster is a MIDI processing and patching system. It allows a musician to
 reconfigure a MIDI setup instantaneously and modify the MIDI data in real
