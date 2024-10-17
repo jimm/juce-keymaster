@@ -69,6 +69,9 @@ public:
       // When another instance of the app is launched while this one is running,
       // this method is invoked, and the commandLine parameter tells you what
       // the other instance's command-line arguments were.
+
+      File file(commandLine);
+      mainWindow->load_document(file);
     }
 
   //==============================================================================
@@ -109,6 +112,16 @@ public:
 
     ~MainWindow() {
       main_component = nullptr;
+    }
+
+    void load_document(const File &file) {
+      auto result = main_component->loadDocument(file);
+      if (result != Result::ok()) { // old instance is still intact
+        AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
+                                         "Error loading KeyMaster file",
+                                         result.getErrorMessage(),
+                                         "OK");
+      }
     }
 
     void closeButtonPressed() override

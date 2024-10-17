@@ -98,34 +98,29 @@ void MainComponent::update() {
 
 // ================ initial load ================
 
-
 void MainComponent::load_or_create_keymaster() {
-  KeyMaster *km = nullptr;
-
   auto settings = app_properties.getUserSettings();
   if (settings->containsKey(KM_FILE_PROPS_KEY)) {
     File file(settings->getValue(KM_FILE_PROPS_KEY));
     if (!file.exists())
       settings->removeValue(KM_FILE_PROPS_KEY);
     else {
-      Storage s(device_manager, file);
-      km = s.load();
-      if (s.has_error()) {
+      auto result = loadDocument(file);
+      if (result != Result::ok()) {
         AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon,
                                          "Error loading KeyMaster file",
-                                         s.error(),
+                                         result.getErrorMessage(),
                                          "OK");
-        delete km;
-        km = nullptr;
       }
     }
   }
 
-  if (km == nullptr) {
-    km = new KeyMaster(device_manager);
-    km->initialize();
-  }
+  auto km = KeyMaster_instance();
+  if (km != nullptr)
+    return;
 
+  km = new KeyMaster(device_manager);
+  km->initialize();
   km->set_file_based_document(this);
   setChangedFlag(false);   // initialize will set it to true
   km->start();
@@ -165,11 +160,7 @@ void MainComponent::open_project() {
   saveIfNeededAndUserAgreesAsync([this] (FileBasedDocument::SaveResult save_result) {
     if (save_result == SaveResult::savedOk) {
       loadFromUserSpecifiedFileAsync(true, [this] (Result result) {
-        if ((bool)result) {
-          auto settings = app_properties.getUserSettings();
-          settings->setValue(KM_FILE_PROPS_KEY, getFile().getFullPathName());
-          update();
-        }
+        // loadDocument handles updating everything
       });
     }
   });
@@ -354,8 +345,11 @@ Result MainComponent::loadDocument(const File &file) {
     old_km->stop();
     delete old_km;
   }
+  setChangedFlag(false);
   new_km->start();
 
+  auto settings = app_properties.getUserSettings();
+  settings->setValue(KM_FILE_PROPS_KEY, getFile().getFullPathName());
   update();
   return Result::ok();
 }
