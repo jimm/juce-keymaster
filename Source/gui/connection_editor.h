@@ -4,11 +4,7 @@
 #include "../km/connection.h"
 #include "km_editor.h"
 #include "cc_maps_table.h"
-
-class NotifyingComboBox : public ComboBox, public ActionBroadcaster {
-public:
-  virtual void valueChanged(Value &value) override { sendActionMessage("combo:changed"); }
-};
+#include "notifying_combo_box.h"
 
 class ConnectionEditor : public KmEditor, public ActionListener {
 public:

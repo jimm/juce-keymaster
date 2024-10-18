@@ -36,6 +36,8 @@
             file="Source/gui/messages_list_box.cpp"/>
       <FILE id="ibUera" name="messages_list_box.h" compile="0" resource="0"
             file="Source/gui/messages_list_box.h"/>
+      <FILE id="sONZHO" name="notifying_combo_box.h" compile="0" resource="0"
+            file="Source/gui/notifying_combo_box.h"/>
       <FILE id="EJUIUE" name="patch_editor.cpp" compile="1" resource="0"
             file="Source/gui/patch_editor.cpp"/>
       <FILE id="Be4LaY" name="patch_editor.h" compile="0" resource="0" file="Source/gui/patch_editor.h"/>

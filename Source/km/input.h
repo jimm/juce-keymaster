@@ -3,9 +3,9 @@
 #include <JuceHeader.h>
 #include "consts.h"
 #include "instrument.h"
-#include "midi_message_learner.h"
 
 class Patch;
+class MidiMessageLearner;
 
 class Input : public Instrument {
 public:
@@ -20,8 +20,9 @@ public:
   virtual void stop() override;
   bool is_running() override { return (bool)device; }
 
-  // The next incoming message is sent to the learner
-  void learn(MidiMessageLearner *learner) { message_learner = learner; }
+  // Incoming messages are sent to the learner until stop_learning is called
+  void start_learning(MidiMessageLearner *learner) { message_learner = learner; }
+  void stop_learning() { message_learner = nullptr; }
 
   void midi_in(const MidiMessage &msg);
 

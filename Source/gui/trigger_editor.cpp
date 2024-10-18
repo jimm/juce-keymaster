@@ -66,10 +66,15 @@ TriggerEditor * open_trigger_editor(Trigger *t)
 }
 
 TriggerEditor::TriggerEditor(Trigger *t, bool is_new)
-  : KmEditor(is_new), MidiMessageLearner(false, false, true, false), _trigger(t)
+  : KmEditor(is_new), MidiMessageLearner(false, false, true, false),
+    _trigger(t), _learning_input(nullptr)
 {
   init();
   addActionListener(this);
+}
+
+TriggerEditor::~TriggerEditor() {
+  stop_learning();
 }
 
 int TriggerEditor::width() {
@@ -178,10 +183,15 @@ void TriggerEditor::init_input_and_message() {
   _input_trigger_message = _trigger->trigger_message();
   draw_input_message();
   _message_learn.onClick = [this] {
-    auto inp = selected_input();
-    if (inp != nullptr) {
-      _message_learn.setButtonText("Listening...");
-      inp->learn(this);
+    if (is_learning())          // want to cancel
+      stop_learning();
+    else {
+      auto inp = selected_input();
+      if (inp != nullptr) {
+        _learning_input = inp;
+        start_learning(inp);
+        _message_learn.setButtonText("Cancel");
+      }
     }
   };
 
@@ -273,8 +283,10 @@ void TriggerEditor::draw_input_message() {
   _message.setText(text, NotificationType::dontSendNotification);
 }
 
-void TriggerEditor::learnMidiMessage(const MidiMessage &message) {
-  _input_trigger_message = message;
+void TriggerEditor::learn_midi_message(const MidiMessage &message) {
+  stop_learning();
+  MidiMessageLearner::learn_midi_message(message);
+  _input_trigger_message = midi_messages()[0];
   sendActionMessage("message-learning:done");
 }
 
@@ -286,5 +298,9 @@ void TriggerEditor::actionListenerCallback(const String &message) {
   else if (message == "key:learned") {
     _key_learn.setButtonText("Set Key");
     _key_erase.setEnabled(_key.key().isValid());
+  }
+  else if (message == "combo:changed") { // only sent by input instrument
+    stop_learning();
+    _message_learn.setButtonText("Learn");
   }
 }

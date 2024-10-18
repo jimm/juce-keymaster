@@ -1,5 +1,6 @@
 #include "keymaster.h"
 #include "input.h"
+#include "midi_message_learner.h"
 
 #define is_realtime(b) ((b) >= 0xf8)
 
@@ -58,10 +59,8 @@ void Input::midi_in(const MidiMessage &message) {
   if (p != nullptr)
     p->midi_in(this, message);
 
-  if (message_learner != nullptr && message_learner->wants_message(message)) {
-    message_learner->learnMidiMessage(message);
-    message_learner = nullptr;
-  }
+  if (message_learner != nullptr && message_learner->wants_midi_message(message))
+    message_learner->learn_midi_message(message);
 }
 
 // Note off and sustain off messages must be sent to the same patch as the

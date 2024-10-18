@@ -4,6 +4,7 @@
 #include "../km/trigger.h"
 #include "../km/midi_message_learner.h"
 #include "km_editor.h"
+#include "notifying_combo_box.h"
 
 class KeyLearner : public Label, public ActionBroadcaster {
 public:
@@ -23,7 +24,7 @@ private:
 class TriggerEditor : public KmEditor, public MidiMessageLearner, public ActionListener {
 public:
   TriggerEditor(Trigger *t, bool is_new);
-  virtual ~TriggerEditor() {}
+  virtual ~TriggerEditor();
 
   virtual int width() override;
   virtual int height() override;
@@ -33,6 +34,7 @@ public:
 private:
   MidiMessage _input_trigger_message;
   Trigger *_trigger;
+  Input::Ptr _learning_input;
 
   Label _key_label { {}, "Trigger Key" };
   KeyLearner _key;
@@ -41,7 +43,7 @@ private:
 
   Label _input_and_message_label { {}, "Trigger Input and Message" };
   Label _input_label { {}, "Input" };
-  ComboBox _input;
+  NotifyingComboBox _input;
   Label _message_label { {}, "MIDI" };
   Label _message { {}, "(None)" };
   TextButton _message_learn { "Learn" };
@@ -64,7 +66,7 @@ private:
 
   Input::Ptr selected_input();
   void draw_input_message();
-  virtual void learnMidiMessage(const MidiMessage &message) override;
+  virtual void learn_midi_message(const MidiMessage &message) override;
 };
 
 // If trigger is nullptr we create a new one.

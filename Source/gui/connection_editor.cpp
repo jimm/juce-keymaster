@@ -226,7 +226,6 @@ void ConnectionEditor::init_input() {
 }
 
 void ConnectionEditor::init_output() {
-  DBG("init_output");
   _output_instrument.addItem("Select output instrument", UNSELECTED);
   int i = 1;
   for (auto outp : KeyMaster_instance()->device_manager().outputs()) {
