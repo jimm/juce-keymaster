@@ -170,15 +170,15 @@ void TriggerEditor::init_key() {
 
 void TriggerEditor::init_input_and_message() {
   _input.addItem("(No input selected)", UNSELECTED);
-  int i = 0;
+  _input.setSelectedId(UNSELECTED);
+  Input::Ptr trig_inp = _trigger->trigger_input();
+  int i = 1;
   for (auto inp : KeyMaster_instance()->device_manager().inputs()) {
-    _input.addItem(inp->info.name, i+1);
-    if (inp == _trigger->trigger_input())
+    _input.addItem(inp->info.name, i);
+    if (inp == trig_inp)
       _input.setSelectedId(i);
     ++i;
   }
-  if (_input.getSelectedId() == 0)
-    _input.setSelectedId(UNSELECTED);
 
   _input_trigger_message = _trigger->trigger_message();
   draw_input_message();
