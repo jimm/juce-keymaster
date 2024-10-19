@@ -9,9 +9,8 @@
 void TriggersTableListBoxModel::make_columns(TableHeaderComponent &header) {
   auto props = TableHeaderComponent::ColumnPropertyFlags::notSortable;
   header.addColumn("Key", 1, 15, 15, -1, props);
-  header.addColumn("Input", 2, 75, 75, -1, props);
-  header.addColumn("MIDI", 3, 75, 75, -1, props);
-  header.addColumn("Action / Message", 4, 75, 75, -1, props);
+  header.addColumn("MIDI", 2, 100, 100, -1, props);
+  header.addColumn("Action / Message", 3, 100, 100, -1, props);
   header.setStretchToFitActive(true);
 }
 
@@ -27,14 +26,11 @@ void TriggersTableListBoxModel::paintCell(
     if (t->has_trigger_key_press())
       str << t->trigger_key_press().getTextDescriptionWithIcons();
     break;
-  case 2:                       // input
-    str = input_string(t);
-    break;
-  case 3:                       // trigger
-    if (!t->trigger_message().isActiveSense())
+  case 2:                       // trigger
+    if (t->has_trigger_message())
       str = t->trigger_message().getDescription();
     break;
-  case 4:                       // action / message
+  case 3:                       // action / message
     str = action_string(t);
     break;
   }
@@ -42,11 +38,6 @@ void TriggersTableListBoxModel::paintCell(
   g.drawText(str, 2, 0, width - 4, height, Justification::centredLeft, true);
   g.setColour(_lf.findColour(ListBox::backgroundColourId));
   g.fillRect(width - 1, 0, 1, height);
-}
-
-String TriggersTableListBoxModel::input_string(Trigger *t) {
-  Input::Ptr input = t->trigger_input();
-  return input ? input->info.name : "<not connected>";
 }
 
 String TriggersTableListBoxModel::action_string(Trigger *t) {

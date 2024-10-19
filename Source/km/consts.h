@@ -7,6 +7,7 @@
 #define UNDEFINED (-1)
 #define UNDEFINED_ID (-1L)
 #define CONNECTION_ALL_CHANNELS (-1)
+#define EMPTY_MESSAGE_BYTES 0xF4
 
 // The JUCE MidiMessage static factory methods require MIDI channels 1-16
 #define JCH(ch) ((ch)+1)
@@ -48,6 +49,8 @@ enum DialogResult {
 
 // System exclusive start
 #define SYSEX 0xF0
+// MIDI Time Code quarter frame
+#define MTC_QFRAME 0xF1
 // Beats from top: LSB/MSB 6 ticks 1 beat
 #define SONG_POINTER 0xF2
 // Val number of song

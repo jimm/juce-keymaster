@@ -3,9 +3,7 @@
 #include "consts.h"
 #include "keymaster.h"
 #include "message_block.h"
-
-#define is_channel(b) ((b) >= 0x80 && (b) < 0xf0)
-#define is_realtime(b) ((b) >= 0xf8)
+#include "utils.h"
 
 int CHANNEL_MESSAGE_LENGTHS[] = {
   3, 3, 3, 3, 2, 2, 3           // note off - pitch bend

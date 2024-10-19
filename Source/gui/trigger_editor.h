@@ -4,7 +4,6 @@
 #include "../km/trigger.h"
 #include "../km/midi_message_learner.h"
 #include "km_editor.h"
-#include "notifying_combo_box.h"
 
 class KeyLearner : public Label, public ActionBroadcaster {
 public:
@@ -32,39 +31,35 @@ public:
   virtual void actionListenerCallback(const String &message) override;
 
 private:
-  MidiMessage _input_trigger_message;
   Trigger *_trigger;
-  Input::Ptr _learning_input;
+  MidiMessage _input_trigger_message;
 
   Label _key_label { {}, "Trigger Key" };
   KeyLearner _key;
   TextButton _key_learn { "Set Key" };
-  TextButton _key_erase { "Remove Key" };
+  TextButton _key_clear { "Clear" };
 
-  Label _input_and_message_label { {}, "Trigger Input and Message" };
-  Label _input_label { {}, "Input" };
-  NotifyingComboBox _input;
-  Label _message_label { {}, "MIDI" };
+  Label _message_label { {}, "Trigger Message" };
   Label _message { {}, "(None)" };
   TextButton _message_learn { "Learn" };
+  TextButton _message_clear { "Clear" };
 
   Label _action_label { {}, "Action" };
   ComboBox _action;
 
   virtual void layout(Rectangle<int> &area) override;
   void layout_key(Rectangle<int> &area);
-  void layout_input_and_message(Rectangle<int> &area);
+  void layout_message(Rectangle<int> &area);
   void layout_action(Rectangle<int> &area);
 
   virtual void init() override;
   void init_key();
-  void init_input_and_message();
+  void init_message();
   void init_action();
   virtual void cancel_cleanup() override;
 
   virtual bool apply() override;
 
-  Input::Ptr selected_input();
   void draw_input_message();
   virtual void learn_midi_message(const MidiMessage &message) override;
 };

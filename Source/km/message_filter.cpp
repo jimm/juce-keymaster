@@ -150,7 +150,7 @@ bool MessageFilter::filter_out(int status, int data1) {
     case STOP:
       return !_start_continue_stop;
     case ACTIVE_SENSE:
-      // When we initialize PortMidi we always filter out all active sensing
+      // By default, KeyMaster always filters out all active sensing
       // messages. This does the same thing.
       return true;
     case SYSTEM_RESET:

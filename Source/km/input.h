@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "consts.h"
 #include "instrument.h"
+#include "midi_message_learner.h"
 
 class Patch;
 class MidiMessageLearner;

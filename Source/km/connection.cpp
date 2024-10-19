@@ -2,10 +2,7 @@
 #include "consts.h"
 #include "connection.h"
 #include "keymaster.h"
-
-#define is_status(b) (((b) & 0x80) == 0x80)
-#define is_system(b) ((b) >= SYSEX)
-#define is_realtime(b) ((b) >= 0xf8)
+#include "utils.h"
 
 Connection::Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr output, int out_chan)
   : DBObj(id),
@@ -235,7 +232,7 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
     cc = _cc_maps[data[1]];
     if (cc != nullptr) {
       cc_msg = cc->process(msg, _output_chan);
-      if (!cc_msg.isActiveSense()) // ACTIVE_SENSE means don't send
+      if (!mm_equal(cc_msg, EMPTY_MESSAGE)) // don't send
         midi_out(cc_msg);
     }
     else {

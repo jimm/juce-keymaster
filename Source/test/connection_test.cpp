@@ -313,4 +313,3 @@ void ConnectionTest::expect_sent_count(int expected, TestConnection &conn) {
 
   expect(expected == num_sent, s);
 }
-

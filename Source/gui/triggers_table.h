@@ -23,7 +23,6 @@ public:
   virtual void cellDoubleClicked(int row, int col, const MouseEvent&) override;
 
 private:
-  String input_string(Trigger *t);
   String action_string(Trigger *t);
 };
 

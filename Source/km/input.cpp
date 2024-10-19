@@ -1,8 +1,7 @@
 #include "keymaster.h"
 #include "input.h"
 #include "midi_message_learner.h"
-
-#define is_realtime(b) ((b) >= 0xf8)
+#include "utils.h"
 
 Input::Input() {
   initialize();
@@ -49,7 +48,7 @@ void Input::midi_in(const MidiMessage &message) {
     return;
 
   for (auto &trigger : km->triggers())
-    trigger->signal_message(this, message);
+    trigger->signal_message(message);
 
   // Let the input tell us which patch to use. By default it's the current
   // patch, but if this is a note off or sustain off then we need to send
@@ -59,7 +58,7 @@ void Input::midi_in(const MidiMessage &message) {
   if (p != nullptr)
     p->midi_in(this, message);
 
-  if (message_learner != nullptr && message_learner->wants_midi_message(message))
+  if (message_learner != nullptr)
     message_learner->learn_midi_message(message);
 }
 

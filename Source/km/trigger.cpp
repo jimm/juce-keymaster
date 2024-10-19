@@ -7,8 +7,7 @@
 
 Trigger::Trigger(DBObjID id, const String &name, TriggerAction ta, MessageBlock *out_msg)
   : DBObj(id), Nameable(name),
-    _trigger_input(nullptr),
-    _trigger_message(ACTIVE_SENSE),
+    _trigger_message(EMPTY_MESSAGE),
     _action(ta),
     _output_message(out_msg)
 {
@@ -25,10 +24,11 @@ void Trigger::set_trigger_key_press(const KeyPress key_press) {
 // `message` might be EMPTY_MESSAGE, which will always be ignored.
 //
 // Reemember that MidiMessage channels go from 1-16
-void Trigger::set_trigger_message(Input::Ptr input, MidiMessage message) {
-  _trigger_input = input;
-  _trigger_message = message;
-  KeyMaster_instance()->changed();
+void Trigger::set_trigger_message(MidiMessage message) {
+  if (!mm_equal(_trigger_message, message)) { // TODO better comparison for note-style messages
+    _trigger_message = message;
+    KeyMaster_instance()->changed();
+  }
 }
 
 void Trigger::set_action(TriggerAction action) {
@@ -45,10 +45,8 @@ void Trigger::set_output_message(MessageBlock *msg) {
   }
 }
 
-bool Trigger::signal_message(Input::Ptr input, const MidiMessage& message) {
-  if (input != _trigger_input
-      || !input->is_running()
-      || !mm_equal(message, _trigger_message))
+bool Trigger::signal_message(const MidiMessage& message) {
+  if (!mm_equal(message, _trigger_message)) // TODO better comparisons for note-style messages
     return false;
 
   perform_action();

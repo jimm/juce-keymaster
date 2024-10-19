@@ -6,6 +6,7 @@
 #include "formatter.h"
 #include "input.h"
 #include "output.h"
+#include "utils.h"
 
 #define SCHEMA_VERSION 1
 
@@ -127,13 +128,10 @@ void Storage::load_triggers(var triggers) {
       nullptr);
 
     auto bytes_str = (String)vmsg.getProperty("bytes", v);
-    if (vmsg.hasProperty("input_identifier")) {
-      Input::Ptr input = find_input(
-        (String)vmsg.getProperty("input_identifier", v),
-        (String)vmsg.getProperty("input_name", v));
+    if (vmsg.hasProperty("trigger_message_bytes")) {
       MessageBlock mblock(UNDEFINED_ID, "");
       mblock.from_hex_string((String)vmsg.getProperty("trigger_message_bytes", v));
-      t->set_trigger_message(input, mblock.midi_messages()[0]);
+      t->set_trigger_message(mblock.midi_messages()[0]);
     }
     if (vmsg.hasProperty("key_code"))
       t->set_trigger_key_press(KeyPress((int)vmsg.getProperty("key_code", v)));
@@ -365,9 +363,7 @@ var Storage::triggers() {
     int action_int = (int)trigger->action();
     t->setProperty("action", var(action_int));
 
-    if (trigger->trigger_input()) {
-      t->setProperty("input_identifier", var(trigger->trigger_input()->info.identifier));
-      t->setProperty("input_name", var(trigger->trigger_input()->info.name));
+    if (trigger->has_trigger_message()) {
       t->setProperty("trigger_message_bytes",
                      var(String::toHexString(trigger->trigger_message().getRawData(),
                                              trigger->trigger_message().getRawDataSize())));
