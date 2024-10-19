@@ -345,11 +345,12 @@ Result MainComponent::loadDocument(const File &file) {
     old_km->stop();
     delete old_km;
   }
+  setFile(file);
   setChangedFlag(false);
   new_km->start();
 
   auto settings = app_properties.getUserSettings();
-  settings->setValue(KM_FILE_PROPS_KEY, getFile().getFullPathName());
+  settings->setValue(KM_FILE_PROPS_KEY, file.getFullPathName());
   update();
   return Result::ok();
 }
