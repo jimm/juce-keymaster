@@ -5,10 +5,8 @@
 
 class MidiMessageLearner {
 public:
-  MidiMessageLearner(bool clock_ok, bool active_sense_ok, bool other_realtime_ok, bool sysex_ok);
+  MidiMessageLearner(bool sysex_ok, bool clock_ok = false, bool active_sense_ok = false);
   virtual ~MidiMessageLearner();
-
-  void learn_one_message();
 
   // If max_messages = 0, keeps learning until stop_learning is called.
   // Else, stops after that many messages and calls max_callback when the
@@ -17,6 +15,10 @@ public:
 
   bool is_learning() { return _learning; }
 
+  // Called by learn_midi_message. You don't have to call this; it's only
+  // public so it's easier to test.
+  bool want_midi_message(const MidiMessage &message);
+
   // Overrideable so you can call stop_learning when you want to
   virtual void learn_midi_message(const MidiMessage &message);
 
@@ -24,16 +26,16 @@ public:
 
   Array<MidiMessage> &midi_messages() { return _midi_messages; }
 
+  // For testing
+  void reset(bool sysex_ok = false, bool clock_ok = false, bool active_sense_ok = false);
+
 private:
+  bool _sysex_ok;
   bool _clock_ok;
   bool _active_sense_ok;
-  bool _other_realtime_ok;
-  bool _sysex_ok;
   bool _learning;
   int _max_messages;
   int _num_messages;
   std::function<void()> _max_callback;
   Array<MidiMessage> _midi_messages;
-
-  bool want_midi_message(const MidiMessage &message);
 };

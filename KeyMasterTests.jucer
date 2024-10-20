@@ -26,6 +26,10 @@
             file="Source/test/message_block_test.cpp"/>
       <FILE id="Q4J3si" name="message_block_test.h" compile="0" resource="0"
             file="Source/test/message_block_test.h"/>
+      <FILE id="KMwjGE" name="midi_message_learner_test.cpp" compile="1"
+            resource="0" file="Source/test/midi_message_learner_test.cpp"/>
+      <FILE id="hTfXc3" name="midi_message_learner_test.h" compile="0" resource="0"
+            file="Source/test/midi_message_learner_test.h"/>
       <FILE id="vuR96U" name="storage_test.cpp" compile="1" resource="0"
             file="Source/test/storage_test.cpp"/>
       <FILE id="gpnd65" name="storage_test.h" compile="0" resource="0" file="Source/test/storage_test.h"/>

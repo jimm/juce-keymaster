@@ -21,13 +21,19 @@ void DeviceManager::update_devices() {
 }
 
 void DeviceManager::update_inputs() {
+// Don't load real MIDI devices when running tests
+#ifndef JUCE_UNIT_TESTS
   for (auto info : MidiInput::getAvailableDevices())
     find_or_create_input(info)->start();
+#endif
 }
 
 void DeviceManager::update_outputs() {
+// Don't load real MIDI devices when running tests
+#ifndef JUCE_UNIT_TESTS
   for (auto info : MidiOutput::getAvailableDevices())
     find_or_create_output(info);
+#endif
 }
 
 Input::Ptr DeviceManager::find_input(const String &identifier) {

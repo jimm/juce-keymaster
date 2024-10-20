@@ -66,8 +66,7 @@ TriggerEditor * open_trigger_editor(Trigger *t)
 }
 
 TriggerEditor::TriggerEditor(Trigger *t, bool is_new)
-  : KmEditor(is_new), MidiMessageLearner(false, false, true, true),
-    _trigger(t)
+  : KmEditor(is_new), MidiMessageLearner(true) _trigger(t)
 {
   init();
   addActionListener(this);

@@ -32,7 +32,7 @@ KeyMaster *load_test_data(DeviceManager &dev_mgr, String data_file_path) {
   return new_km;
 }
 
-bool mm_eq(MidiMessage &a, MidiMessage &b) {
+bool mm_eq(const MidiMessage &a, const MidiMessage &b) {
   if (mm_equal(a, b))
     return true;
 

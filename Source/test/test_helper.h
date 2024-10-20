@@ -6,4 +6,4 @@
 
 extern KeyMaster *load_test_data(DeviceManager &dev_mgr, String data_file_path = "");
 
-extern bool mm_eq(MidiMessage &a, MidiMessage &b);
+extern bool mm_eq(const MidiMessage &a, const MidiMessage &b);
