@@ -12,6 +12,10 @@ void DeviceManager::handleIncomingMidiMessage(MidiInput *source, const MidiMessa
 }
 
 void DeviceManager::update_devices() {
+  _inputs.clear();
+  _identifier_to_input.clear();
+  _outputs.clear();
+  _identifier_to_output.clear();
   update_inputs();
   update_outputs();
 }

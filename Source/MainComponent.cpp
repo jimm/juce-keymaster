@@ -146,6 +146,10 @@ void MainComponent::create_new_project() {
   new_km->start();
 
   update();
+
+  // Remove old project, if any, from settings
+  auto settings = app_properties.getUserSettings();
+  settings->removeValue(KM_FILE_PROPS_KEY);
 }
 
 void MainComponent::new_project() {

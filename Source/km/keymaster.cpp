@@ -34,6 +34,9 @@ KeyMaster::KeyMaster(DeviceManager &dev_mgr, bool testing)
   _set_lists.add(new SetList(UNDEFINED_ID, "All Songs"));
   _cursor = new Cursor(this);
   set_KeyMaster_instance(this);
+
+  // Take this opportunity to tell the device manager to forget about any non-attached devices.
+  _device_manager.update_devices();
 }
 
 KeyMaster::~KeyMaster() {
