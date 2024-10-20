@@ -10,10 +10,16 @@ public:
 
   void learn_one_message();
 
+  // If max_messages = 0, keeps learning until stop_learning is called.
+  // Else, stops after that many messages and calls max_callback when the
+  // limit is reached.
   void start_learning(int max_messages = 0, std::function<void()> max_callback = []{}); // 0 means no limit
+
   bool is_learning() { return _learning; }
+
   // Overrideable so you can call stop_learning when you want to
   virtual void learn_midi_message(const MidiMessage &message);
+
   void stop_learning();
 
   Array<MidiMessage> &midi_messages() { return _midi_messages; }

@@ -61,7 +61,6 @@ private:
   virtual bool apply() override;
 
   void draw_input_message();
-  virtual void learn_midi_message(const MidiMessage &message) override;
 };
 
 // If trigger is nullptr we create a new one.

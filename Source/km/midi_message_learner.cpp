@@ -38,8 +38,10 @@ bool MidiMessageLearner::want_midi_message(const MidiMessage &message) {
 }
 
 void MidiMessageLearner::learn_midi_message(const MidiMessage &message) {
-  if (want_midi_message(message))
-    _midi_messages.add(message);
+  if (!want_midi_message(message))
+    return;
+
+  _midi_messages.add(message);
   if (_max_messages > 0 && ++_num_messages >= _max_messages) {
     stop_learning();
     _max_callback();

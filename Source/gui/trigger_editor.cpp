@@ -257,15 +257,9 @@ void TriggerEditor::draw_input_message() {
   _message.setText(text, NotificationType::dontSendNotification);
 }
 
-void TriggerEditor::learn_midi_message(const MidiMessage &message) {
-  stop_learning();
-  MidiMessageLearner::learn_midi_message(message);
-  _input_trigger_message = midi_messages()[0];
-  sendActionMessage("message-learning:done");
-}
-
 void TriggerEditor::actionListenerCallback(const String &message) {
   if (message == "message-learning:done") {
+    _input_trigger_message = midi_messages()[0];
     draw_input_message();
     _message_learn.setButtonText("Learn");
     _message_clear.setEnabled(!mm_equal(_input_trigger_message, EMPTY_MESSAGE));
