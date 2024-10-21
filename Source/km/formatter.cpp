@@ -4,6 +4,7 @@
 #include <JuceHeader.h>
 #include "formatter.h"
 #include "consts.h"
+#include "utils.h"
 
 static const int NOTE_OFFSETS[] = {
   9, 11, 0, 2, 4, 5, 7
@@ -36,4 +37,33 @@ int note_name_to_num(String str) {
 
   int octave = (str.substring(num_start).getIntValue() + 1) * 12;
   return octave + from_c + accidental;
+}
+
+String trigger_message_description(const MidiMessage &msg) {
+  if (mm_equal(msg, EMPTY_MESSAGE))
+    return "";
+
+  const uint8 *tdata = msg.getRawData();
+  uint8 status = tdata[0];
+
+  if (is_system(status))
+    return msg.getDescription();
+
+  // Modified version of MidiMessage::getDescription()
+  if (msg.isNoteOn())           return "Note on "  + MidiMessage::getMidiNoteName(msg.getNoteNumber(), true, true, 3) + ", Channel " + String(msg.getChannel());
+  if (msg.isNoteOff())          return "Note off " + MidiMessage::getMidiNoteName(msg.getNoteNumber(), true, true, 3) + ", Channel " + String(msg.getChannel());
+  if (msg.isProgramChange())    return "Program change " + String(msg.getProgramChangeNumber()) + ", Channel " + String(msg.getChannel());
+  if (msg.isPitchWheel())       return "Pitch wheel, Channel " + String(msg.getChannel());
+  if (msg.isAftertouch())       return "Aftertouch " + MidiMessage::getMidiNoteName(msg.getNoteNumber(), true, true, 3) + ", Channel " + String(msg.getChannel());
+  if (msg.isChannelPressure())  return "Channel pressure, Channel " + String(msg.getChannel());
+  if (msg.isAllNotesOff())      return "All notes off, Channel " + String(msg.getChannel());
+  if (msg.isAllSoundOff())      return "All sound off, Channel " + String(msg.getChannel());
+  if (msg.isMetaEvent())        return "Meta event";
+  if (msg.isController()) {
+    String name (MidiMessage::getControllerName(msg.getControllerNumber()));
+    if (name.isEmpty())
+      name = String(msg.getControllerNumber());
+    return "Controller " + name + ", Channel " + String(msg.getChannel());
+  }
+  return String::toHexString(msg.getRawData(), msg.getRawDataSize());
 }

@@ -3,6 +3,7 @@
 #include "../km/keymaster.h"
 #include "../km/trigger.h"
 #include "../km/editor.h"
+#include "../km/formatter.h"
 #include "../km/utils.h"
 
 #define FIELD_WIDTH 200
@@ -66,7 +67,7 @@ TriggerEditor * open_trigger_editor(Trigger *t)
 }
 
 TriggerEditor::TriggerEditor(Trigger *t, bool is_new)
-  : KmEditor(is_new), MidiMessageLearner(true) _trigger(t)
+: KmEditor(is_new), MidiMessageLearner(true), _trigger(t)
 {
   init();
   addActionListener(this);
@@ -250,9 +251,7 @@ bool TriggerEditor::apply() {
 }
 
 void TriggerEditor::draw_input_message() {
-  String text = mm_equal(_input_trigger_message, EMPTY_MESSAGE)
-    ? "(None)"
-    : _input_trigger_message.getDescription();
+  String text = trigger_message_description(_input_trigger_message);
   _message.setText(text, NotificationType::dontSendNotification);
 }
 

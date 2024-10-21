@@ -3,6 +3,7 @@
 #include "../km/keymaster.h"
 #include "../km/trigger.h"
 #include "../km/editor.h"
+#include "../km/formatter.h"
 #include "triggers_table.h"
 #include "trigger_editor.h"
 
@@ -28,7 +29,7 @@ void TriggersTableListBoxModel::paintCell(
     break;
   case 2:                       // trigger
     if (t->has_trigger_message())
-      str = t->trigger_message().getDescription();
+      str = trigger_message_description(t->trigger_message());
     break;
   case 3:                       // action / message
     str = action_string(t);
