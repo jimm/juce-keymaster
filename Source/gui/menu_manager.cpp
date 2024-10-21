@@ -245,7 +245,7 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     result.addDefaultKeypress('k', ModifierKeys::commandModifier);
     break;
   case CommandIDs::all_notes_off:
-    result.setInfo("All Notes Off", "All Notes Off", "MIDI", 0);
+    result.setInfo("Panic", "Panic", "MIDI", 0);
     result.addDefaultKeypress(KeyPress::F1Key, 0);
     break;
   case CommandIDs::super_panic:

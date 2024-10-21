@@ -52,7 +52,7 @@ String TriggersTableListBoxModel::action_string(Trigger *t) {
     case TriggerAction::PREV_PATCH:
       return "Prev Patch";
     case TriggerAction::PANIC:
-      return "All Notes Off";
+      return "Panic";
     case TriggerAction::SUPER_PANIC:
       return "Super Panic";
     case TriggerAction::TOGGLE_CLOCK:

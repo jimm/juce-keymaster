@@ -285,20 +285,20 @@ void KeyMaster::jump_to_patch_index(int i) {
 // ================ doing things ================
 
 void KeyMaster::panic(bool send_notes_off) {
-  MidiMessageSequence buf;
+  Array<MidiMessage> buf;
 
   if (send_notes_off) {
     for (int juce_chan = 1; juce_chan <= MIDI_CHANNELS; ++juce_chan) {
       for (int note = 0; note < 128; ++note)
-        buf.addEvent(MidiMessage::noteOff(juce_chan, note), 0);
+        buf.add(MidiMessage::noteOff(juce_chan, note));
     }
   }
   else {
     for (int juce_chan = 1; juce_chan <= MIDI_CHANNELS; ++juce_chan)
-      buf.addEvent(MidiMessage::controllerEvent(juce_chan, CM_ALL_NOTES_OFF, 0), 0);
+      buf.add(MidiMessage::controllerEvent(juce_chan, CM_ALL_NOTES_OFF, 0));
   }
 
   for (auto &msg : buf)
     for (auto &out : _device_manager.outputs())
-      out->midi_out(msg->message);
+      out->midi_out(msg);
 }
