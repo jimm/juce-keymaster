@@ -36,6 +36,9 @@
       <FILE id="HnFyQW" name="test_helper.cpp" compile="1" resource="0" file="Source/test/test_helper.cpp"/>
       <FILE id="JQPAHz" name="test_helper.h" compile="0" resource="0" file="Source/test/test_helper.h"/>
       <FILE id="sIRprU" name="testdata.kmst" compile="0" resource="1" file="Source/test/testdata.kmst"/>
+      <FILE id="U2cwVD" name="trigger_test.cpp" compile="1" resource="0"
+            file="Source/test/trigger_test.cpp"/>
+      <FILE id="rvWsT4" name="trigger_test.h" compile="0" resource="0" file="Source/test/trigger_test.h"/>
       <FILE id="yzYTg3" name="understanding_test.cpp" compile="1" resource="0"
             file="Source/test/understanding_test.cpp"/>
       <FILE id="EihPp9" name="understanding_test.h" compile="0" resource="0"

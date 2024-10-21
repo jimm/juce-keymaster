@@ -191,8 +191,8 @@ void Connection::midi_in(Input::Ptr input, const MidiMessage& msg) {
   if (!_running || _input == nullptr || _input != input || _output == nullptr)
     return;
 
-  const juce::uint8 *data = msg.getRawData();
-  juce::uint8 status = data[0];
+  const uint8 *data = msg.getRawData();
+  uint8 status = data[0];
 
   // See if the message should even be processed, or if we should stop here.
   if (!input_channel_ok(msg))

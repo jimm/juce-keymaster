@@ -22,14 +22,16 @@ void MidiMessageLearnerTest::test_want_midi_message() {
   expect(!mml.want_midi_message(MidiMessage::midiClock()));
   expect(!mml.want_midi_message(MidiMessage(ACTIVE_SENSE)));
   expect(!mml.want_midi_message(MidiMessage::createSysExMessage(sysex_data, 1)));
+  expect(!mml.want_midi_message(MidiMessage::pitchWheel(14, 0x3210)));
 
   expect(mml.want_midi_message(MidiMessage::noteOn(3, 64, (uint8)126)));
   expect(mml.want_midi_message(MidiMessage(SONG_POINTER)));
   expect(mml.want_midi_message(MidiMessage(START)));
 
-  mml.reset(true, true, true);
+  mml.reset(true, true, true, true);
   expect(mml.want_midi_message(MidiMessage::midiClock()));
   expect(mml.want_midi_message(MidiMessage(ACTIVE_SENSE)));
+  expect(mml.want_midi_message(MidiMessage::pitchWheel(14, 0x3210)));
   expect(mml.want_midi_message(MidiMessage::createSysExMessage(sysex_data, 1)));
 }
 

@@ -2,8 +2,9 @@
 #include "keymaster.h"
 #include "utils.h"
 
-MidiMessageLearner::MidiMessageLearner(bool sysex_ok, bool clock_ok, bool active_sense_ok)
-  : _sysex_ok(sysex_ok), _clock_ok(clock_ok), _active_sense_ok(active_sense_ok),
+MidiMessageLearner::MidiMessageLearner(bool sysex_ok, bool pitch_bend_ok, bool clock_ok, bool active_sense_ok)
+  : _sysex_ok(sysex_ok), _pitch_bend_ok(pitch_bend_ok),
+    _clock_ok(clock_ok), _active_sense_ok(active_sense_ok),
     _learning(false), _max_messages(0), _max_callback([]{})
 {
 }
@@ -24,6 +25,8 @@ void MidiMessageLearner:: start_learning(int max_messages, std::function<void()>
 }
 
 bool MidiMessageLearner::want_midi_message(const MidiMessage &message) {
+  if (message.isPitchWheel())
+    return _pitch_bend_ok;
   if (message.isMidiClock())
     return _clock_ok;
   if (message.isActiveSense())
@@ -51,8 +54,9 @@ void MidiMessageLearner::stop_learning() {
       inp->stop_learning();
 }
 
-void MidiMessageLearner::reset(bool sysex_ok, bool clock_ok, bool active_sense_ok) {
+void MidiMessageLearner::reset(bool sysex_ok, bool pitch_bend_ok, bool clock_ok, bool active_sense_ok) {
   _sysex_ok = sysex_ok;
+  _pitch_bend_ok = pitch_bend_ok;
   _clock_ok = clock_ok;
   _active_sense_ok = active_sense_ok;
   _learning = false;

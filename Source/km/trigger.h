@@ -39,15 +39,17 @@ public:
   void set_action(TriggerAction action);
   void set_output_message(MessageBlock *msg);
 
-  bool signal_message(const MidiMessage& message);
+  void signal_message(const MidiMessage& message);
 
   virtual bool keyPressed(const KeyPress &key, Component *) override;
 
-private:
+protected:
   KeyPress _trigger_key_press;
   MidiMessage _trigger_message; // might be EMPTY_MESSAGE
   TriggerAction _action;
   MessageBlock *_output_message;
+  int64 _trigger_timestamp;
 
-  void perform_action();
+  virtual void perform_action(); // virtual so we can override in tests
+  bool too_soon();
 };

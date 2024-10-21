@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     }();
 
   // We need an event loop running for the broadcasters and listeners
-  auto gui = juce::ScopedJuceInitialiser_GUI {};
+  auto gui = ScopedJuceInitialiser_GUI {};
 
   auto category_prefix =
     args.containsOption("--category|-c") ? args.getValueForOption("--category|-c") : "km:";

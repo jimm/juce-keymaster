@@ -5,7 +5,9 @@
 
 class MidiMessageLearner {
 public:
-  MidiMessageLearner(bool sysex_ok, bool clock_ok = false, bool active_sense_ok = false);
+  MidiMessageLearner(
+    bool sysex_ok, bool pitch_bend_ok = false, bool clock_ok = false, bool active_sense_ok = false
+  );
   virtual ~MidiMessageLearner();
 
   // If max_messages = 0, keeps learning until stop_learning is called.
@@ -27,10 +29,13 @@ public:
   Array<MidiMessage> &midi_messages() { return _midi_messages; }
 
   // For testing
-  void reset(bool sysex_ok = false, bool clock_ok = false, bool active_sense_ok = false);
+  void reset(
+    bool sysex_ok = false, bool pitch_bend_ok = false, bool clock_ok = false, bool active_sense_ok = false
+  );
 
 private:
   bool _sysex_ok;
+  bool _pitch_bend_ok;
   bool _clock_ok;
   bool _active_sense_ok;
   bool _learning;

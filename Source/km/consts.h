@@ -7,7 +7,7 @@
 #define UNDEFINED (-1)
 #define UNDEFINED_ID (-1L)
 #define CONNECTION_ALL_CHANNELS (-1)
-#define EMPTY_MESSAGE_BYTES 0xF4
+#define EMPTY_MESSAGE_BYTE 0xF4
 
 // The JUCE MidiMessage static factory methods require MIDI channels 1-16
 #define JCH(ch) ((ch)+1)
@@ -163,6 +163,7 @@ enum DialogResult {
 #define CC_REG_PARAM_MSB 101
 
 // Channel mode message values
+// [121 (0x79) - 127 (0x7f)]
 // Val 0 == off, 0x7f == on
 #define CM_RESET_ALL_CONTROLLERS 0x79
 #define CM_LOCAL_CONTROL 0x7A

@@ -8,7 +8,7 @@
 #define PATCH_START {update_clock(); if (_cursor->patch() != nullptr) _cursor->patch()->start();}
 
 static KeyMaster *km_instance = nullptr;
-const MidiMessage EMPTY_MESSAGE { EMPTY_MESSAGE_BYTES };
+const MidiMessage EMPTY_MESSAGE { EMPTY_MESSAGE_BYTE };
 
 KeyMaster *KeyMaster_instance() {
   return km_instance;
