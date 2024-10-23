@@ -3,6 +3,7 @@
 #include "consts.h"
 #include "keymaster.h"
 #include "message_block.h"
+#include "formatter.h"
 #include "utils.h"
 
 int CHANNEL_MESSAGE_LENGTHS[] = {
@@ -77,21 +78,14 @@ void MessageBlock::from_hex_string(const String &str) {
 
 // Returns a string consisting of space-separated two-digit hex bytes.
 String MessageBlock::to_hex_string() {
-  return to_hex(" ");
+  return to_hex(_midi_messages, " ");
 }
 
 // Returns a string consisting of space- and newline-delimited two-digit hex
 // numbers. Each message is separated by a newline and each byte within the
 // message is separated by a space.
 String MessageBlock::to_editable_hex_string() {
-  return to_hex("\n");
-}
-
-String MessageBlock::to_hex(String message_separator) {
-  StringArray strs;
-  for (auto &msg : _midi_messages)
-    strs.add(String::toHexString(msg.getRawData(), msg.getRawDataSize()));
-  return strs.joinIntoString(message_separator);
+  return to_hex(_midi_messages, "\n");
 }
 
 void MessageBlock::send_to_all_outputs() {

@@ -67,3 +67,13 @@ String trigger_message_description(const MidiMessage &msg) {
   }
   return String::toHexString(msg.getRawData(), msg.getRawDataSize());
 }
+
+// Returns a string consisting of space- and newline-delimited two-digit hex
+// numbers. Each message is separated by `message_separator` and each byte
+// within the message is separated by a space.
+String to_hex(const Array<MidiMessage> &messages, String message_separator) {
+  StringArray strs;
+  for (auto &msg : messages)
+    strs.add(String::toHexString(msg.getRawData(), msg.getRawDataSize()));
+  return strs.joinIntoString(message_separator);
+}

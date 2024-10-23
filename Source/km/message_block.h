@@ -10,7 +10,9 @@ public:
   MessageBlock(DBObjID id, const String &name);
 
   Array<MidiMessage> &midi_messages() { return _midi_messages; }
+  void clear() { _midi_messages.clear(); }
 
+  void from_midi_messages(const Array<MidiMessage> &arr) { _midi_messages = arr; }
   void from_hex_string(const String &str);
 
   String to_hex_string();
@@ -22,6 +24,5 @@ public:
 private:
   Array<MidiMessage> _midi_messages;
 
-  String to_hex(String message_separator);
   MidiMessage sysex_from_bytes(uint8 *data, int start, int num_bytes);
 };

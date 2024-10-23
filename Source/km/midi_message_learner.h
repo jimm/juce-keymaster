@@ -21,7 +21,9 @@ public:
   // public so it's easier to test.
   bool want_midi_message(const MidiMessage &message);
 
-  // Overrideable so you can call stop_learning when you want to
+  // Overridable so you can do what you want when a message arrives.
+  // Recommend you call this first; the message may be rejected so don't
+  // assume it's been added to _midi_messages.
   virtual void learn_midi_message(const MidiMessage &message);
 
   void stop_learning();
