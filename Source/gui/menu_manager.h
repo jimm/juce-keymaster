@@ -33,4 +33,6 @@ private:
   MainComponent *handler;
   std::unique_ptr<MenuBarComponent> menu_bar;
   ApplicationCommandManager command_manager;
+
+  void display_about_dialog();
 };

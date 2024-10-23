@@ -90,6 +90,7 @@ void MainComponent::resized()
 void MainComponent::update() {
   set_list_songs.updateContent();
   song_patches.updateContent();
+  song_notes.update_contents();
   connections_table.updateContent();
   set_lists.updateContent();
   messages.updateContent();

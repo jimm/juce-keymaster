@@ -39,6 +39,11 @@ enum CommandIDs {
   all_notes_off,
   super_panic,
   midi_monitor
+#ifndef JUCE_MAC
+  ,
+  // Help
+  about
+#endif
 };
 
 static Array<CommandIDs> file_commands {
@@ -87,11 +92,20 @@ static Array<CommandIDs> midi_commands {
   CommandIDs::__separator__,
   CommandIDs::midi_monitor
 };
+#ifndef JUCE_MAC
+static Array<CommandIDs> help_commands {
+  CommandIDs::about
+};
+#endif
 static Array<CommandIDs> *command_arrays[4] = {
   &file_commands,
   &edit_commands,
   &go_commands,
   &midi_commands,
+#ifndef JUCE_MAC
+  ,
+  &help_commands
+#endif
 };
 
 MenuManager::~MenuManager() {
@@ -108,6 +122,9 @@ void MenuManager::getAllCommands (Array<CommandID>& c) {
   c.addArray(edit_commands);
   c.addArray(go_commands);
   c.addArray(midi_commands);
+#ifndef JUCE_MAC
+  c.addArray(help_commands);
+#endif
   c.removeAllInstancesOf(CommandIDs::__separator__);
 }
 
@@ -256,6 +273,11 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     result.setInfo("Midi Monitor", "Midi Monitor", "MIDI", 0);
     result.addDefaultKeypress('i', ModifierKeys::commandModifier);
     break;
+#ifndef JUCE_MAC
+  case CommandIDs::about:
+    result.setInfo("About KeyMaster", "About KeyMaster", "Help", 0);
+    break;
+#endif
   default:
     // error
     break;
@@ -361,6 +383,11 @@ bool MenuManager::perform(const InvocationInfo& info) {
   case CommandIDs::midi_monitor:
     handler->midi_monitor();
     break;
+#ifndef JUCE_MAC
+  case CommandIDs::about:
+    display_about_dialog();
+    break;
+#endif
   default:
     return false;
   }
@@ -390,7 +417,13 @@ void MenuManager::make_menu_bar(MainComponent *c) {
   handler = c;
 
 #if JUCE_MAC
-  MenuBarModel::setMacMainMenu(this);
+  PopupMenu extra_apple_menu_items;
+  extra_apple_menu_items.addItem("About KeyMaster", [this] {
+    display_about_dialog();
+  });
+
+  // TODO add about menu item. second Arg is `const PopupMenu* extraAppleMenuItems`.
+  MenuBarModel::setMacMainMenu(this, &extra_apple_menu_items);
 #else
   menu_bar.reset(new MenuBarComponent(this));
   c->addAndMakeVisible(menu_bar.get());
@@ -408,4 +441,15 @@ void MenuManager::resized(Rectangle<int> &area) {
 #ifndef JUCE_MAC
   menu_bar->setBounds(area.removeFromTop(LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
 #endif
+}
+
+void MenuManager::display_about_dialog() {
+    AlertWindow::showMessageBoxAsync(
+      MessageBoxIconType::NoIcon,
+      "About KeyMaster",
+      "KeyMaster\n" \
+      "by Jim Menard\n" \
+      "jim@jimmenard.com\n\n" \
+      "https://github.com/jimm/juce-keymaster",
+      "OK");
 }

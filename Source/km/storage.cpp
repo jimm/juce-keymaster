@@ -411,10 +411,10 @@ var Storage::connections(Array<Connection *> &connections) {
   Array<var> cs;
   for (auto conn : connections) {
     DynamicObject::Ptr c(new DynamicObject());
-    c->setProperty("input_id", conn->input()->info.identifier);
-    c->setProperty("input_name", conn->input()->info.name);
-    c->setProperty("output_id", conn->output()->info.identifier);
-    c->setProperty("output_name", conn->output()->info.name);
+    c->setProperty("input_id", conn->input()->identifier());
+    c->setProperty("input_name", conn->input()->name());
+    c->setProperty("output_id", conn->output()->identifier());
+    c->setProperty("output_name", conn->output()->name());
     if (conn->input_chan() != CONNECTION_ALL_CHANNELS)
       c->setProperty("input_chan", conn->input_chan());
     if (conn->output_chan() != CONNECTION_ALL_CHANNELS)

@@ -125,9 +125,9 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   p = s->patches()[0];          // Two Inputs Merging
   expect(p->connections().size() == 2);
   Connection *conn = p->connections()[0];
-  expect(conn->input()->info.name == "first input");
+  expect(conn->input()->name() == "first input");
   expect(conn->input_chan() == CONNECTION_ALL_CHANNELS);
-  expect(conn->output()->info.name == "first output");
+  expect(conn->output()->name() == "first output");
   expect(conn->output_chan() == CONNECTION_ALL_CHANNELS);
 
   s = all_songs[ANOTHER_INDEX];  // Another Song
@@ -244,8 +244,8 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   p = s->patches()[0];
   expect(p->name() == s->name());
   expect(p->connections().size() == 1);
-  expect(p->connections()[0]->input()->info.name == "first input");
-  expect(p->connections()[0]->output()->info.name == "first output");
+  expect(p->connections()[0]->input()->name() == "first input");
+  expect(p->connections()[0]->output()->name() == "first output");
 }
 
 void StorageTest::test_save() {

@@ -201,7 +201,7 @@ void ConnectionEditor::init_input() {
   _input_instrument.addItem("Select input instrument", UNSELECTED);
   int i = 1;
   for (auto inp : KeyMaster_instance()->device_manager().inputs()) {
-    _input_instrument.addItem(inp->info.name, i);
+    _input_instrument.addItem(inp->name(), i);
     if (inp == _conn->input())
       _input_instrument.setSelectedId(i);
     ++i;
@@ -229,7 +229,7 @@ void ConnectionEditor::init_output() {
   _output_instrument.addItem("Select output instrument", UNSELECTED);
   int i = 1;
   for (auto outp : KeyMaster_instance()->device_manager().outputs()) {
-    _output_instrument.addItem(outp->info.name, i);
+    _output_instrument.addItem(outp->name(), i);
     if (outp == _conn->output())
       _output_instrument.setSelectedId(i);
     ++i;

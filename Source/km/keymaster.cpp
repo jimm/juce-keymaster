@@ -168,7 +168,7 @@ void KeyMaster::create_songs() {
   for (auto& input : _device_manager.inputs()) {
     // this input to each individual output
     for (auto& output : _device_manager.outputs()) {
-      String name = input->info.name + " -> " + output->info.name;
+      String name = input->name() + " -> " + output->name();
       Song *song = new Song(UNDEFINED_ID, name);
       all_songs()->add_song(song);
 
@@ -185,7 +185,7 @@ void KeyMaster::create_songs() {
 
     if (_device_manager.outputs().size() > 1) {
       // one more song: this input to all outputs at once
-      String name = input->info.name + " -> all outputs";
+      String name = input->name() + " -> all outputs";
       Song *song = new Song(UNDEFINED_ID, name);
       all_songs()->add_song(song);
 

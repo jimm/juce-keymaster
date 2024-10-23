@@ -34,7 +34,7 @@ void ConnectionsTableListBoxModel::paintCell(
   switch (columnId) {
   case 1:                       // input name
     if (c->input())
-      str = c->input()->info.name;
+      str = c->input()->name();
     else
       str = "<not connected>";
     break;
@@ -46,7 +46,7 @@ void ConnectionsTableListBoxModel::paintCell(
     break;
   case 3:                       // output name
     if (c->output())
-      str = c->output()->info.name;
+      str = c->output()->name();
     else
       str = "<not connected>";
     break;
