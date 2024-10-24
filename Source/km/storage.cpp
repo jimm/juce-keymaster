@@ -110,7 +110,11 @@ void Storage::load_messages(var messages) {
       (int)vmsg.getProperty("id", v),
       (String)vmsg.getProperty("name", v));
     auto bytes_str = (String)vmsg.getProperty("bytes", v);
-    m->from_hex_string(bytes_str);
+    auto result = m->from_hex_string(bytes_str);
+    if (result.failed()) {
+      // TODO this should be a warning message
+      // error_str = "error in message data for message" + m->name();
+    }
     km->messages().add(m);
   }
 }
@@ -130,8 +134,13 @@ void Storage::load_triggers(var triggers) {
     auto bytes_str = (String)vmsg.getProperty("bytes", v);
     if (vmsg.hasProperty("trigger_message_bytes")) {
       MessageBlock mblock(UNDEFINED_ID, "");
-      mblock.from_hex_string((String)vmsg.getProperty("trigger_message_bytes", v));
-      t->set_trigger_message(mblock.midi_messages()[0]);
+      auto result = mblock.from_hex_string((String)vmsg.getProperty("trigger_message_bytes", v));
+      if (result.failed()) {
+        // TODO this should be a warning message, not an error message
+        // error_str = String::formatted("error in trigger message data for trigger %d", i + 1);
+      }
+      else
+        t->set_trigger_message(mblock.midi_messages()[0]);
     }
     if (vmsg.hasProperty("key_code"))
       t->set_trigger_key_press(KeyPress((int)vmsg.getProperty("key_code", v)));

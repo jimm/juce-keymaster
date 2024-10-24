@@ -30,6 +30,10 @@ void MessageBlockTest::test_from_hex_string() {
   expect(mm_eq(msg = m.midi_messages()[2], expected = MidiMessage::createSysExMessage(sysex_data, 3)));
   expect(mm_eq(msg = m.midi_messages()[3], expected = MidiMessage(0x92, 0x80, 0xff)));
   expect(mm_eq(msg = m.midi_messages()[4], expected = MidiMessage(0x82, 0x80, 0xff)));
+
+  auto result = m.from_hex_string("fff");
+  expect(result.failed());
+  expect(result.getErrorMessage() == "byte 1 is not between 0 (00) and 255 (ff)");
 }
 
 void MessageBlockTest::test_to_hex_string() {

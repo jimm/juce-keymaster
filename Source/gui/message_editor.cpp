@@ -90,6 +90,7 @@ void MessageEditor::init() {
   _bytes.setReturnKeyStartsNewLine(true);
   _bytes.setCaretVisible(true);
   _bytes.setText(_message->to_editable_hex_string());
+  _bytes.addListener(this);
 
   _bytes_learn.onClick = [this] {
     if (is_learning()) {        // stop
@@ -131,7 +132,12 @@ void MessageEditor::cancel_cleanup() {
 
 bool MessageEditor::apply() {
   _message->set_name(_name.getText());
-  _message->from_hex_string(_bytes.getText());
+  auto result = _message->from_hex_string(_bytes.getText());
+  if (result.failed()) {
+    error_messages.add(result.getErrorMessage());
+    display_errors("Message");
+    return false;
+  }
 
   if (_is_new) {
     Editor e;

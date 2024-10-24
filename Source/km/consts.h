@@ -49,11 +49,11 @@ enum DialogResult {
 
 // System exclusive start
 #define SYSEX 0xF0
-// MIDI Time Code quarter frame
+// MIDI Time Code quarter frame, 1 data byte
 #define MTC_QFRAME 0xF1
-// Beats from top: LSB/MSB 6 ticks 1 beat
+// Beats from top: LSB/MSB 6 ticks 1 beat; 2 data bytes
 #define SONG_POINTER 0xF2
-// Val number of song
+// Val number of song; 1 data byte
 #define SONG_SELECT 0xF3
 // Tune request
 #define TUNE_REQUEST 0xF6
