@@ -1,9 +1,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "input.h"
 
-class MidiMessageLearner {
+class MidiMessageLearner : public MidiListener {
 public:
   MidiMessageLearner(
     bool sysex_ok, bool pitch_bend_ok = false, bool clock_ok = false, bool active_sense_ok = false
@@ -16,6 +15,8 @@ public:
   void start_learning(int max_messages = 0, std::function<void()> max_callback = []{}); // 0 means no limit
 
   bool is_learning() { return _learning; }
+
+  virtual void midi_input(const String &name, const MidiMessage &message) override { learn_midi_message(message); }
 
   // Called by learn_midi_message. You don't have to call this; it's only
   // public so it's easier to test.

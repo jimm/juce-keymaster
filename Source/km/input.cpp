@@ -8,8 +8,7 @@ Input::Input() {
 }
 
 Input::Input(MidiDeviceInfo device_info, MidiInputCallback *listener)
-  : Instrument(device_info), device(MidiInput::openDevice(info.identifier, listener)),
-    message_learner(nullptr)
+  : Instrument(device_info), device(MidiInput::openDevice(info.identifier, listener))
 {
   initialize();
 }
@@ -58,8 +57,9 @@ void Input::midi_in(const MidiMessage &message) {
   if (p != nullptr)
     p->midi_in(this, message);
 
-  if (message_learner != nullptr)
-    message_learner->learn_midi_message(message);
+  if (!_listeners.isEmpty())
+    for (auto listener : _listeners)
+      listener->midi_input(name(), message);
 }
 
 // Note off and sustain off messages must be sent to the same patch as the

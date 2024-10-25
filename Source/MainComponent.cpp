@@ -5,6 +5,7 @@
 #include "km/storage.h"
 #include "gui/connection_editor.h"
 #include "gui/song_editor.h"
+#include "gui/midi_monitor.h"
 
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
@@ -33,10 +34,17 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
 
 MainComponent::~MainComponent()
 {
+  // TODO save monitor window to app settings
+
+  for (auto &window : _windows)
+    window.deleteAndZero();
+  _windows.clear();
+
   if (KeyMaster_instance()) {
     KeyMaster_instance()->cursor()->removeAllActionListeners();
     delete KeyMaster_instance();
   }
+
 }
 
 void MainComponent::paint(Graphics& g)
@@ -322,6 +330,32 @@ void MainComponent::super_panic() {
 }
 
 void MainComponent::midi_monitor() {
+  auto *monitor_win = new DocumentWindow(
+    "MIDI Monitor",
+    LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId),
+    false
+  );
+  _windows.add(monitor_win);
+
+  auto contents = new MidiMonitor();
+  monitor_win->setContentOwned(contents, false);
+
+  // TODO load from app settings
+
+  auto display_area = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea.reduced(20);
+  DBG(display_area.toString()); // DEBUG
+  Rectangle<int> area(
+    (display_area.getWidth() - contents->width()) / 2,
+    (display_area.getHeight() - contents->height()) / 3,
+    contents->width(),
+    contents->height()
+  );
+  DBG(area.toString());         // DEBUG
+  monitor_win->setBounds(area);
+
+  monitor_win->setResizable(true, true);
+  monitor_win->setUsingNativeTitleBar(true);
+  monitor_win->setVisible(true);
 }
 
 // ================ loading and saving ================

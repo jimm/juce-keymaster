@@ -9,3 +9,12 @@ Output::Output(MidiDeviceInfo device_info)
 Output::~Output() {
   stop();
 }
+
+void Output::midi_out(MidiMessage &msg){
+  if (device)
+    device->sendMessageNow(msg);
+
+  if (!_listeners.isEmpty())
+    for (auto listener : _listeners)
+      listener->midi_output(name(), msg);
+}

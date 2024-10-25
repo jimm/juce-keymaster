@@ -21,10 +21,6 @@ public:
   virtual void stop() override;
   bool is_running() override { return (bool)device; }
 
-  // Incoming messages are sent to the learner until stop_learning is called
-  void start_learning(MidiMessageLearner *learner) { message_learner = learner; }
-  void stop_learning() { message_learner = nullptr; }
-
   void midi_in(const MidiMessage &msg);
 
   void send_pending_offs();
@@ -35,7 +31,6 @@ private:
   std::unique_ptr<MidiInput> device;
   Patch *note_off_patches[MIDI_CHANNELS][NOTES_PER_CHANNEL];
   Patch *sustain_off_patches[MIDI_CHANNELS];
-  MidiMessageLearner *message_learner;
 
   void initialize();
   Patch *patch_for_message(const MidiMessage &msg);

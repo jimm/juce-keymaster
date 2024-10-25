@@ -36,6 +36,9 @@
             file="Source/gui/messages_list_box.cpp"/>
       <FILE id="ibUera" name="messages_list_box.h" compile="0" resource="0"
             file="Source/gui/messages_list_box.h"/>
+      <FILE id="kuQGQ1" name="midi_monitor.cpp" compile="1" resource="0"
+            file="Source/gui/midi_monitor.cpp"/>
+      <FILE id="sEhMiE" name="midi_monitor.h" compile="0" resource="0" file="Source/gui/midi_monitor.h"/>
       <FILE id="sONZHO" name="notifying_combo_box.h" compile="0" resource="0"
             file="Source/gui/notifying_combo_box.h"/>
       <FILE id="EJUIUE" name="patch_editor.cpp" compile="1" resource="0"
@@ -101,6 +104,7 @@
             file="Source/km/message_filter.cpp"/>
       <FILE id="VuaWaq" name="message_filter.h" compile="0" resource="0"
             file="Source/km/message_filter.h"/>
+      <FILE id="k5wedD" name="midi_listener.h" compile="0" resource="0" file="Source/km/midi_listener.h"/>
       <FILE id="Nxpmr6" name="midi_message_learner.cpp" compile="1" resource="0"
             file="Source/km/midi_message_learner.cpp"/>
       <FILE id="tp8ZWi" name="midi_message_learner.h" compile="0" resource="0"

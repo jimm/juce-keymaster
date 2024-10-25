@@ -78,6 +78,7 @@ private:
   DeviceManager &device_manager;
   ApplicationProperties &app_properties;
   File _file;
+  Array<Component::SafePointer<Component>> _windows;
 
   MenuManager menu_manager;
 

@@ -1,6 +1,5 @@
-#include "midi_message_learner.h"
 #include "keymaster.h"
-#include "utils.h"
+#include "midi_message_learner.h"
 
 MidiMessageLearner::MidiMessageLearner(bool sysex_ok, bool pitch_bend_ok, bool clock_ok, bool active_sense_ok)
   : _sysex_ok(sysex_ok), _pitch_bend_ok(pitch_bend_ok),
@@ -21,7 +20,7 @@ void MidiMessageLearner:: start_learning(int max_messages, std::function<void()>
   _num_messages = 0;
   if (KeyMaster_instance() != nullptr) // null during testing
     for (auto inp : KeyMaster_instance()->device_manager().inputs())
-      inp->start_learning(this);
+      inp->add_listener(this);
 }
 
 bool MidiMessageLearner::want_midi_message(const MidiMessage &message) {
@@ -51,7 +50,7 @@ void MidiMessageLearner::stop_learning() {
   _learning = false;
   if (KeyMaster_instance() != nullptr) // null during testing
     for (auto inp : KeyMaster_instance()->device_manager().inputs())
-      inp->stop_learning();
+      inp->remove_listener(this);
 }
 
 void MidiMessageLearner::reset(bool sysex_ok, bool pitch_bend_ok, bool clock_ok, bool active_sense_ok) {

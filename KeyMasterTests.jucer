@@ -79,6 +79,7 @@
             file="Source/km/message_filter.cpp"/>
       <FILE id="sCvROu" name="message_filter.h" compile="0" resource="0"
             file="Source/km/message_filter.h"/>
+      <FILE id="aBFpxO" name="midi_listener.h" compile="0" resource="0" file="Source/km/midi_listener.h"/>
       <FILE id="fMeVPh" name="midi_message_learner.cpp" compile="1" resource="0"
             file="Source/km/midi_message_learner.cpp"/>
       <FILE id="at8ZgS" name="midi_message_learner.h" compile="0" resource="0"
