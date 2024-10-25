@@ -78,7 +78,7 @@ Result MessageBlock::from_hex_string(const String &str) {
       case SYSEX:
         MidiMessage sysex = sysex_from_bytes(data, i, num_bytes);
         msgs.add(sysex);
-        i += sysex.getSysExDataSize();
+        i += sysex.getSysExDataSize() + 1;
         break;
       // FIXME this won't compile and I don't know why.
       // "Cannot jump from switch statement to this case label"
