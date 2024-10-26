@@ -10,6 +10,7 @@
 #include "gui/song_notes_label.h"
 #include "gui/song_patches_list_box.h"
 #include "gui/triggers_table.h"
+#include "gui/midi_monitor.h"
 
 class KeyMaster;
 
@@ -78,7 +79,7 @@ private:
   DeviceManager &device_manager;
   ApplicationProperties &app_properties;
   File _file;
-  Array<Component::SafePointer<Component>> _windows;
+  std::unique_ptr<MidiMonitorWindow> _midi_monitor_window;
 
   MenuManager menu_manager;
 

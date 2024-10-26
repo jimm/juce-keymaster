@@ -8,6 +8,9 @@ public:
   MidiMonitor();
   virtual ~MidiMonitor();
 
+  void start();
+  void stop();
+
   int width();
   int height();
 
@@ -29,8 +32,21 @@ private:
   CriticalSection _midi_monitor_lock;
   Array<NameAndMessage> _input_messages;
   Array<NameAndMessage> _output_messages;
+  bool _running;
 
   void init_text_editor(TextEditor &te);
 
   bool want_message(const MidiMessage &message);
+};
+
+class MidiMonitorWindow : public DocumentWindow {
+public:
+  MidiMonitorWindow();
+  virtual ~MidiMonitorWindow() {}
+
+  virtual void closeButtonPressed() override;
+
+  MidiMonitor *midi_monitor() {
+    return static_cast<MidiMonitor *>(getContentComponent());
+  }
 };

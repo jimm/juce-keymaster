@@ -6,25 +6,48 @@
 #define INITIAL_WIDTH 800
 #define INITIAL_HEIGHT 600
 
-MidiMonitor::MidiMonitor() {
+MidiMonitor::MidiMonitor() : _running(false) {
   init_text_editor(_input_midi);
   init_text_editor(_output_midi);
   setSize(width(), height());
-
-  for (auto inp : KeyMaster_instance()->device_manager().inputs())
-    inp->add_listener(this);
-
-  for (auto outp : KeyMaster_instance()->device_manager().outputs())
-    outp->add_listener(this);
 }
 
 MidiMonitor::~MidiMonitor() {
+  stop();
+}
 
-  for (auto inp : KeyMaster_instance()->device_manager().inputs())
+void MidiMonitor::start() {
+  if (_running)
+    return;
+
+  _input_midi.setText("");
+  _output_midi.setText("");
+
+  auto device_manager = KeyMaster_instance()->device_manager();
+
+  for (auto inp : device_manager.inputs())
+    inp->add_listener(this);
+  for (auto outp : device_manager.outputs())
+    outp->add_listener(this);
+
+  _running = true;
+}
+
+void MidiMonitor::stop() {
+  if (!_running)
+    return;
+
+  auto km = KeyMaster_instance();
+  if (km == nullptr)            // might be shutting down
+    return;
+  auto device_manager = km->device_manager();
+
+  for (auto inp : device_manager.inputs())
     inp->remove_listener(this);
-
-  for (auto outp : KeyMaster_instance()->device_manager().outputs())
+  for (auto outp : device_manager.outputs())
     outp->remove_listener(this);
+
+  _running = false;
 }
 
 int MidiMonitor::width() { return INITIAL_WIDTH; }
@@ -69,8 +92,6 @@ void MidiMonitor::midi_output(const String &name, const MidiMessage &message) {
 }
 
 void MidiMonitor::handleAsyncUpdate() {
-  DBG("updating monitor");      // DEBUG
-
   Array<NameAndMessage> input_msgs;
   Array<NameAndMessage> output_msgs;
 
@@ -93,4 +114,39 @@ void MidiMonitor::handleAsyncUpdate() {
 
 bool MidiMonitor::want_message(const MidiMessage &message) {
   return !message.isMidiClock() && !message.isActiveSense();
+}
+
+// ================================================================
+
+MidiMonitorWindow::MidiMonitorWindow()
+  : DocumentWindow(
+      "MIDI Monitor",
+      LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId),
+      TitleBarButtons::allButtons,
+      true
+    )
+{
+  auto contents = new MidiMonitor();
+  setContentOwned(contents, false);
+
+  // TODO load from app settings
+  auto display_area = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea.reduced(20);
+  Rectangle<int> area(
+    (display_area.getWidth() - contents->width()) / 2,
+    (display_area.getHeight() - contents->height()) / 3,
+    contents->width(),
+    contents->height()
+  );
+  setBounds(area);
+
+  setResizable(true, true);
+  setUsingNativeTitleBar(true);
+
+  contents->start();
+}
+
+// We don't close the window, we stop monitoring and hide it.
+void MidiMonitorWindow::closeButtonPressed() {
+  midi_monitor()->stop();
+  setVisible(false);
 }
