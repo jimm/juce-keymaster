@@ -127,6 +127,8 @@
       <FILE id="QTBeec" name="utils.h" compile="0" resource="0" file="Source/km/utils.h"/>
     </GROUP>
     <GROUP id="{639E9FB2-0D21-EE57-B418-7882CB5C8D3F}" name="Source">
+      <FILE id="VTXwFy" name="KeyMasterIcon.png" compile="0" resource="1"
+            file="Source/KeyMasterIcon.png"/>
       <FILE id="b8evKl" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="dBx12o" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="w4llZv" name="MainComponent.cpp" compile="1" resource="0"
@@ -148,7 +150,7 @@
   </MODULES>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="VTXwFy" bigIcon="VTXwFy">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="KeyMaster" osxCompatibility="10.13 SDK"
                        macOSDeploymentTarget="10.13"/>
@@ -169,7 +171,7 @@
         <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <XCODE_IPHONE targetFolder="Builds/iOS">
+    <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="VTXwFy" bigIcon="VTXwFy">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
         <CONFIGURATION isDebug="0" name="Release"/>
