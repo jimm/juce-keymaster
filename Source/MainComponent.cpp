@@ -334,7 +334,7 @@ void MainComponent::midi_monitor() {
   }
 
   // TODO pass rectangle to window constructor
-  _midi_monitor_window = std::unique_ptr<MidiMonitorWindow>(new MidiMonitorWindow());
+  _midi_monitor_window = std::unique_ptr<MidiMonitorWindow>(new MidiMonitorWindow(app_properties));
   _midi_monitor_window->setVisible(true);
 }
 

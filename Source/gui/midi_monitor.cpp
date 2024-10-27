@@ -6,7 +6,8 @@
 #define INITIAL_WIDTH 800
 #define INITIAL_HEIGHT 600
 
-MidiMonitor::MidiMonitor() : _running(false) {
+MidiMonitor::MidiMonitor()
+{
   init_text_editor(_input_midi);
   init_text_editor(_output_midi);
   setSize(width(), height());
@@ -118,31 +119,46 @@ bool MidiMonitor::want_message(const MidiMessage &message) {
 
 // ================================================================
 
-MidiMonitorWindow::MidiMonitorWindow()
+MidiMonitorWindow::MidiMonitorWindow(ApplicationProperties &app_properties)
   : DocumentWindow(
       "MIDI Monitor",
       LookAndFeel::getDefaultLookAndFeel().findColour(ResizableWindow::backgroundColourId),
       TitleBarButtons::allButtons,
       true
-    )
+    ),
+    _app_properties(app_properties)
 {
   auto contents = new MidiMonitor();
   setContentOwned(contents, false);
 
-  // TODO load from app settings
-  auto display_area = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea.reduced(20);
-  Rectangle<int> area(
-    (display_area.getWidth() - contents->width()) / 2,
-    (display_area.getHeight() - contents->height()) / 3,
-    contents->width(),
-    contents->height()
-  );
-  setBounds(area);
+  auto settings = _app_properties.getUserSettings();
+  if (settings->containsKey("midi_monitor.window.state")) {
+    DBG("restore");             // DEBUG
+    DBG(settings->getValue("midi_monitor.window.state")); // DEBUG
+    restoreWindowStateFromString(settings->getValue("midi_monitor.window.state"));
+  }
+  else {
+    auto display_area = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea.reduced(20);
+    Rectangle<int> area(
+      (display_area.getWidth() - contents->width()) / 2,
+      (display_area.getHeight() - contents->height()) / 3,
+      contents->width(),
+      contents->height()
+      );
+    setBounds(area);
+  }
 
   setResizable(true, true);
   setUsingNativeTitleBar(true);
 
   contents->start();
+}
+
+MidiMonitorWindow::~MidiMonitorWindow() {
+  auto settings = _app_properties.getUserSettings();
+  settings->setValue("midi_monitor.window.state", getWindowStateAsString());
+  DBG("save");                   // DEBUG
+  DBG(getWindowStateAsString()); // DEBUG
 }
 
 // We don't close the window, we stop monitoring and hide it.

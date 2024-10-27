@@ -39,15 +39,11 @@ public:
 
   void shutdown() override
     {
-      // Add your application's shutdown code here..
+      // Add your application's shutdown code here.
 
       auto win = mainWindow.get();
       auto settings = app_properties.getUserSettings();
-      settings->setValue("window.x", win->getX());
-      settings->setValue("window.y", win->getY());
-      auto comp = win->getChildComponent(0);
-      settings->setValue("window.width", comp->getWidth());
-      settings->setValue("window.height", comp->getHeight());
+      settings->setValue("window.state", win->getWindowStateAsString());
       app_properties.closeFiles();
 
       mainWindow = nullptr; // (deletes our window)
@@ -99,12 +95,10 @@ public:
         setResizable(true, true);
 
         auto settings = app_properties.getUserSettings();
-        auto x = settings->getIntValue("window.x", DEFAULT_WINDOW_X);
-        auto y = settings->getIntValue("window.y", DEFAULT_WINDOW_Y);
-        if (x != DEFAULT_WINDOW_X && y != DEFAULT_WINDOW_Y)
-          setBounds(x, y, getWidth(), getHeight());
+        if (settings->containsKey("window.state"))
+          restoreWindowStateFromString(settings->getValue("window.state"));
         else
-          centreWithSize(getWidth(), getHeight());
+            centreWithSize(getWidth(), getHeight());
 #endif
 
         setVisible(true);

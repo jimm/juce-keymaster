@@ -41,12 +41,15 @@ private:
 
 class MidiMonitorWindow : public DocumentWindow {
 public:
-  MidiMonitorWindow();
-  virtual ~MidiMonitorWindow() {}
+  MidiMonitorWindow(ApplicationProperties &app_properties);
+  virtual ~MidiMonitorWindow();
 
   virtual void closeButtonPressed() override;
 
   MidiMonitor *midi_monitor() {
     return static_cast<MidiMonitor *>(getContentComponent());
   }
+
+private:
+  ApplicationProperties &_app_properties;
 };
