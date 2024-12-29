@@ -7,7 +7,7 @@
 #include "gui/messages_list_box.h"
 #include "gui/set_list_songs_list_box.h"
 #include "gui/set_lists_list_box.h"
-#include "gui/song_notes_label.h"
+#include "gui/song_notes.h"
 #include "gui/song_patches_list_box.h"
 #include "gui/triggers_table.h"
 #include "gui/midi_monitor.h"
@@ -92,8 +92,13 @@ private:
   Label song_patches_label;
   SongPatchesListBox song_patches;
 
+  Label clock_label;
+  TextEditor bpm;
+  Label bpm_label { {}, "BPM" };
+  TextButton clock_status { "Start" };
+
   Label song_notes_label;
-  SongNotesLabel song_notes;
+  SongNotes song_notes;
 
   Label connections_table_label;
   ConnectionsTableListBox connections_table;
@@ -119,13 +124,26 @@ private:
   void config_table_list_box(
     const char *label_text, Label &label, KmTableListBox &list_box, KmTableListBoxModel *model);
 
+  void update_clock_contents();
+
+  void layout_top(Rectangle<int> &area);
+  void layout_set_list_songs_and_song_patches(Rectangle<int> &area);
+  void layout_clock_and_notes(Rectangle<int> &area);
+  void layout_middle(Rectangle<int> &area);
+  void layout_bottom(Rectangle<int> &area);
+
+  void init_song_notes();
+
   void make_set_list_songs_pane();
   void make_song_patches_pane();
+  void make_clock_pane();
   void make_song_notes_pane();
   void make_connections_pane();
   void make_set_lists_pane();
   void make_messages_pane();
   void make_triggers_pane();
+
+  void clock_button_clicked();
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

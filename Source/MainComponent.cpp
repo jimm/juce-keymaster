@@ -7,19 +7,32 @@
 #include "gui/song_editor.h"
 #include "gui/midi_monitor.h"
 
+#define SPACE 12
+#define MAIN_LABEL_HEIGHT 20
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
+#define CLOCK_INFO_HEIGHT 30
+#define CLOCK_STATUS_WIDTH 80
+#define BPM_WIDTH 60
+#define BPM_LABEL_WIDTH 60
 static const char * const KM_FILE_PROPS_KEY = "km.file";
+
+using Track = Grid::TrackInfo;
+using Fr = Grid::Fr;
+using Px = Grid::Px;
 
 MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &props)
   : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
     device_manager(dev_mgr), app_properties(props)
 {
+  init_song_notes();
+
   load_or_create_keymaster();
 
   make_menu_bar();
   make_set_list_songs_pane();
   make_song_patches_pane();
+  make_clock_pane();
   make_song_notes_pane();
   make_set_lists_pane();
   make_messages_pane();
@@ -59,29 +72,62 @@ void MainComponent::resized()
   auto bottom_area = area.removeFromBottom(area.getHeight() / 2);
   auto middle_area = area;
 
-  using Track = Grid::TrackInfo;
-  using Fr = Grid::Fr;
-  using Px = Grid::Px;
+  layout_top(top_area);
+  layout_middle(middle_area);
+  layout_bottom(bottom_area);
+}
 
-  Grid top_grid;
-  top_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
-  top_grid.templateColumns = { Track(Fr(2)), Track(Fr(2)), Track(Fr(3)) };
-  top_grid.items = {
+void MainComponent::layout_top(Rectangle<int> &area)
+{
+  int slice = area.getWidth() / 7;
+  auto col_area = area.removeFromLeft(slice * 4);
+  layout_set_list_songs_and_song_patches(col_area);
+  layout_clock_and_notes(area);
+}
+
+void MainComponent::layout_set_list_songs_and_song_patches(Rectangle<int> &area)
+{
+  Grid grid;
+  grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
+  grid.templateColumns = { Track(Fr(1)), Track(Fr(1)) };
+  grid.items = {
     // top row labels
-    GridItem(set_list_songs_label), GridItem(song_patches_label), GridItem(song_notes_label),
+    GridItem(set_list_songs_label), GridItem(song_patches_label),
     // top row components
-    GridItem(set_list_songs), GridItem(song_patches), GridItem(song_notes),
+    GridItem(set_list_songs), GridItem(song_patches)
   };
-  top_grid.performLayout(top_area);
+  grid.performLayout(area);
+}
 
-  Grid middle_grid;
-  middle_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
-  middle_grid.templateColumns = { Track(Fr(1)) };
-  middle_grid.items = { GridItem(connections_table_label), GridItem(connections_table) };
-  middle_grid.performLayout(middle_area);
+void MainComponent::layout_clock_and_notes(Rectangle<int> &area)
+{
+  auto row_area = area.removeFromTop(MAIN_LABEL_HEIGHT);
+  clock_label.setBounds(row_area);
+  row_area = area.removeFromTop(CLOCK_INFO_HEIGHT);
+  bpm.setBounds(row_area.removeFromLeft(BPM_WIDTH));
+  bpm_label.setBounds(row_area.removeFromLeft(BPM_LABEL_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  clock_status.setBounds(row_area.removeFromLeft(CLOCK_STATUS_WIDTH));
 
+  area.removeFromTop(SPACE);
+  row_area = area.removeFromTop(MAIN_LABEL_HEIGHT);
+  song_notes_label.setBounds(row_area);
+  song_notes.setBounds(area);
+}
+
+void MainComponent::layout_middle(Rectangle<int> &area)
+{
+  Grid grid;
+  grid.templateRows = { Track(Px(MAIN_LABEL_HEIGHT)), Track(Fr(1)) };
+  grid.templateColumns = { Track(Fr(1)) };
+  grid.items = { GridItem(connections_table_label), GridItem(connections_table) };
+  grid.performLayout(area);
+}
+
+void MainComponent::layout_bottom(Rectangle<int> &area)
+{
   Grid bottom_grid;
-  bottom_grid.templateRows = { Track(Px(20)), Track(Fr(1)) };
+  bottom_grid.templateRows = { Track(Px(MAIN_LABEL_HEIGHT)), Track(Fr(1)) };
   bottom_grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(2)) };
   bottom_grid.items = {
     // bottom row labels
@@ -89,12 +135,13 @@ void MainComponent::resized()
     // bottom row components
     GridItem(set_lists), GridItem(messages), GridItem(triggers)
   };
-  bottom_grid.performLayout(bottom_area);
+  bottom_grid.performLayout(area);
 }
 
 void MainComponent::update() {
   set_list_songs.updateContent();
   song_patches.updateContent();
+  update_clock_contents();
   song_notes.update_contents();
   connections_table.updateContent();
   set_lists.updateContent();
@@ -419,6 +466,18 @@ void MainComponent::config_table_list_box(
   config_lbox(label_text, label, list_box);
 }
 
+void MainComponent::update_clock_contents() {
+  clock_status.setButtonText(KeyMaster_instance()->is_clock_running() ? "Running" : "Start");
+}
+
+void MainComponent::init_song_notes() {
+  song_notes.setFont(FontOptions(18.0f));
+  song_notes.setMultiLine(true);
+  song_notes.setTabKeyUsedAsCharacter(true);
+  song_notes.setReturnKeyStartsNewLine(true);
+  song_notes.addListener(&song_notes);
+}
+
 void MainComponent::make_set_list_songs_pane() {
   auto model = new SetListSongsListBoxModel();
   config_list_box("Set List Songs", set_list_songs_label, set_list_songs, model);
@@ -433,9 +492,17 @@ void MainComponent::make_song_patches_pane() {
   song_patches.selectRow(model->selected_row_num());
 }
 
+void MainComponent::make_clock_pane() {
+  clock_status.setToggleable(true);
+  clock_status.onClick = [this] { clock_button_clicked(); };
+  config_label(clock_label, "Clock");
+  addAndMakeVisible(bpm);
+  addAndMakeVisible(bpm_label);
+  addAndMakeVisible(clock_status);
+}
+
 void MainComponent::make_song_notes_pane() {
   config_label(song_notes_label, "Song Notes");
-  song_notes.setJustificationType(Justification(Justification::topLeft));
 
   song_notes.update_contents();
   KeyMaster_instance()->cursor()->addActionListener(&song_notes);
@@ -463,6 +530,16 @@ void MainComponent::make_messages_pane() {
 void MainComponent::make_triggers_pane() {
   auto model = new TriggersTableListBoxModel();
   config_table_list_box("Triggers", triggers_label, triggers, model);
+}
+
+void MainComponent::clock_button_clicked() {
+  bool state = clock_status.getToggleState();
+  auto km = KeyMaster_instance();
+  if (state)
+    km->start_clock();
+  else
+    km->stop_clock();
+  update_clock_contents();
 }
 
 // ================ helpers ================

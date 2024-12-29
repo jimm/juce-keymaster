@@ -54,8 +54,7 @@
             file="Source/gui/set_lists_list_box.h"/>
       <FILE id="vos7Xo" name="song_editor.cpp" compile="1" resource="0" file="Source/gui/song_editor.cpp"/>
       <FILE id="GnYiXL" name="song_editor.h" compile="0" resource="0" file="Source/gui/song_editor.h"/>
-      <FILE id="bqPIax" name="song_notes_label.h" compile="0" resource="0"
-            file="Source/gui/song_notes_label.h"/>
+      <FILE id="FC3tY1" name="song_notes.h" compile="0" resource="0" file="Source/gui/song_notes.h"/>
       <FILE id="pUfxBV" name="song_patches_list_box.cpp" compile="1" resource="0"
             file="Source/gui/song_patches_list_box.cpp"/>
       <FILE id="NBcTfo" name="song_patches_list_box.h" compile="0" resource="0"
