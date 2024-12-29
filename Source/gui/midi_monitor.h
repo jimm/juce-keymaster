@@ -27,6 +27,8 @@ private:
     MidiMessage message;
   };
 
+  Label _input_label { {}, "Input" };
+  Label _output_label { {}, "Output" };
   TextEditor _input_midi;
   TextEditor _output_midi;
   CriticalSection _midi_monitor_lock;
@@ -34,7 +36,7 @@ private:
   Array<NameAndMessage> _output_messages;
   bool _running;
 
-  void init_text_editor(TextEditor &te);
+  void init_text_editor(Label &l, TextEditor &te);
 
   bool want_message(const MidiMessage &message);
 };

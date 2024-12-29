@@ -1,15 +1,15 @@
 #include <JuceHeader.h>
 #include "../km/keymaster.h"
+#include "km_editor.h"          // for size constants
 #include "midi_monitor.h"
 
-#define SPACE 12
 #define INITIAL_WIDTH 800
 #define INITIAL_HEIGHT 600
 
 MidiMonitor::MidiMonitor()
 {
-  init_text_editor(_input_midi);
-  init_text_editor(_output_midi);
+  init_text_editor(_input_label, _input_midi);
+  init_text_editor(_output_label, _output_midi);
   setSize(width(), height());
 }
 
@@ -60,11 +60,18 @@ void MidiMonitor::resized() {
   area.reduce(SPACE, SPACE);
 
   int width = (area.getWidth() - SPACE) / 2;
+  auto label_area = area.removeFromTop(LABEL_HEIGHT);
+  _input_label.setBounds(label_area.removeFromLeft(width));
+  _output_label.setBounds(label_area.removeFromRight(width));
+
+  area.removeFromTop(SPACE);
   _input_midi.setBounds(area.removeFromLeft(width));
   _output_midi.setBounds(area.removeFromRight(width));
 }
 
-void MidiMonitor::init_text_editor(TextEditor &te) {
+void MidiMonitor::init_text_editor(Label &l, TextEditor &te) {
+  addAndMakeVisible(l);
+
   te.setMultiLine(true);
   te.setReturnKeyStartsNewLine(false);
   te.setReadOnly(true);
@@ -133,8 +140,6 @@ MidiMonitorWindow::MidiMonitorWindow(ApplicationProperties &app_properties)
 
   auto settings = _app_properties.getUserSettings();
   if (settings->containsKey("midi_monitor.window.state")) {
-    DBG("restore");             // DEBUG
-    DBG(settings->getValue("midi_monitor.window.state")); // DEBUG
     restoreWindowStateFromString(settings->getValue("midi_monitor.window.state"));
   }
   else {
@@ -157,8 +162,6 @@ MidiMonitorWindow::MidiMonitorWindow(ApplicationProperties &app_properties)
 MidiMonitorWindow::~MidiMonitorWindow() {
   auto settings = _app_properties.getUserSettings();
   settings->setValue("midi_monitor.window.state", getWindowStateAsString());
-  DBG("save");                   // DEBUG
-  DBG(getWindowStateAsString()); // DEBUG
 }
 
 // We don't close the window, we stop monitoring and hide it.
