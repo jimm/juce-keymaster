@@ -25,9 +25,9 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
   : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
     device_manager(dev_mgr), app_properties(props)
 {
-  init_song_notes();
+  init_song_notes();            // must be before song notes component creation
 
-  load_or_create_keymaster();
+  load_or_create_keymaster();   // must be before menu bar creation
 
   make_menu_bar();
   make_set_list_songs_pane();
@@ -38,6 +38,8 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
   make_messages_pane();
   make_triggers_pane();
   make_connections_pane();
+
+  add_cursor_listeners();
 
   auto settings = props.getUserSettings();
   auto width = settings->getIntValue("window.width", DEFAULT_WINDOW_WIDTH);
@@ -414,6 +416,7 @@ Result MainComponent::loadDocument(const File &file) {
   setFile(file);
   setChangedFlag(false);
   new_km->start();
+  add_cursor_listeners();
 
   auto settings = app_properties.getUserSettings();
   settings->setValue(KM_FILE_PROPS_KEY, file.getFullPathName());
@@ -481,14 +484,12 @@ void MainComponent::init_song_notes() {
 void MainComponent::make_set_list_songs_pane() {
   auto model = new SetListSongsListBoxModel();
   config_list_box("Set List Songs", set_list_songs_label, set_list_songs, model);
-  KeyMaster_instance()->cursor()->addActionListener(&set_list_songs);
   set_list_songs.selectRow(model->selected_row_num());
 }
 
 void MainComponent::make_song_patches_pane() {
   auto model = new SongPatchesListBoxModel();
   config_list_box("Song Patches", song_patches_label, song_patches, model);
-  KeyMaster_instance()->cursor()->addActionListener(&song_patches);
   song_patches.selectRow(model->selected_row_num());
 }
 
@@ -505,20 +506,17 @@ void MainComponent::make_song_notes_pane() {
   config_label(song_notes_label, "Song Notes");
 
   song_notes.update_contents();
-  KeyMaster_instance()->cursor()->addActionListener(&song_notes);
   addAndMakeVisible(song_notes);
 }
 
 void MainComponent::make_connections_pane() {
   auto model = new ConnectionsTableListBoxModel();
   config_table_list_box("Patch Connections", connections_table_label, connections_table, model);
-  KeyMaster_instance()->cursor()->addActionListener(&connections_table);
 }
 
 void MainComponent::make_set_lists_pane() {
   auto model = new SetListsListBoxModel();
   config_list_box("Set Lists", set_lists_label, set_lists, model);
-  KeyMaster_instance()->cursor()->addActionListener(&set_lists);
   set_lists.selectRow(model->selected_row_num());
 }
 
@@ -543,6 +541,15 @@ void MainComponent::clock_button_clicked() {
 }
 
 // ================ helpers ================
+
+void MainComponent::add_cursor_listeners() {
+  Cursor *cursor = KeyMaster_instance()->cursor();
+  cursor->addActionListener(&set_list_songs);
+  cursor->addActionListener(&song_patches);
+  cursor->addActionListener(&song_notes);
+  cursor->addActionListener(&connections_table);
+  cursor->addActionListener(&set_lists);
+}
 
 void MainComponent::actionListenerCallback(const String &message) {
   if (message == "update:all")

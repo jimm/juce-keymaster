@@ -143,6 +143,8 @@ private:
   void make_messages_pane();
   void make_triggers_pane();
 
+  void add_cursor_listeners();
+
   void clock_button_clicked();
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
