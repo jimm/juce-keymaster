@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-class Clock : HighResolutionTimer {
+class Clock : public ActionBroadcaster, HighResolutionTimer {
 public:
   Clock();
   virtual ~Clock() override;
@@ -20,4 +20,5 @@ protected:
   float _bpm;
   long _millisecs_per_tick;
   bool _running;
+  int _tick;
 };

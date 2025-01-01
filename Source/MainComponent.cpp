@@ -7,14 +7,16 @@
 #include "gui/song_editor.h"
 #include "gui/midi_monitor.h"
 
+#define SMALL_SPACE 4
 #define SPACE 12
 #define MAIN_LABEL_HEIGHT 20
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
-#define CLOCK_INFO_HEIGHT 30
-#define CLOCK_STATUS_WIDTH 80
+#define CLOCK_INFO_HEIGHT 24
+#define CLOCK_LIGHT_WIDTH 16
+#define CLOCK_BUTTON_WIDTH 80
 #define BPM_WIDTH 60
-#define BPM_LABEL_WIDTH 60
+#define BPM_LABEL_WIDTH 40
 static const char * const KM_FILE_PROPS_KEY = "km.file";
 
 using Track = Grid::TrackInfo;
@@ -25,8 +27,6 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
   : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
     device_manager(dev_mgr), app_properties(props)
 {
-  init_song_notes();            // must be before song notes component creation
-
   load_or_create_keymaster();   // must be before menu bar creation
 
   make_menu_bar();
@@ -39,7 +39,7 @@ MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &prop
   make_triggers_pane();
   make_connections_pane();
 
-  add_cursor_listeners();
+  add_km_listeners();
 
   auto settings = props.getUserSettings();
   auto width = settings->getIntValue("window.width", DEFAULT_WINDOW_WIDTH);
@@ -106,10 +106,14 @@ void MainComponent::layout_clock_and_notes(Rectangle<int> &area)
   auto row_area = area.removeFromTop(MAIN_LABEL_HEIGHT);
   clock_label.setBounds(row_area);
   row_area = area.removeFromTop(CLOCK_INFO_HEIGHT);
+
+  clock_light.setBounds(row_area.removeFromLeft(CLOCK_BUTTON_WIDTH));
   bpm.setBounds(row_area.removeFromLeft(BPM_WIDTH));
+
   bpm_label.setBounds(row_area.removeFromLeft(BPM_LABEL_WIDTH));
+
   row_area.removeFromLeft(SPACE);
-  clock_status.setBounds(row_area.removeFromLeft(CLOCK_STATUS_WIDTH));
+  clock_button.setBounds(row_area.removeFromLeft(CLOCK_BUTTON_WIDTH));
 
   area.removeFromTop(SPACE);
   row_area = area.removeFromTop(MAIN_LABEL_HEIGHT);
@@ -143,7 +147,7 @@ void MainComponent::layout_bottom(Rectangle<int> &area)
 void MainComponent::update() {
   set_list_songs.updateContent();
   song_patches.updateContent();
-  update_clock_contents();
+  // update_clock_contents();
   song_notes.update_contents();
   connections_table.updateContent();
   set_lists.updateContent();
@@ -198,6 +202,7 @@ void MainComponent::create_new_project() {
     old_km->stop();
     delete old_km;
   }
+  add_km_listeners();
   new_km->start();
 
   update();
@@ -415,8 +420,8 @@ Result MainComponent::loadDocument(const File &file) {
   }
   setFile(file);
   setChangedFlag(false);
+  add_km_listeners();
   new_km->start();
-  add_cursor_listeners();
 
   auto settings = app_properties.getUserSettings();
   settings->setValue(KM_FILE_PROPS_KEY, file.getFullPathName());
@@ -470,15 +475,7 @@ void MainComponent::config_table_list_box(
 }
 
 void MainComponent::update_clock_contents() {
-  clock_status.setButtonText(KeyMaster_instance()->is_clock_running() ? "Running" : "Start");
-}
-
-void MainComponent::init_song_notes() {
-  song_notes.setFont(FontOptions(18.0f));
-  song_notes.setMultiLine(true);
-  song_notes.setTabKeyUsedAsCharacter(true);
-  song_notes.setReturnKeyStartsNewLine(true);
-  song_notes.addListener(&song_notes);
+  bpm.setText(String(KeyMaster_instance()->clock().bpm()), NotificationType::dontSendNotification);
 }
 
 void MainComponent::make_set_list_songs_pane() {
@@ -494,12 +491,12 @@ void MainComponent::make_song_patches_pane() {
 }
 
 void MainComponent::make_clock_pane() {
-  clock_status.setToggleable(true);
-  clock_status.onClick = [this] { clock_button_clicked(); };
+  bpm.setText(String(KeyMaster_instance()->clock().bpm()));
   config_label(clock_label, "Clock");
+  addAndMakeVisible(clock_light);
   addAndMakeVisible(bpm);
   addAndMakeVisible(bpm_label);
-  addAndMakeVisible(clock_status);
+  addAndMakeVisible(clock_button);
 }
 
 void MainComponent::make_song_notes_pane() {
@@ -530,25 +527,25 @@ void MainComponent::make_triggers_pane() {
   config_table_list_box("Triggers", triggers_label, triggers, model);
 }
 
-void MainComponent::clock_button_clicked() {
-  bool state = clock_status.getToggleState();
-  auto km = KeyMaster_instance();
-  if (state)
-    km->start_clock();
-  else
-    km->stop_clock();
-  update_clock_contents();
-}
-
 // ================ helpers ================
 
-void MainComponent::add_cursor_listeners() {
-  Cursor *cursor = KeyMaster_instance()->cursor();
+// Call this before calling the cursor's init method so we get the "moved"
+// message it sends and can redraw everything we need to.
+void MainComponent::add_km_listeners() {
+  KeyMaster *km = KeyMaster_instance();
+
+  Cursor *cursor = km->cursor();
   cursor->addActionListener(&set_list_songs);
   cursor->addActionListener(&song_patches);
   cursor->addActionListener(&song_notes);
   cursor->addActionListener(&connections_table);
   cursor->addActionListener(&set_lists);
+
+  Clock &clock = km->clock();
+  clock.addActionListener(&clock_light);
+  clock.addActionListener(&bpm);
+  clock.addActionListener(&clock_button);
+  
 }
 
 void MainComponent::actionListenerCallback(const String &message) {

@@ -2,6 +2,9 @@
 
 #include <JuceHeader.h>
 #include "km/device_manager.h"
+#include "gui/clock_bpm.h"
+#include "gui/clock_button.h"
+#include "gui/clock_light.h"
 #include "gui/connections_table.h"
 #include "gui/menu_manager.h"
 #include "gui/messages_list_box.h"
@@ -93,9 +96,10 @@ private:
   SongPatchesListBox song_patches;
 
   Label clock_label;
-  TextEditor bpm;
+  ClockLight clock_light;
+  ClockBpm bpm;
   Label bpm_label { {}, "BPM" };
-  TextButton clock_status { "Start" };
+  ClockButton clock_button;
 
   Label song_notes_label;
   SongNotes song_notes;
@@ -143,9 +147,7 @@ private:
   void make_messages_pane();
   void make_triggers_pane();
 
-  void add_cursor_listeners();
-
-  void clock_button_clicked();
+  void add_km_listeners();
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

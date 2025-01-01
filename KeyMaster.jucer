@@ -12,6 +12,8 @@
       <FILE id="c5Syva" name="cc_maps_table.cpp" compile="1" resource="0"
             file="Source/gui/cc_maps_table.cpp"/>
       <FILE id="vr38ws" name="cc_maps_table.h" compile="0" resource="0" file="Source/gui/cc_maps_table.h"/>
+      <FILE id="oFi5SW" name="clock_bpm.h" compile="0" resource="0" file="Source/gui/clock_bpm.h"/>
+      <FILE id="jSfpgy" name="clock_button.h" compile="0" resource="0" file="Source/gui/clock_button.h"/>
       <FILE id="O1skj4" name="connection_editor.cpp" compile="1" resource="0"
             file="Source/gui/connection_editor.cpp"/>
       <FILE id="oZD7Wl" name="connection_editor.h" compile="0" resource="0"

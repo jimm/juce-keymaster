@@ -43,6 +43,7 @@ void Cursor::init() {
     song_index = UNDEFINED;
     patch_index = UNDEFINED;
   }
+  sendActionMessage(moved);
 }
 
 SetList *Cursor::set_list() const {

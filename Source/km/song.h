@@ -9,6 +9,9 @@ public:
   Song(DBObjID id, const String &name);
   ~Song();
 
+  void start();
+  void stop();
+
   inline Array<Patch *> &patches() { return _patches; }
   inline String &notes() { return _notes; }
   inline float bpm() const { return _bpm; }

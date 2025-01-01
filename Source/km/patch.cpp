@@ -22,6 +22,8 @@ void Patch::start() {
   for (auto& conn : _connections)
     conn->start();
   _running = true;
+
+  KeyMaster_instance()->cursor()->song()->start();
 }
 
 bool Patch::is_running() {
@@ -31,6 +33,8 @@ bool Patch::is_running() {
 void Patch::stop() {
   if (!_running)
     return;
+
+  KeyMaster_instance()->cursor()->song()->stop();
 
   for (auto& conn : _connections)
     conn->stop();

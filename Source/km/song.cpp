@@ -13,6 +13,17 @@ Song::~Song() {
     delete patch;
 }
 
+void Song::start() {
+  Clock &clock = KeyMaster_instance()->clock();
+  clock.set_bpm(_bpm);
+  if (_clock_on_at_start)
+    clock.start();
+}
+
+void Song::stop() {
+  KeyMaster_instance()->clock().stop();
+}
+
 void Song::set_notes(const String &notes) {
   if (_notes != notes) {
     _notes = notes;

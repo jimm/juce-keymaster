@@ -4,6 +4,14 @@
 
 class SongNotes : public TextEditor, public ActionListener, public TextEditor::Listener {
 public:
+  SongNotes() {
+    setFont(FontOptions(18.0f));
+    setMultiLine(true);
+    setTabKeyUsedAsCharacter(true);
+    setReturnKeyStartsNewLine(true);
+    addListener(this);
+  }
+
   virtual void textEditorTextChanged(TextEditor &) override {
     Song *song = KeyMaster_instance()->cursor()->song();
     if (song)
