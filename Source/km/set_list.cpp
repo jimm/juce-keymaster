@@ -21,6 +21,14 @@ void SetList::add_song(Song *song) {
   KeyMaster_instance()->changed();
 }
 
+void SetList::insert_song(int index, Song *song) {
+  if (this == KeyMaster_instance()->all_songs())
+    return;
+
+  _songs.insert(index, song);
+  KeyMaster_instance()->changed();
+}
+
 void SetList::remove_song(Song *song) {
   _songs.removeFirstMatchingValue(song);
   KeyMaster_instance()->changed();

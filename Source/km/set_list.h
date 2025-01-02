@@ -11,6 +11,7 @@ public:
   inline Array<Song *> &songs() { return _songs; }
 
   void add_song(Song *song);
+  void insert_song(int index, Song *song);
   void remove_song(Song *song);
 
   void set_songs(Array<Song *>&other_songs);

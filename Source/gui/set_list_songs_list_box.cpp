@@ -13,7 +13,8 @@ void SetListSongsListBox::popupMenu() {
   SetList *set_list = static_cast<SetListSongsListBoxModel *>(getListBoxModel())->set_list();
   bool is_all_songs = set_list == km->all_songs();
   auto rows = getSelectedRows();
-  Song *song = rows.size() > 0 ? set_list->songs()[rows[0]] : nullptr;
+  int selected_index = rows.size() > 0 ? rows[0] : UNDEFINED;
+  Song *song = selected_index == UNDEFINED ? nullptr : set_list->songs()[selected_index];
 
   if (song) {
     menu.addItem("Edit Song", [this, song] {
@@ -27,7 +28,7 @@ void SetListSongsListBox::popupMenu() {
 
   if (is_all_songs) {
     if (song) {
-      menu.addItem("Delete Selected Song", [&] {
+      menu.addItem("Delete Selected Song", [this, set_list, song] {
         Editor e;
         e.remove_song_from_set_list(set_list, song); // destroys the song as well
         sendActionMessage("update:all");
@@ -35,24 +36,19 @@ void SetListSongsListBox::popupMenu() {
     }
   }
   else {
-    menu.addItem("Add Song to Set List", [&] {
-      PopupMenu songsMenu;
-      KeyMaster *km = KeyMaster_instance();
-
-      for (auto *song : km->all_songs()->songs()) {
-        menu.addItem(song->name(), [&] {
-          Editor e;
-          set_list->add_song(song);
-          km->cursor()->goto_song(song);
-          sendActionMessage("update:all");
-        });
-      }
-    });
+    PopupMenu submenu;
+    for (auto *s : km->all_songs()->songs()) {
+      submenu.addItem(s->name(), [this, km, set_list, selected_index, s] {
+        set_list->insert_song(selected_index + 1, s);
+        km->cursor()->goto_song(s);
+        sendActionMessage("update:all");
+      });
+    }
+    menu.addSubMenu("Add Song to Set List", submenu);
 
     if (song) {
-      menu.addItem("Remove Selected Song from Set List", [&] {
+      menu.addItem("Remove Selected Song from Set List", [this, set_list, song] {
         Editor e;
-
         e.remove_song_from_set_list(set_list, song);
         sendActionMessage("update:all");
       });
