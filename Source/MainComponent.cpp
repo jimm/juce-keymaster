@@ -4,6 +4,7 @@
 #include "km/keymaster.h"
 #include "km/storage.h"
 #include "gui/connection_editor.h"
+#include "gui/set_list_editor.h"
 #include "gui/song_editor.h"
 #include "gui/midi_monitor.h"
 
@@ -300,12 +301,7 @@ void MainComponent::new_connection() {
 }
 
 void MainComponent::new_set_list() {
-  Editor e;
-  SetList *set_list = e.create_set_list();
-  e.add_set_list(set_list);
-  // TODO open editor
-
-  set_lists.updateContent();
+  open_set_list_editor(nullptr)->addActionListener(this);
 }
 
 void MainComponent::delete_message() {

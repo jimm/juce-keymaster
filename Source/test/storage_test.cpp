@@ -219,18 +219,18 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   expect(cc->min_out() == 40);
   expect(cc->max_out() == 50);
 
-  // ==== load song list
+  // ==== load set list
   if (call_begin_test)
-    beginTest("load song list");
+    beginTest("load set list");
   expect(km->set_lists().size() == 3);
 
-  SetList *sl = km->set_lists()[1]; // first user-defined song list
+  SetList *sl = km->set_lists()[1]; // first user-defined set list
   expect(sl->name() == "Set List One");
   expect(sl->songs().size() == 2);
   expect(sl->songs()[0] == all_songs[THIS_IS_A_SONG_INDEX]);
   expect(sl->songs().getLast() == all_songs[ANOTHER_INDEX]);
 
-  sl = km->set_lists()[2];       // second user-defined song list
+  sl = km->set_lists()[2];       // second user-defined set list
   expect(sl->name() == "Set List Two");
   expect(sl->songs().size() == 2);
   expect(sl->songs()[0] == all_songs[ANOTHER_INDEX]);

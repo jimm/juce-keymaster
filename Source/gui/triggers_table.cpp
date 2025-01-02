@@ -72,14 +72,20 @@ void TriggersTableListBoxModel::cellDoubleClicked(int row, int col, const MouseE
 
 void TriggersTableListBox::popupMenu() {
   PopupMenu menu;
+  auto rows = getSelectedRows();
+  auto trigger = rows.size() > 0 ? KeyMaster_instance()->triggers()[rows[0]] : nullptr;
+
+  if (trigger) {
+    menu.addItem("Edit Trigger", [this, trigger] {
+      open_trigger_editor(trigger)->addActionListener(this);
+    });
+  }
 
   menu.addItem("Create New Trigger", [this] {
     open_trigger_editor(nullptr)->addActionListener(this);
   });
 
-  auto rows = getSelectedRows();
-  if (rows.size() > 0) {
-    auto trigger = KeyMaster_instance()->triggers()[rows[0]];
+  if (trigger) {
     menu.addItem("Delete Selected Trigger", [this, trigger] {
       Editor e;
       e.destroy_trigger(trigger);

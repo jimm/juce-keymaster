@@ -9,18 +9,23 @@ void SongPatchesListBoxModel::listBoxItemDoubleClicked(int row, const MouseEvent
 
 void SongPatchesListBox::popupMenu() {
   PopupMenu menu;
+  auto song = KeyMaster_instance()->cursor()->song();
+  auto rows = getSelectedRows();
+  Patch *patch = rows.size() > 0 ? song->patches()[rows[0]] : nullptr;
+
+  if (patch) {
+    menu.addItem("Edit Patch", [this, patch] {
+      open_patch_editor(patch)->addActionListener(this);
+    });
+  }
 
   menu.addItem("Create New Patch", [this] {
     open_patch_editor(nullptr)->addActionListener(this);
   });
 
-  auto rows = getSelectedRows();
-  if (rows.size() > 0) {
+  if (patch) {
     menu.addItem("Delete Selected Patch", [&] {
       Editor e;
-      auto song = KeyMaster_instance()->cursor()->song();
-      auto patch = song->patches()[rows[0]];
-
       e.destroy_patch(song, patch);
       sendActionMessage("update:all");
     });

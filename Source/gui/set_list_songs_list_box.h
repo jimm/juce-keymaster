@@ -33,7 +33,4 @@ public:
 
 protected:
   virtual void popupMenu() override;
-
-  void popup_all_songs_menu();
-  void popup_set_list_menu();
 };

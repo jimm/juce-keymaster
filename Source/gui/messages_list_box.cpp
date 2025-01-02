@@ -9,14 +9,20 @@ void MessagesListBoxModel::listBoxItemDoubleClicked(int row, const MouseEvent&) 
 void MessagesListBox::popupMenu() {
   PopupMenu menu;
   auto messages = KeyMaster_instance()->messages();
+  auto rows = getSelectedRows();
+  MessageBlock *message = rows.size() > 0 ? messages[rows[0]] : nullptr;
+
+  if (message) {
+    menu.addItem("Edit Message", [this, message] {
+      open_message_editor(message)->addActionListener(this);
+    });
+  }
 
   menu.addItem("Create New Message", [this] {
     open_message_editor(nullptr)->addActionListener(this);
   });
 
-  auto rows = getSelectedRows();
-  if (rows.size() > 0) {
-    auto message = messages[rows[0]];
+  if (message) {
     menu.addItem("Delete Selected Message", [this, message] {
       Editor e;
       e.destroy_message(message);

@@ -85,14 +85,20 @@ void ConnectionsTableListBoxModel::cellDoubleClicked(int row, int col, const Mou
 void ConnectionsTableListBox::popupMenu() {
   PopupMenu menu;
   auto patch = KeyMaster_instance()->cursor()->patch();
+  auto rows = getSelectedRows();
+  Connection *conn = rows.size() > 0 ? patch->connections()[rows[0]] : nullptr;
+
+  if (conn) {
+    menu.addItem("Edit Connection", [this, conn] {
+      open_connection_editor(conn)->addActionListener(this);
+    });
+  }
 
   menu.addItem("Create New Connection", [this] {
     open_connection_editor(nullptr)->addActionListener(this);
   });
 
-  auto rows = getSelectedRows();
-  if (rows.size() > 0) {
-    auto conn = patch->connections()[rows[0]];
+  if (conn) {
     menu.addItem("Delete Selected Connection", [this, patch, conn] {
       Editor e;
       e.destroy_connection(patch, conn);
