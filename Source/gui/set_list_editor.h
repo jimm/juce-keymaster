@@ -4,31 +4,12 @@
 #include "../km/keymaster.h"
 #include "../km/set_list.h"
 #include "km_editor.h"
+#include "set_list_edit_box.h"
+#include "set_list_model.h"
 
-struct AllSongsModel final : public ListBoxModel {
-  SetList * _all_songs = KeyMaster_instance()->all_songs();
-
-  int getNumRows() override { return _all_songs->songs().size(); }
-
-  void paintListBoxItem(int row, Graphics &g, int width, int height, bool rowIsSelected) override {
-    if (rowIsSelected)
-      g.fillAll(Colours::lightblue);
-
-    g.setColour (LookAndFeel::getDefaultLookAndFeel().findColour(Label::textColourId));
-    g.setFont((float)height * 0.7f);
-
-    g.drawText(_all_songs->songs()[row]->name(),
-               5, 0, width, height,
-               Justification::centredLeft, true);
-  }
-
-  // TODO do I need this?
-  var getDragSourceDescription (const SparseSet<int>& selected_rows) override {
-    StringArray rows;
-    for (int i = 0; i < selected_rows.size(); ++i)
-      rows.add(_all_songs->songs()[selected_rows[i]]->name());
-    return rows.joinIntoString (", ");
-  }
+class AllSongsModel final : public SetListModel {
+public:
+  AllSongsModel() : SetListModel(KeyMaster_instance()->all_songs()) {}
 };
 
 class SetListEditor : public KmEditor, public DragAndDropContainer {
@@ -46,8 +27,12 @@ private:
   TextEditor _name;
 
   Label _all_songs_label { {}, "All Songs" };
-  ListBox _all_songs;
+  ListBox _all_songs_box;
   AllSongsModel _all_songs_model;
+
+  Label _set_list_label { {}, "Set List" };
+  SetListEditBox _set_list_box;
+  SetListEditModel _set_list_model { _set_list };
 
   virtual void layout(Rectangle<int> &area) override;
   void layout_name(Rectangle<int> &area);

@@ -9,7 +9,7 @@
 #define LIST_HEIGHT 300
 
 #define CONTENT_WIDTH (LIST_WIDTH * 2 + SPACE)
-#define CONTENT_HEIGHT (BETWEEN_ROW_SPACE * 1 + LIST_HEIGHT)
+#define CONTENT_HEIGHT (BETWEEN_ROW_SPACE * 1 + SPACE * 2 + DATA_ROW_HEIGHT + LABEL_HEIGHT * 2 + LIST_HEIGHT)
 
 SetListEditor * open_set_list_editor(SetList *sl)
 {
@@ -48,18 +48,8 @@ int SetListEditor::height() {
 
 void SetListEditor::layout(Rectangle<int> &area) {
   layout_name(area);
-  layout_lists(area);
-}
-
-void SetListEditor::layout_lists(Rectangle<int> &area) {
   area.removeFromTop(BETWEEN_ROW_SPACE);
-  // TODO label
-  _all_songs.setBounds(area.removeFromLeft(LIST_WIDTH));
-
-  area.removeFromLeft(SPACE);
-  // TODO set list
-  // _set_list_list.setBounds(area);
-
+  layout_lists(area);
   KmEditor::layout(area);
 }
 
@@ -70,17 +60,34 @@ void SetListEditor::layout_name(Rectangle<int> &area) {
   _name.setBounds(row_area.removeFromLeft(NAME_WIDTH));
 }
 
+void SetListEditor::layout_lists(Rectangle<int> &area) {
+  auto row_area = area.removeFromTop(LABEL_HEIGHT);
+  _all_songs_label.setBounds(row_area.removeFromLeft(LIST_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _set_list_label.setBounds(row_area);
+
+  area.removeFromTop(SPACE);
+  row_area = area.removeFromTop(LIST_HEIGHT);
+  _all_songs_box.setBounds(row_area.removeFromLeft(LIST_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _set_list_box.setBounds(row_area);
+}
+
 void SetListEditor::init() {
   _name.setText(_set_list->name());
 
-  _all_songs.setModel(&_all_songs_model);
-  _all_songs.setMultipleSelectionEnabled(true);
+  _all_songs_box.setModel(&_all_songs_model);
+  _all_songs_box.setMultipleSelectionEnabled(true);
+
+  _set_list_box.setModel(&_set_list_model);
+  _set_list_box.setMultipleSelectionEnabled(false);
 
   addAndMakeVisible(_name_label);
   addAndMakeVisible(_name);
-  // TODO addAndMakeVisible(_all_songs_label);
-  addAndMakeVisible(_all_songs);
-  // TODO addAndMakeVisible(_set_list_list);
+  addAndMakeVisible(_all_songs_label);
+  addAndMakeVisible(_all_songs_box);
+  addAndMakeVisible(_set_list_label);
+  addAndMakeVisible(_set_list_box);
 
   KmEditor::init();
 }
@@ -91,6 +98,9 @@ void SetListEditor::cancel_cleanup() {
 
 bool SetListEditor::apply() {
   _set_list->set_name(_name.getText());
+
+  auto model = static_cast<SetListModel *>(_set_list_box.getListBoxModel());
+  _set_list->set_songs(model->set_list()->songs());
 
   if (_is_new) {
     Editor e;

@@ -15,6 +15,6 @@ public:
 
   void set_songs(Array<Song *>&other_songs);
 
-private:
+protected:
   Array<Song *> _songs;
 };

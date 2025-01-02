@@ -46,10 +46,14 @@
       <FILE id="EJUIUE" name="patch_editor.cpp" compile="1" resource="0"
             file="Source/gui/patch_editor.cpp"/>
       <FILE id="Be4LaY" name="patch_editor.h" compile="0" resource="0" file="Source/gui/patch_editor.h"/>
+      <FILE id="uonMF5" name="set_list_edit_box.h" compile="0" resource="0"
+            file="Source/gui/set_list_edit_box.h"/>
       <FILE id="Akv7eQ" name="set_list_editor.cpp" compile="1" resource="0"
             file="Source/gui/set_list_editor.cpp"/>
       <FILE id="hMM1f7" name="set_list_editor.h" compile="0" resource="0"
             file="Source/gui/set_list_editor.h"/>
+      <FILE id="vC5lwa" name="set_list_model.h" compile="0" resource="0"
+            file="Source/gui/set_list_model.h"/>
       <FILE id="vvaa7d" name="set_list_songs_list_box.cpp" compile="1" resource="0"
             file="Source/gui/set_list_songs_list_box.cpp"/>
       <FILE id="QLqr8Z" name="set_list_songs_list_box.h" compile="0" resource="0"
