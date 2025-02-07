@@ -11,11 +11,15 @@ void DeviceManager::handleIncomingMidiMessage(MidiInput *source, const MidiMessa
   input->midi_in(message);
 }
 
-void DeviceManager::update_devices() {
+void DeviceManager::clear() {
   _inputs.clear();
   _identifier_to_input.clear();
   _outputs.clear();
   _identifier_to_output.clear();
+}
+
+void DeviceManager::update_devices() {
+  clear();
   update_inputs();
   update_outputs();
 }

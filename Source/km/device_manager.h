@@ -9,6 +9,7 @@ public:
 
   virtual ~DeviceManager() override;
 
+  void clear();
   void update_devices();
 
   ReferenceCountedArray<Input> &inputs() { return _inputs; }
