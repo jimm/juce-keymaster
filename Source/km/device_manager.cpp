@@ -49,6 +49,16 @@ Input::Ptr DeviceManager::find_or_create_input(const String &identifier, const S
 Input::Ptr DeviceManager::find_or_create_input(const MidiDeviceInfo info) {
   Input::Ptr input = find_input(info.identifier);
   if (input == nullptr) {
+    // Look for the name, keeping the identifier we have because that's the
+    // current system's identifier for that name.
+    for (auto [id, inp] : _identifier_to_input) {
+      if (inp->name() == info.name) {
+        input = inp;
+        break;
+      }
+    }
+  }
+  if (input == nullptr) {
     input = new Input(info, this);
     _inputs.add(input);
     _identifier_to_input[info.identifier] = input;
@@ -68,6 +78,14 @@ Output::Ptr DeviceManager::find_or_create_output(const String &identifier, const
 
 Output::Ptr DeviceManager::find_or_create_output(const MidiDeviceInfo info) {
   Output::Ptr output = find_output(info.identifier);
+  // Look for the name, keeping the identifier we have because that's the
+  // current system's identifier for that name.
+  for (auto [id, outp] : _identifier_to_output) {
+    if (outp->name() == info.name) {
+      output = outp;
+      break;
+    }
+  }
   if (output == nullptr) {
     output = new Output(info);
     _outputs.add(output);

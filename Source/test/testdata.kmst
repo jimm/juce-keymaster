@@ -70,40 +70,30 @@
       "id": 3,
       "name": "next song",
       "action": 0,
-      "input_identifier": "input-1",
-      "input_name": "first input",
       "trigger_message_bytes": "b0 32 7f"
     },
     {
       "id": 4,
       "name": "prev song",
       "action": 1,
-      "input_identifier": "input-1",
-      "input_name": "first input",
       "trigger_message_bytes": "b0 33 7f"
     },
     {
       "id": 5,
       "name": "next patch",
       "action": 2,
-      "input_identifier": "input-1",
-      "input_name": "first input",
       "trigger_message_bytes": "b0 34 7f"
     },
     {
       "id": 6,
       "name": "prev patch",
       "action": 3,
-      "input_identifier": "input-1",
-      "input_name": "first input",
       "trigger_message_bytes": "b0 35 7f"
     },
     {
       "id": 7,
       "name": "send tune request message",
       "action": 7,
-      "input_identifier": "input-1",
-      "input_name": "first input",
       "trigger_message_bytes": "b0 36 7f",
       "output_message_id": 1
     }

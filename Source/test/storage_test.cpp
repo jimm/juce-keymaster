@@ -20,6 +20,7 @@ void StorageTest::shutdown() {
 
 void StorageTest::runTest() {
   test_load("", true);
+  test_different_device_identifiers();
   test_save();
 }
 
@@ -246,6 +247,29 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   expect(p->connections().size() == 1);
   expect(p->connections()[0]->input()->name() == "first input");
   expect(p->connections()[0]->output()->name() == "first output");
+}
+
+void StorageTest::test_different_device_identifiers() {
+  DeviceManager dm;
+
+  // Put known instrument names into device manager with different
+  // identifiers
+  dm.find_or_create_input(MidiDeviceInfo("first input", "i1"));
+  dm.find_or_create_input(MidiDeviceInfo("second input", "i2"));
+  dm.find_or_create_input(MidiDeviceInfo("first output", "o1"));
+  dm.find_or_create_input(MidiDeviceInfo("second output", "o2"));
+
+  beginTest("DeviceManager uses instrument name if identifier not found");
+
+  expect(dm.find_input("i1") != nullptr); // make sure we have the "old" identifier
+
+  km = load_test_data(dm, "");
+
+  expect(dm.find_input("i1") == nullptr);
+  auto inp = dm.find_input("input-1");
+  expect(inp != nullptr);
+  expect(inp->name() == "first input");
+  expect(inp->identifier() == "input-1");
 }
 
 void StorageTest::test_save() {
