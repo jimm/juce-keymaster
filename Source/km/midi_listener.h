@@ -6,6 +6,6 @@ class MidiListener {
 public:
   virtual ~MidiListener() {}
 
-  virtual void midi_input(const String &name, const MidiMessage &message) {}
-  virtual void midi_output(const String &name, const MidiMessage &message) {}
+  virtual void midi_input(const String &, const MidiMessage &) {}
+  virtual void midi_output(const String &, const MidiMessage &) {}
 };

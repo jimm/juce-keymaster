@@ -359,9 +359,11 @@ void MainComponent::prev_patch() {
 }
 
 void MainComponent::find_song() {
+  // TODO
 }
 
 void MainComponent::find_set_list() {
+  // TODO
 }
 
 void MainComponent::toggle_clock() {

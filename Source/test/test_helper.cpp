@@ -3,11 +3,17 @@
 #include "../km/storage.h"
 #include "../km/utils.h"
 
+#define DEFAULT_DATA_FILE_PATH "../../../../Source/test/testdata.kmst"
+
+/*
+ * Loads a KeyMaster file, by default DEFAULT_DATA_FILE_PATH. Returns a new
+ * instance of KeyMaster with testing set to true.
+ */
 KeyMaster *load_test_data(DeviceManager &dev_mgr, String data_file_path) {
   KeyMaster *old_km = KeyMaster_instance();
 
   if (data_file_path == "")
-    data_file_path = "../../../../Source/test/testdata.kmst";
+    data_file_path = DEFAULT_DATA_FILE_PATH;
   if (!File::isAbsolutePath(data_file_path)) {
     data_file_path =
       File::addTrailingSeparator(File::getCurrentWorkingDirectory().getFullPathName())
@@ -32,6 +38,11 @@ KeyMaster *load_test_data(DeviceManager &dev_mgr, String data_file_path) {
   return new_km;
 }
 
+/*
+ * Returns true if the raw data of two `MidiMessage`s are equal by calling
+ * `mm_equal`. As a side effect, if they are not equal it calls `DBG` to
+ * print out the difference.
+ */
 bool mm_eq(const MidiMessage &a, const MidiMessage &b) {
   if (mm_equal(a, b))
     return true;

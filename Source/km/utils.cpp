@@ -1,6 +1,9 @@
 #include <JuceHeader.h>
 #include "utils.h"
 
+/*
+ * Returns true if the raw data of two `MidiMessage`s are equal.
+ */
 bool mm_equal(const MidiMessage &a, const MidiMessage &b) {
   int a_size = a.getRawDataSize();
   if (a_size != b.getRawDataSize())

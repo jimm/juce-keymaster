@@ -7,7 +7,7 @@ public:
   MidiMessageLearner(
     bool sysex_ok, bool pitch_bend_ok = false, bool clock_ok = false, bool active_sense_ok = false
   );
-  virtual ~MidiMessageLearner();
+  virtual ~MidiMessageLearner() override;
 
   // If max_messages = 0, keeps learning until stop_learning is called.
   // Else, stops after that many messages and calls max_callback when the
@@ -16,7 +16,7 @@ public:
 
   bool is_learning() { return _learning; }
 
-  virtual void midi_input(const String &name, const MidiMessage &message) override { learn_midi_message(message); }
+  virtual void midi_input(const String &, const MidiMessage &message) override { learn_midi_message(message); }
 
   // Called by learn_midi_message. You don't have to call this; it's only
   // public so it's easier to test.
