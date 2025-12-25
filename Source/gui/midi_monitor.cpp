@@ -107,6 +107,8 @@ void MidiMonitor::handleAsyncUpdate() {
     const ScopedLock sl(_midi_monitor_lock);
     input_msgs = _input_messages;
     output_msgs = _output_messages;
+    _input_messages.clear();
+    _output_messages.clear();
   }
 
   String text;

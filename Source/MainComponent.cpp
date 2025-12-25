@@ -319,7 +319,12 @@ void MainComponent::delete_trigger() {
 }
 
 void MainComponent::delete_song() {
-  // TODO
+  Song *song = KeyMaster_instance()->cursor()->song();
+  if (song == nullptr)
+    return;
+
+  Editor e;
+  e.destroy_song(song);
   set_list_songs.updateContent();
   song_patches.updateContent();
   connections_table.updateContent();

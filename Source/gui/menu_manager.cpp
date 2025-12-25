@@ -207,7 +207,8 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     break;
   case CommandIDs::delete_song:
     result.setInfo("Delete Song", "Delete Song", "Edit", 0);
-    result.setActive(km->all_songs()->songs().size() > 1);
+    song = km->cursor()->song();
+    result.setActive(song != nullptr && km->all_songs()->songs().size() > 1);
     break;
   case CommandIDs::delete_patch:
     result.setInfo("Delete Patch", "Delete Patch", "Edit", 0);

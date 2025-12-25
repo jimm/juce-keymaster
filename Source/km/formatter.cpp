@@ -10,6 +10,7 @@ static const int NOTE_OFFSETS[] = {
   9, 11, 0, 2, 4, 5, 7
 };
 
+// Converts a note name like "C4" to a MIDI note number.
 // str may point to an integer string like "64" as well
 int note_name_to_num(String str) {
   char ch = (char)str[0];
@@ -39,6 +40,7 @@ int note_name_to_num(String str) {
   return octave + from_c + accidental;
 }
 
+// Returns the text description of a MidiMessage.
 String trigger_message_description(const MidiMessage &msg) {
   if (mm_equal(msg, EMPTY_MESSAGE))
     return "";

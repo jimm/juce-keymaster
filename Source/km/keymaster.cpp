@@ -161,46 +161,6 @@ void KeyMaster::update_clock() {
 // read its data from a file.
 void KeyMaster::initialize() {
   generate_default_curves(this->_curves);
-  create_songs();
-}
-
-void KeyMaster::create_songs() {
-  for (auto& input : _device_manager.inputs()) {
-    // this input to each individual output
-    for (auto& output : _device_manager.outputs()) {
-      String name = input->name() + " -> " + output->name();
-      Song *song = new Song(UNDEFINED_ID, name);
-      all_songs()->add_song(song);
-
-      Patch *patch = new Patch(UNDEFINED_ID, name);
-      song->add_patch(patch);
-
-      Connection *conn = new Connection(
-        UNDEFINED,
-        input, CONNECTION_ALL_CHANNELS,
-        output, CONNECTION_ALL_CHANNELS);
-      patch->add_connection(conn);
-
-    }
-
-    if (_device_manager.outputs().size() > 1) {
-      // one more song: this input to all outputs at once
-      String name = input->name() + " -> all outputs";
-      Song *song = new Song(UNDEFINED_ID, name);
-      all_songs()->add_song(song);
-
-      Patch *patch = new Patch(UNDEFINED_ID, name);
-      song->add_patch(patch);
-
-      for (auto& output : _device_manager.outputs()) {
-        Connection *conn = new Connection(
-          UNDEFINED,
-          input, CONNECTION_ALL_CHANNELS,
-          output, CONNECTION_ALL_CHANNELS);
-        patch->add_connection(conn);
-      }
-    }
-  }
 }
 
 // ================ movement ================

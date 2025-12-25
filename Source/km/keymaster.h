@@ -103,9 +103,6 @@ private:
   bool _testing;
   Array<MessageBlock *> _messages;
   Array<Curve *> _curves;
-
-  // ================ initialization ================
-  void create_songs();
 };
 
 KeyMaster *KeyMaster_instance();
