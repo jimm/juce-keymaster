@@ -5,11 +5,22 @@
 
 #define INITIAL_WIDTH 800
 #define INITIAL_HEIGHT 600
+#define CLEAR_BUTTON_WIDTH 60
 
 MidiMonitor::MidiMonitor()
 {
   init_text_editor(_input_label, _input_midi);
   init_text_editor(_output_label, _output_midi);
+
+  addAndMakeVisible(_clear);
+  _clear.onClick = [this] {
+    const ScopedLock sl(_midi_monitor_lock);
+    _input_messages.clear();
+    _output_messages.clear();
+    _input_midi.setText("");
+    _output_midi.setText("");
+  };
+
   setSize(width(), height());
 }
 
@@ -62,7 +73,10 @@ void MidiMonitor::resized() {
   int width = (area.getWidth() - SPACE) / 2;
   auto label_area = area.removeFromTop(LABEL_HEIGHT);
   _input_label.setBounds(label_area.removeFromLeft(width));
-  _output_label.setBounds(label_area.removeFromRight(width));
+  auto right_half = label_area.removeFromRight(width);
+  _output_label.setBounds(right_half.removeFromLeft(width - CLEAR_BUTTON_WIDTH));
+
+  _clear.setBounds(right_half.removeFromRight(CLEAR_BUTTON_WIDTH));
 
   area.removeFromTop(SPACE);
   _input_midi.setBounds(area.removeFromLeft(width));

@@ -29,6 +29,7 @@ private:
 
   Label _input_label { {}, "Input" };
   Label _output_label { {}, "Output" };
+  TextButton _clear { "Clear" };
   TextEditor _input_midi;
   TextEditor _output_midi;
   CriticalSection _midi_monitor_lock;
