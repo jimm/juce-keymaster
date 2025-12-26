@@ -14,8 +14,7 @@
 #define DEFAULT_WINDOW_WIDTH 900
 #define DEFAULT_WINDOW_HEIGHT 700
 #define CLOCK_INFO_HEIGHT 24
-#define CLOCK_LIGHT_WIDTH 16
-#define CLOCK_BUTTON_WIDTH 80
+#define CLOCK_BUTTON_WIDTH 40
 #define BPM_WIDTH 60
 #define BPM_LABEL_WIDTH 40
 static const char * const KM_FILE_PROPS_KEY = "km.file";
