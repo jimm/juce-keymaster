@@ -2,27 +2,32 @@
 
 #include <JuceHeader.h>
 
-class ClockLight : public ImageButton, public ActionListener {
+#define CLOCK_LIGHT_SIZE 16
+#define ON_COLOR Colours::lightgreen
+#define OFF_COLOR Colours::darkgreen
+
+class ClockLight : public Component, public ActionListener {
 public:
   ClockLight() {
-    Graphics g(_image);
-    g.setColour(Colours::lightgreen);
-    g.fillEllipse(0, 0, 16, 16);
+    _curr_color = OFF_COLOR;
+  }
 
-    setImages(false, false, true,
-              _image, 0.4f, Colours::transparentBlack,
-              _image, 1.0f, Colours::transparentBlack,
-              _image, 1.0f, Colours::transparentBlack,
-              0.5f);
+  virtual void paint(Graphics &g) override {
+    g.setColour(_curr_color);
+    g.fillEllipse(CLOCK_LIGHT_SIZE, CLOCK_LIGHT_SIZE / 4, CLOCK_LIGHT_SIZE, CLOCK_LIGHT_SIZE);
   }
 
   void actionListenerCallback(const String &message) override {
-    if (message == "clock:beat")
-      setState(ButtonState::buttonDown);
-    else if (message == "clock:unbeat")
-      setState(ButtonState::buttonNormal);
+    if (message == "clock:beat") {
+      _curr_color = ON_COLOR;
+      repaint();
+    }
+    else if (message == "clock:unbeat") {
+      _curr_color = OFF_COLOR;
+      repaint();
+    }
   }
 
 private:
-  Image _image { Image::RGB, 16, 16, false };
+  Colour _curr_color;
 };
