@@ -19,6 +19,8 @@ void Clock::set_bpm(float new_val) {
   if (std::abs(_bpm - new_val) > 0.001) {
     _bpm = new_val;
     _millisecs_per_tick = BPM_TO_CLOCK_TICK_MS(_bpm);
+    if (is_running())
+      startTimer((int)_millisecs_per_tick); // resets the timer
     sendActionMessage("clock:bpm");
   }
 }

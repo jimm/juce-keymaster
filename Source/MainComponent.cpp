@@ -494,7 +494,8 @@ void MainComponent::make_song_patches_pane() {
 }
 
 void MainComponent::make_clock_pane() {
-  bpm.setText(String(KeyMaster_instance()->clock().bpm()));
+  bpm.addListener(&bpm);        // when text changes, it updates the clock
+  bpm.setText(String(KeyMaster_instance()->clock().bpm()), NotificationType::dontSendNotification);
   config_label(clock_label, "Clock");
   addAndMakeVisible(clock_light);
   addAndMakeVisible(bpm);

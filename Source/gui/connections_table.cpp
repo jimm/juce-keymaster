@@ -8,7 +8,7 @@
 void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
   auto props = TableHeaderComponent::ColumnPropertyFlags::notSortable;
   header.addColumn("Input", 1, 75, 75, -1, props);
-  header.addColumn("Chan", 2, 20, 20, -1, props);
+  header.addColumn("Chan", 2, 25, 25, -1, props);
   header.addColumn("Output", 3, 75, 75, -1, props);
   header.addColumn("Chan", 4, 25, 25, -1, props);
   header.addColumn("Zone", 5, 30, 30, -1, props);
