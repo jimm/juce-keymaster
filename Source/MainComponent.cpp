@@ -386,6 +386,7 @@ void MainComponent::midi_monitor() {
   if (_midi_monitor_window != nullptr) {
     _midi_monitor_window->setVisible(true);
     _midi_monitor_window->midi_monitor()->start();
+    _midi_monitor_window->toFront(true);
     return;
   }
 
