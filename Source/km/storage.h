@@ -36,18 +36,16 @@ private:
   void load_set_lists(var);
 
   void assign_ids();
-  void assign_ids(Array<DBObj *> objs);
-  var schema_version();
-  var curves();
-  var curves(Array<Curve *> &curves);
-  var messages();
-  var triggers();
-  var songs();
-  var patches(Array<Patch *> &patches);
-  var connections(Array<Connection *> &connections);
-  var controller_mapping(Controller *controller);
-  var message_filter(MessageFilter &mf);
-  var set_lists();
+  var schema_version_var();
+  var curves_var();
+  var messages_var();
+  var triggers_var();
+  var songs_var();
+  var patches_var(Array<Patch *> &patches);
+  var connections_var(Array<Connection *> &connections);
+  var controller_mapping_var(Controller *controller);
+  var message_filter_var(MessageFilter &mf);
+  var set_lists_var();
 
   void create_default_patches();
   void create_default_patch(Song *);

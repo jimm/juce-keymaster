@@ -58,12 +58,12 @@ void Storage::save(KeyMaster *keymaster) {
   assign_ids();
 
   DynamicObject obj;
-  obj.setProperty("schema_version", schema_version());
-  obj.setProperty("messages", messages());
-  obj.setProperty("triggers", triggers());
-  obj.setProperty("songs", songs());
-  obj.setProperty("set_lists", set_lists());
-  obj.setProperty("curves", curves());
+  obj.setProperty("schema_version", schema_version_var());
+  obj.setProperty("messages", messages_var());
+  obj.setProperty("triggers", triggers_var());
+  obj.setProperty("songs", songs_var());
+  obj.setProperty("set_lists", set_lists_var());
+  obj.setProperty("curves", curves_var());
 
   FileOutputStream output(file);
   output.setPosition(0);
@@ -84,6 +84,7 @@ String Storage::error() {
 // ================================================================
 
 void Storage::load_schema_version(var schema_version) {
+  loading_version = schema_version;
   // TODO do something with this
 }
 
@@ -305,12 +306,6 @@ void Storage::load_set_lists(var slists) {
 // save helpers
 // ================================================================
 
-void Storage::assign_ids(Array<DBObj *> objs) {
-  int i = 1;
-  for (auto &obj : objs)
-    obj->set_id(i++);
-}
-
 void Storage::assign_ids() {
   int i = 1;
   for (auto &curve : km->curves())
@@ -326,17 +321,13 @@ void Storage::assign_ids() {
     song->set_id(i++);
 }
 
-var Storage::schema_version() {
+var Storage::schema_version_var() {
   return var(SCHEMA_VERSION);
 }
 
-var Storage::curves() {
-  return curves(km->curves());
-}
-
-var Storage::curves(Array<Curve *> &curves) {
+var Storage::curves_var() {
   Array<var> curve_vars;
-  for (auto curve : curves) {
+  for (auto curve : km->curves()) {
     DynamicObject::Ptr c(new DynamicObject());
     c->setProperty("id", var(curve->id()));
     c->setProperty("name", var(curve->name()));
@@ -350,7 +341,7 @@ var Storage::curves(Array<Curve *> &curves) {
   return var(curve_vars);
 }
 
-var Storage::messages() {
+var Storage::messages_var() {
   Array<var> messages;
   for (auto message : km->messages()) {
     DynamicObject::Ptr m(new DynamicObject());
@@ -362,7 +353,7 @@ var Storage::messages() {
   return var(messages);
 }
 
-var Storage::triggers() {
+var Storage::triggers_var() {
   Array<var> triggers;
   for (auto trigger : km->triggers()) {
     DynamicObject::Ptr t(new DynamicObject());
@@ -386,7 +377,7 @@ var Storage::triggers() {
   return var(triggers);
 }
 
-var Storage::songs() {
+var Storage::songs_var() {
   Array<var> songs;
   for (auto song : km->all_songs()->songs()) {
     DynamicObject::Ptr s(new DynamicObject());
@@ -395,18 +386,18 @@ var Storage::songs() {
     s->setProperty("bpm", var(song->bpm()));
     s->setProperty("clock_on_at_start", var(song->clock_on_at_start()));
     s->setProperty("notes", var(song->notes()));
-    s->setProperty("patches", patches(song->patches()));
+    s->setProperty("patches", patches_var(song->patches()));
     songs.add(var(s.get()));
   }
   return var(songs);
 }
 
-var Storage::patches(Array<Patch *> &patches) {
+var Storage::patches_var(Array<Patch *> &patches) {
   Array<var> ps;
   for (auto patch : patches) {
     DynamicObject::Ptr p(new DynamicObject());
     p->setProperty("name", var(patch->name()));
-    p->setProperty("connections", var(connections(patch->connections())));
+    p->setProperty("connections", connections_var(patch->connections()));
     if (patch->start_message())
       p->setProperty("start_message_id", patch->start_message()->id());
     if (patch->stop_message())
@@ -416,7 +407,7 @@ var Storage::patches(Array<Patch *> &patches) {
   return var(ps);
 }
 
-var Storage::connections(Array<Connection *> &connections) {
+var Storage::connections_var(Array<Connection *> &connections) {
   Array<var> cs;
   for (auto conn : connections) {
     DynamicObject::Ptr c(new DynamicObject());
@@ -445,13 +436,13 @@ var Storage::connections(Array<Connection *> &connections) {
     c->setProperty("xpose", conn->xpose());
     if (conn->velocity_curve() != nullptr)
       c->setProperty("velocity_curve_id", conn->velocity_curve()->id());
-    c->setProperty("message_filter", message_filter(conn->message_filter()));
+    c->setProperty("message_filter", message_filter_var(conn->message_filter()));
 
     Array<var> cc_maps;
     for (int i = 0; i < 128; ++i) {
       Controller *cc_map = conn->cc_map(i);
       if (cc_map != nullptr)
-        cc_maps.add(controller_mapping(cc_map));
+        cc_maps.add(controller_mapping_var(cc_map));
     }
     if (!cc_maps.isEmpty())
       c->setProperty("controller_mappings", var(cc_maps));
@@ -461,7 +452,7 @@ var Storage::connections(Array<Connection *> &connections) {
   return var(cs);
 }
 
-var Storage::controller_mapping(Controller *controller) {
+var Storage::controller_mapping_var(Controller *controller) {
   DynamicObject::Ptr c(new DynamicObject());
 
   c->setProperty("cc_num", var(controller->cc_num()));
@@ -477,7 +468,7 @@ var Storage::controller_mapping(Controller *controller) {
   return var(c.get());
 }
 
-var Storage::message_filter(MessageFilter &mf) {
+var Storage::message_filter_var(MessageFilter &mf) {
   int flags = 0;
   if (mf.note()) flags |= (1 << 0);
   if (mf.poly_pressure()) flags |= (1 << 1);
@@ -495,7 +486,7 @@ var Storage::message_filter(MessageFilter &mf) {
   return var(flags);
 }
 
-var Storage::set_lists() {
+var Storage::set_lists_var() {
   Array<var> set_lists;
 
   for (auto slist : km->set_lists()) {
@@ -551,13 +542,14 @@ void Storage::set_find_error_message(
   const char * const find_name, DBObjID find_id
 ) {
   error_str = String::formatted("%s (%lld) can't find %s with id %lld",
-          searcher_name, searcher_id, find_name, find_id);
+                                searcher_name, searcher_id, find_name, find_id);
 }
 
 void Storage::set_find_error_message(
   const char * const searcher_name, DBObjID searcher_id,
   const char * const find_name, const String &find_id
 ) {
-  error_str = String::formatted("%s (%lld) can't find %s with id ");
+  error_str = String::formatted("%s (%lld) can't find %s with id ",
+                                searcher_name, searcher_id, find_name);
   error_str += find_id;
 }
