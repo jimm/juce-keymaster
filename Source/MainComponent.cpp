@@ -25,7 +25,8 @@ using Px = Grid::Px;
 
 MainComponent::MainComponent(DeviceManager &dev_mgr, ApplicationProperties &props)
   : FileBasedDocument(".kmst", "*.kmst", "Open project", "Save project"),
-    device_manager(dev_mgr), app_properties(props)
+    device_manager(dev_mgr), app_properties(props),
+    recent_files(std::make_unique<RecentFiles>(&props))
 {
   load_or_create_keymaster();   // must be before menu bar creation
 
@@ -235,12 +236,48 @@ void MainComponent::save_project() {
     if (save_result == SaveResult::savedOk) {
       auto settings = app_properties.getUserSettings();
       settings->setValue(KM_FILE_PROPS_KEY, getFile().getFullPathName());
+      recent_files->addFile(getFile());
     }
   } );
 }
 
 void MainComponent::save_project_as() {
-  saveAsInteractiveAsync(true, [this] (FileBasedDocument::SaveResult _) { } );
+  saveAsInteractiveAsync(true, [this] (FileBasedDocument::SaveResult save_result) {
+    if (save_result == SaveResult::savedOk) {
+      recent_files->addFile(getFile());
+    }
+  });
+}
+
+// ================ recent files ================
+
+StringArray MainComponent::get_recent_files() {
+  return recent_files->getRecentFiles();
+}
+
+void MainComponent::open_recent_file(int index) {
+  auto files = recent_files->getRecentFiles();
+  if (index >= 0 && index < files.size()) {
+    File file(files[index]);
+    if (file.existsAsFile()) {
+      saveIfNeededAndUserAgreesAsync([this, file] (FileBasedDocument::SaveResult save_result) {
+        if (save_result == SaveResult::savedOk) {
+          loadDocument(file);
+        }
+      });
+    }
+    else {
+      // File no longer exists, remove it from list
+      recent_files->removeFile(file);
+      AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                        "File Not Found",
+                                        "The file \"" + file.getFileName() + "\" could not be found.");
+    }
+  }
+}
+
+void MainComponent::clear_recent_files() {
+  recent_files->clear();
 }
 
 void MainComponent::undo() {
@@ -428,6 +465,7 @@ Result MainComponent::loadDocument(const File &file) {
 
   auto settings = app_properties.getUserSettings();
   settings->setValue(KM_FILE_PROPS_KEY, file.getFullPathName());
+  recent_files->addFile(file);
   update();
   return Result::ok();
 }

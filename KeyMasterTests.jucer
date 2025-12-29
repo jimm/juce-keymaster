@@ -94,6 +94,9 @@
       <FILE id="AIIcwY" name="output.h" compile="0" resource="0" file="Source/km/output.h"/>
       <FILE id="Vg94cA" name="patch.cpp" compile="1" resource="0" file="Source/km/patch.cpp"/>
       <FILE id="Ez6c3P" name="patch.h" compile="0" resource="0" file="Source/km/patch.h"/>
+      <FILE id="A5srVy" name="recent_files.cpp" compile="1" resource="0"
+            file="Source/km/recent_files.cpp"/>
+      <FILE id="pxX4Vt" name="recent_files.h" compile="0" resource="0" file="Source/km/recent_files.h"/>
       <FILE id="qxf129" name="set_list.cpp" compile="1" resource="0" file="Source/km/set_list.cpp"/>
       <FILE id="RrDC63" name="set_list.h" compile="0" resource="0" file="Source/km/set_list.h"/>
       <FILE id="gua9bk" name="song.cpp" compile="1" resource="0" file="Source/km/song.cpp"/>

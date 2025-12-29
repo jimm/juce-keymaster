@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "km/device_manager.h"
+#include "km/recent_files.h"
 #include "gui/clock_bpm.h"
 #include "gui/clock_button.h"
 #include "gui/clock_light.h"
@@ -67,6 +68,11 @@ public:
   void super_panic();
   void midi_monitor();
 
+  // ================ recent files ================
+  StringArray get_recent_files();
+  void open_recent_file(int index);
+  void clear_recent_files();
+
   // ================ loading and saving ================
   void check_ok_to_quit(std::function<void (bool)> callback);
   String getDocumentTitle() override { return "KeyMaster"; }
@@ -83,6 +89,7 @@ private:
   ApplicationProperties &app_properties;
   File _file;
   std::unique_ptr<MidiMonitorWindow> _midi_monitor_window;
+  std::unique_ptr<RecentFiles> recent_files;
 
   MenuManager menu_manager;
 

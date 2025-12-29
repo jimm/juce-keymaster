@@ -9,6 +9,16 @@ enum CommandIDs {
   open_project,
   save_project,
   save_project_as,
+  recent_file_base = 0x2300,
+  recent_file_1 = recent_file_base,
+  recent_file_2,
+  recent_file_3,
+  recent_file_4,
+  recent_file_5,
+  recent_file_6,
+  recent_file_7,
+  recent_file_8,
+  clear_recent_files,
   // Edit
   undo,
   redo,
@@ -119,6 +129,10 @@ MenuManager::~MenuManager() {
 
 void MenuManager::getAllCommands (Array<CommandID>& c) {
   c.addArray(file_commands);
+  // Add recent file commands
+  for (int i = 0; i < 8; ++i)
+    c.add(CommandIDs::recent_file_base + i);
+  c.add(CommandIDs::clear_recent_files);
   c.addArray(edit_commands);
   c.addArray(go_commands);
   c.addArray(midi_commands);
@@ -279,8 +293,23 @@ void MenuManager::getCommandInfo(CommandID commandID, ApplicationCommandInfo &re
     result.setInfo("About KeyMaster", "About KeyMaster", "Help", 0);
     break;
 #endif
+  case CommandIDs::clear_recent_files:
+    result.setInfo("Clear Recent Files", "Clears the recent files list", "File", 0);
+    break;
   default:
-    // error
+    // Handle recent file commands
+    if (commandID >= CommandIDs::recent_file_base &&
+        commandID < CommandIDs::recent_file_base + 8) {
+      int index = commandID - CommandIDs::recent_file_base;
+      auto recentFiles = handler->get_recent_files();
+      if (index < recentFiles.size()) {
+        File file(recentFiles[index]);
+        result.setInfo(file.getFileName(), "Opens " + file.getFullPathName(), "File", 0);
+      }
+      else {
+        result.setInfo("Recent File", "Recent file", "File", 0);
+      }
+    }
     break;
   }
 }
@@ -389,7 +418,18 @@ bool MenuManager::perform(const InvocationInfo& info) {
     display_about_dialog();
     break;
 #endif
+  case CommandIDs::clear_recent_files:
+    handler->clear_recent_files();
+    menuItemsChanged();
+    break;
   default:
+    // Handle recent file commands
+    if (info.commandID >= CommandIDs::recent_file_base &&
+        info.commandID < CommandIDs::recent_file_base + 8) {
+      int index = info.commandID - CommandIDs::recent_file_base;
+      handler->open_recent_file(index);
+      return true;
+    }
     return false;
   }
   return true;
@@ -408,6 +448,28 @@ PopupMenu MenuManager::getMenuForIndex(int menuIndex, const String& _menuName) {
       menu.addSeparator();
     else
       menu.addCommandItem(&command_manager, cmd);
+
+    // Add Recent Files submenu after open_project in File menu
+    if (menuIndex == 0 && cmd == CommandIDs::open_project) {
+      PopupMenu recentMenu;
+      auto recentFiles = handler->get_recent_files();
+
+      if (recentFiles.isEmpty()) {
+        recentMenu.addItem(-1, "(No Recent Files)", false);
+      }
+      else {
+        for (int i = 0; i < recentFiles.size(); ++i) {
+          File file(recentFiles[i]);
+          recentMenu.addCommandItem(&command_manager,
+                                    CommandIDs::recent_file_base + i,
+                                    file.getFileName());
+        }
+        recentMenu.addSeparator();
+        recentMenu.addCommandItem(&command_manager, CommandIDs::clear_recent_files);
+      }
+
+      menu.addSubMenu("Recent Files", recentMenu);
+    }
   }
   return menu;
 }
