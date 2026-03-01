@@ -4,6 +4,7 @@
 #include "km/keymaster.h"
 #include "km/storage.h"
 #include "gui/connection_editor.h"
+#include "gui/find_dialog.h"
 #include "gui/set_list_editor.h"
 #include "gui/song_editor.h"
 #include "gui/midi_monitor.h"
@@ -400,11 +401,11 @@ void MainComponent::prev_patch() {
 }
 
 void MainComponent::find_song() {
-  // TODO
+  open_find_dialog(FindDialog::FindSong);
 }
 
 void MainComponent::find_set_list() {
-  // TODO
+  open_find_dialog(FindDialog::FindSetList);
 }
 
 void MainComponent::toggle_clock() {

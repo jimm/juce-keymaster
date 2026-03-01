@@ -22,6 +22,8 @@
             file="Source/gui/connections_table.cpp"/>
       <FILE id="UrMJqx" name="connections_table.h" compile="0" resource="0"
             file="Source/gui/connections_table.h"/>
+      <FILE id="FDlg1c" name="find_dialog.cpp" compile="1" resource="0" file="Source/gui/find_dialog.cpp"/>
+      <FILE id="FDlg2h" name="find_dialog.h" compile="0" resource="0" file="Source/gui/find_dialog.h"/>
       <FILE id="XG3kUy" name="km_editor.cpp" compile="1" resource="0" file="Source/gui/km_editor.cpp"/>
       <FILE id="eFm7L1" name="km_editor.h" compile="0" resource="0" file="Source/gui/km_editor.h"/>
       <FILE id="BgxL3U" name="km_list_box.h" compile="0" resource="0" file="Source/gui/km_list_box.h"/>
