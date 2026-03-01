@@ -17,7 +17,7 @@ other MIDI event), an entire MIDI system can be totally reconfigured.
 
 For more information see the [wiki](https://github.com/jimm/keymaster/wiki).
 
-![Screenshot](https://raw.githubusercontent.com/wiki/jimm/keymaster/images/km_screen_shot.png)
+![Screenshot](https://raw.githubusercontent.com/wiki/jimm/juce-keymaster/images/km_screen_shot.png)
 
 # To Do / Bugs
 

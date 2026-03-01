@@ -182,8 +182,8 @@
         <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors_headless" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../miscellaneous/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="VTXwFy" bigIcon="VTXwFy">
@@ -202,8 +202,8 @@
         <MODULEPATH id="juce_events" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors_headless" path="../../miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../miscellaneous/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
   </EXPORTFORMATS>
