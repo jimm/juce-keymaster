@@ -13,7 +13,6 @@ public:
   int height();
 
   void resized() override;
-  void focusGained(FocusChangeType) override;
 
 private:
   Type _type;

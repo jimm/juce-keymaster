@@ -43,6 +43,8 @@ FindDialog::FindDialog(Type type)
   addAndMakeVisible(_cancel);
 
   setSize(width(), height());
+
+  Timer::callAfterDelay(0, [this] { _regex.grabKeyboardFocus(); });
 }
 
 int FindDialog::width() {
@@ -51,10 +53,6 @@ int FindDialog::width() {
 
 int FindDialog::height() {
   return CONTENT_HEIGHT + SPACE * 2;
-}
-
-void FindDialog::focusGained(FocusChangeType) {
-  _regex.grabKeyboardFocus();
 }
 
 void FindDialog::resized() {
