@@ -49,9 +49,13 @@ ConnectionEditor * open_connection_editor(Connection *c)
   return cdc;
 }
 
+ConnectionEditor::~ConnectionEditor() {
+  stop_learning();
+}
+
 ConnectionEditor::ConnectionEditor(
   Connection *c, bool is_new)
-  : KmEditor(is_new), _conn(c)
+  : KmEditor(is_new), MidiMessageLearner(false), _conn(c)
 {
   init_input();
   init_output();
@@ -67,6 +71,7 @@ ConnectionEditor::ConnectionEditor(
   _del_cc_map.onClick = [this] { del_cc_map(); };
 
   KmEditor::init();
+  start_learning();
 }
 
 int ConnectionEditor::width() {
@@ -146,6 +151,8 @@ void ConnectionEditor::layout_zone(Rectangle<int> &area) {
   _zone_between.setBounds(row_area.removeFromLeft(ZONE_BETWEEN_WIDTH));
   row_area.removeFromLeft(SPACE);
   _zone_high.setBounds(row_area.removeFromLeft(ZONE_WIDTH));
+  row_area.removeFromLeft(SPACE);
+  _zone_error.setBounds(row_area);
 }
 
 void ConnectionEditor::layout_xpose_and_velocity_curve(Rectangle<int> &area) {
@@ -277,8 +284,11 @@ void ConnectionEditor::init_zone() {
   init_text_editor(_zone_low, MidiMessage::getMidiNoteName(_conn->zone_low(), true, true, 4));
   init_text_editor(_zone_high, MidiMessage::getMidiNoteName(_conn->zone_high(), true, true, 4));
 
+  _zone_error.setColour(Label::textColourId, Colours::orangered);
+
   addAndMakeVisible(_zone_label);
   addAndMakeVisible(_zone_between);
+  addAndMakeVisible(_zone_error);
 }
 
 void ConnectionEditor::init_xpose() {
@@ -508,6 +518,37 @@ void ConnectionEditor::update_conn_cc_maps() {
       _conn->set_cc_map(i, nullptr); // takes care of deleting old one
     }
   }
+}
+
+void ConnectionEditor::learn_midi_message(const MidiMessage &message) {
+  if (!message.isNoteOn())
+    return;
+  int note = message.getNoteNumber();
+  MessageManager::callAsync([this, note] {
+    auto note_name = MidiMessage::getMidiNoteName(note, true, true, 4);
+    if (_zone_low.hasKeyboardFocus(false)) {
+      int high = note_name_to_num(_zone_high.getText());
+      if (high >= 0 && high <= 127 && note > high) {
+        show_zone_error("Low key must not exceed high key");
+        return;
+      }
+      _zone_low.setText(note_name);
+    } else if (_zone_high.hasKeyboardFocus(false)) {
+      int low = note_name_to_num(_zone_low.getText());
+      if (low >= 0 && low <= 127 && note < low) {
+        show_zone_error("High key must not be below low key");
+        return;
+      }
+      _zone_high.setText(note_name);
+    }
+  });
+}
+
+void ConnectionEditor::show_zone_error(const String &msg) {
+  _zone_error.setText(msg, dontSendNotification);
+  Timer::callAfterDelay(3000, [this] {
+    _zone_error.setText({}, dontSendNotification);
+  });
 }
 
 void ConnectionEditor::actionListenerCallback(const String &message) {

@@ -2,19 +2,21 @@
 
 #include <JuceHeader.h>
 #include "../km/connection.h"
+#include "../km/midi_message_learner.h"
 #include "km_editor.h"
 #include "cc_maps_table.h"
 #include "notifying_combo_box.h"
 
-class ConnectionEditor : public KmEditor, public ActionListener {
+class ConnectionEditor : public KmEditor, public MidiMessageLearner, public ActionListener {
 public:
   ConnectionEditor(Connection *c, bool is_new);
-  virtual ~ConnectionEditor() {}
+  virtual ~ConnectionEditor();
 
   virtual int width() override;
   virtual int height() override;
 
   virtual void actionListenerCallback(const String &message) override;
+  virtual void learn_midi_message(const MidiMessage &message) override;
 
 private:
   Connection *_conn;
@@ -43,6 +45,7 @@ private:
   TextEditor _zone_low { "Zone Low" };
   Label _zone_between { {}, "-" };
   TextEditor _zone_high { "Zone High" };
+  Label _zone_error;
 
   Label _xpose_label { {}, "Transpose" };
   TextEditor _xpose { "Tranpose" };
@@ -98,6 +101,7 @@ private:
   void init_text_editor(TextEditor &te, String initial_contents);
 
   void update_enabled_states();
+  void show_zone_error(const String &msg);
 
   void add_cc_map();
   void del_cc_map();
