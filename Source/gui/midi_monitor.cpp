@@ -126,14 +126,24 @@ void MidiMonitor::handleAsyncUpdate() {
   }
 
   String text;
-  for (auto &n_and_m : input_msgs)
-    text << n_and_m.name << "\t" << n_and_m.message.getDescription() << "\n";
+  for (auto &n_and_m : input_msgs) {
+    append_name_and_message(n_and_m, text);
+  }
   _input_midi.insertTextAtCaret(text);
 
   text = "";
   for (auto &n_and_m : output_msgs)
-    text << n_and_m.name << "\t" << n_and_m.message.getDescription() << "\n";
+    append_name_and_message(n_and_m, text);
   _output_midi.insertTextAtCaret(text);
+}
+
+void MidiMonitor::append_name_and_message(const NameAndMessage &n_and_m, String &text) {
+  text << n_and_m.name << "\t" << n_and_m.message.getDescription();
+  if (n_and_m.message.isController()) {
+    int n = n_and_m.message.getControllerNumber();
+    text << String::formatted(" (cc %d, 0x%02x)", n, n);
+  }
+  text << "\n";
 }
 
 bool MidiMonitor::want_message(const MidiMessage &message) {

@@ -40,6 +40,8 @@ private:
   void init_text_editor(Label &l, TextEditor &te);
 
   bool want_message(const MidiMessage &message);
+
+  void append_name_and_message(const NameAndMessage &n_and_m, String &text);
 };
 
 class MidiMonitorWindow : public DocumentWindow {
