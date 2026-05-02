@@ -150,6 +150,50 @@ for (int i = 0; i < ipcs.size() - 1; ++i)
 
 ---
 
+## Step 7 — Update Tests
+
+**`Source/test/connection_test.cpp`** — remove tests that exercise
+program change on `Connection`:
+- The four `program_change_send_channel()` expectation cases
+- The `set_program_prog()` / `programChange` send assertion
+
+**`Source/test/storage_test.cpp`** — update serialization tests:
+- Remove "load bank msb, lsb, and program" and "load bank lsb only"
+  test cases that read program change fields off a `Connection`
+- Add test cases that load a patch JSON carrying an
+  `"instrument_program_changes"` array and verify the resulting
+  `InstrumentProgramChange` objects (output, channel, bank MSB/LSB,
+  prog)
+- Add a migration test: load a connection JSON that still carries a
+  `"program"` key and verify a synthesized `InstrumentProgramChange`
+  is attached to the parent patch
+
+**New file: `Source/test/instrument_program_change_test.cpp/.h`** —
+unit tests for `InstrumentProgramChange::send()`:
+- Verify CC 0 (MSB), CC 32 (LSB), and program change are sent when
+  the respective fields are set
+- Verify that `UNDEFINED` fields produce no output messages
+- Register the new files in the `.jucer` project
+
+**Run tests** with `./test.sh` after each step and confirm all tests
+pass before moving on.
+
+---
+
+## Step 8 — Update `CLAUDE.md`
+
+Update the project's `CLAUDE.md` to reflect the structural changes:
+
+- **File Organization** — add
+  `instrument_program_change.h/.cpp` to the `Source/km/` listing
+- **Main Classes** — update `patch.h/cpp` description to mention the
+  IPC array; update `connection.h/cpp` description to note that
+  program change fields have been removed
+- **Data Hierarchy** — add `InstrumentProgramChange[]` as a child of
+  `Patch[]` (alongside `Connection[]`)
+
+---
+
 ## Affected Files
 
 | File | Change |
@@ -161,3 +205,7 @@ for (int i = 0; i < ipcs.size() - 1; ++i)
 | `Source/gui/connection_editor.h/.cpp` | Remove program change UI |
 | `Source/gui/patch_editor.h/.cpp` | Add IPC table + duplicate warning |
 | `*.jucer` | Register new source files |
+| `Source/test/connection_test.cpp/.h` | Remove connection program change tests |
+| `Source/test/storage_test.cpp/.h` | Update + add IPC serialization/migration tests |
+| `Source/test/instrument_program_change_test.cpp/.h` | **New** — IPC send tests |
+| `CLAUDE.md` | Update class descriptions and data hierarchy |
