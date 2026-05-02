@@ -9,7 +9,8 @@ class MessageBlock;
 
 class IpcTableModel : public TableListBoxModel {
 public:
-  IpcTableModel(Array<InstrumentProgramChange> &ipcs) : _ipcs(ipcs) {}
+  IpcTableModel(Array<InstrumentProgramChange> &ipcs, TableListBox &table)
+    : _ipcs(ipcs), _table(table) {}
 
   int getNumRows() override;
   void paintRowBackground(Graphics &g, int row, int w, int h, bool sel) override;
@@ -19,6 +20,7 @@ public:
 
 private:
   Array<InstrumentProgramChange> &_ipcs;
+  TableListBox &_table;
 };
 
 class PatchEditor : public KmEditor {
@@ -34,8 +36,8 @@ public:
 private:
   Patch *_patch;
   Array<InstrumentProgramChange> _edit_ipcs;
+  TableListBox _ipc_table;   // must precede _ipc_model (model holds a ref)
   IpcTableModel _ipc_model;
-  TableListBox _ipc_table;
 
   Label _name_label { {}, "Name" };
   TextEditor _name;
@@ -48,7 +50,6 @@ private:
 
   Label _ipc_label { {}, "Program Changes" };
   TextButton _add_ipc { "+" };
-  TextButton _del_ipc { "-" };
 
   virtual void layout(Rectangle<int> &area) override;
   void layout_name(Rectangle<int> &area);
@@ -61,7 +62,6 @@ private:
   virtual void cancel_cleanup() override;
 
   void add_ipc();
-  void del_ipc();
 
   virtual bool apply() override;
 };

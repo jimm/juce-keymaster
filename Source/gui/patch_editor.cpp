@@ -5,7 +5,7 @@
 #include "../km/editor.h"
 
 #define NAME_WIDTH 300
-#define IPC_TABLE_WIDTH 460
+#define IPC_TABLE_WIDTH 490
 #define IPC_TABLE_HEIGHT 120
 #define IPC_BUTTON_WIDTH 40
 #define IPC_BUTTON_HEIGHT 25
@@ -112,6 +112,16 @@ Component* IpcTableModel::refreshComponentForCell(
     };
     return te;
   }
+  case 6: {  // Delete
+    auto btn = new TextButton("x");
+    btn->onClick = [this, row] {
+      if (row >= _ipcs.size()) return;
+      _ipcs.remove(row);
+      _table.updateContent();
+      _table.repaint();
+    };
+    return btn;
+  }
   default:
     return nullptr;
   }
@@ -143,7 +153,7 @@ PatchEditor * open_patch_editor(Patch *p)
 }
 
 PatchEditor::PatchEditor(Patch *p, bool is_new)
-  : KmEditor(is_new), _patch(p), _ipc_model(_edit_ipcs)
+  : KmEditor(is_new), _patch(p), _ipc_model(_edit_ipcs, _ipc_table)
 {
   init();
 }
@@ -192,8 +202,6 @@ void PatchEditor::layout_ipc_table(Rectangle<int> &area) {
   area.removeFromTop(SPACE);
   auto row_area = area.removeFromTop(IPC_BUTTON_HEIGHT);
   _add_ipc.setBounds(row_area.removeFromLeft(IPC_BUTTON_WIDTH));
-  row_area.removeFromLeft(SPACE);
-  _del_ipc.setBounds(row_area.removeFromLeft(IPC_BUTTON_WIDTH));
 }
 
 void PatchEditor::init() {
@@ -235,18 +243,18 @@ void PatchEditor::init_ipc_table() {
                    TableHeaderComponent::visible | TableHeaderComponent::resizable);
   header.addColumn("Prog",     5,  65, 40, -1,
                    TableHeaderComponent::visible | TableHeaderComponent::resizable);
+  header.addColumn("",         6,  30, 30, 30,
+                   TableHeaderComponent::visible);
 
   _ipc_table.setModel(&_ipc_model);
   _ipc_table.setColour(ListBox::outlineColourId, Colours::grey);
   _ipc_table.setOutlineThickness(1);
 
   _add_ipc.onClick = [this] { add_ipc(); };
-  _del_ipc.onClick = [this] { del_ipc(); };
 
   addAndMakeVisible(_ipc_label);
   addAndMakeVisible(_ipc_table);
   addAndMakeVisible(_add_ipc);
-  addAndMakeVisible(_del_ipc);
 }
 
 void PatchEditor::cancel_cleanup() {
@@ -263,14 +271,6 @@ void PatchEditor::add_ipc() {
   _ipc_table.repaint();
 }
 
-void PatchEditor::del_ipc() {
-  int row = _ipc_table.getSelectedRow();
-  if (row >= 0 && row < _edit_ipcs.size()) {
-    _edit_ipcs.remove(row);
-    _ipc_table.updateContent();
-    _ipc_table.repaint();
-  }
-}
 
 bool PatchEditor::apply() {
   _patch->set_name(_name.getText());
