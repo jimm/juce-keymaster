@@ -11,7 +11,6 @@ Connection::Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr ou
     _xpose(0), _velocity_curve(nullptr),
     _running(false), _changing_was_running(false)
 {
-  _prog.bank_msb = _prog.bank_lsb = _prog.prog = UNDEFINED;
   _zone = { 0, 127 };
   for (int i = 0; i < 128; ++i)
     _cc_maps[i] = nullptr;
@@ -21,7 +20,6 @@ Connection::Connection(const Connection &other) noexcept
   : DBObj(0),                   // don't need to worry about this; not saving/loading
     _input(other._input), _output(other._output),
     _input_chan(other._input_chan), _output_chan(other._output_chan),
-    _prog(other._prog),
     _zone(other._zone),
     _xpose(other._xpose), _velocity_curve(other._velocity_curve),
     _running(false), _changing_was_running(false)
@@ -43,16 +41,6 @@ void Connection::start() {
     return;
 
   _running = true;
-
-  int chan = program_change_send_channel();
-  if (chan != CONNECTION_ALL_CHANNELS) {
-    if (_prog.bank_msb >= 0)
-      midi_out(MidiMessage::controllerEvent(JCH(chan), CC_BANK_SELECT_MSB, _prog.bank_msb));
-    if (_prog.bank_lsb >= 0)
-      midi_out(MidiMessage::controllerEvent(JCH(chan), CC_BANK_SELECT_LSB, _prog.bank_lsb));
-    if (_prog.prog >= 0)
-      midi_out(MidiMessage::programChange(JCH(chan), _prog.prog));
-  }
 }
 
 bool Connection::is_running() {
@@ -87,27 +75,6 @@ void Connection::set_input_chan(int val) {
 void Connection::set_output_chan(int val) {
   if (_output_chan != val) {
     _output_chan = val;
-    KeyMaster_instance()->changed();
-  }
-}
-
-void Connection::set_program_bank_msb(int val) {
-  if (_prog.bank_msb != val) {
-    _prog.bank_msb = val;
-    KeyMaster_instance()->changed();
-  }
-}
-
-void Connection::set_program_bank_lsb(int val) {
-  if (_prog.bank_lsb != val) {
-    _prog.bank_lsb = val;
-    KeyMaster_instance()->changed();
-  }
-}
-
-void Connection::set_program_prog(int val) {
-  if (_prog.prog != val) {
-    _prog.prog = val;
     KeyMaster_instance()->changed();
   }
 }
@@ -157,15 +124,6 @@ void Connection::set_cc_map(int cc_num, Controller *val) {
     _cc_maps[cc_num] = val;
     KeyMaster_instance()->changed();
   }
-}
-
-// Returns the channel for the initial bank/program change messages. If we
-// can't determine that (both input and output channels are
-// CONNECTION_ALL_CHANNELS) then return CONNECTION_ALL_CHANNELS.
-int Connection::program_change_send_channel() {
-  if (_output_chan != CONNECTION_ALL_CHANNELS)
-    return _output_chan;
-  return _input_chan;
 }
 
 // Call this when a Connection is being edited so that it can restart itself

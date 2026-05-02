@@ -7,7 +7,7 @@
 #include "cc_maps_table.h"
 #include "notifying_combo_box.h"
 
-class ConnectionEditor : public KmEditor, public MidiMessageLearner, public ActionListener {
+class ConnectionEditor : public KmEditor, public MidiMessageLearner {
 public:
   ConnectionEditor(Connection *c, bool is_new);
   virtual ~ConnectionEditor();
@@ -15,7 +15,6 @@ public:
   virtual int width() override;
   virtual int height() override;
 
-  virtual void actionListenerCallback(const String &message) override;
   virtual void learn_midi_message(const MidiMessage &message) override;
 
 private:
@@ -32,14 +31,6 @@ private:
 
   Label _output_chan_label { {}, "Output Chan" };
   NotifyingComboBox _output_chan;
-
-  Label _prog_label { {}, "Program Change (ignored if in chan = All and out chan = Input)" };
-  Label _msb_label { {}, "MSB:" };
-  TextEditor _msb { "Bank MSB" };
-  Label _lsb_label { {}, "LSB:" };
-  TextEditor _lsb { "Bank LSB" };
-  Label _prog_field_label { {}, "Prog:" };
-  TextEditor _prog { "Program" };
 
   Label _zone_label { {}, "Keyboard Zone" };
   TextEditor _zone_low { "Zone Low" };
@@ -82,7 +73,6 @@ private:
   void layout_instrument(
     Rectangle<int> &area, Label &inst_label, ComboBox &inst, Label &chan_label, ComboBox &chan
   );
-  void layout_program(Rectangle<int> &area);
   void layout_zone(Rectangle<int> &area);
   void layout_xpose_and_velocity_curve(Rectangle<int> &area);
   void layout_message_filters(Rectangle<int> &area);
@@ -91,7 +81,6 @@ private:
 
   void init_input();
   void init_output();
-  void init_prog();
   void init_zone();
   void init_xpose();
   void init_message_filters();
@@ -100,7 +89,6 @@ private:
 
   void init_text_editor(TextEditor &te, String initial_contents);
 
-  void update_enabled_states();
   void show_zone_error(const String &msg);
 
   void add_cc_map();

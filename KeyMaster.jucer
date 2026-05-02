@@ -92,6 +92,10 @@
       <FILE id="Vlkgmp" name="cursor.h" compile="0" resource="0" file="Source/km/cursor.h"/>
       <FILE id="RQZMY5" name="curve.cpp" compile="1" resource="0" file="Source/km/curve.cpp"/>
       <FILE id="xEnEXe" name="curve.h" compile="0" resource="0" file="Source/km/curve.h"/>
+      <FILE id="ipc001" name="instrument_program_change.cpp" compile="1"
+            resource="0" file="Source/km/instrument_program_change.cpp"/>
+      <FILE id="ipc002" name="instrument_program_change.h" compile="0" resource="0"
+            file="Source/km/instrument_program_change.h"/>
       <FILE id="zConXR" name="db_obj.h" compile="0" resource="0" file="Source/km/db_obj.h"/>
       <FILE id="NcbsfT" name="device_manager.cpp" compile="1" resource="0"
             file="Source/km/device_manager.cpp"/>

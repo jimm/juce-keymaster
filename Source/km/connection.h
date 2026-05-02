@@ -8,12 +8,6 @@
 #include "controller.h"
 #include "curve.h"
 
-typedef struct program {
-  int bank_msb;
-  int bank_lsb;
-  int prog;
-} program;
-
 typedef struct zone {
   int low;
   int high;
@@ -29,9 +23,6 @@ public:
   inline Output::Ptr output() const { return _output; }
   inline int input_chan() const { return _input_chan; }
   inline int output_chan() const { return _output_chan; }
-  inline int program_bank_msb() const { return _prog.bank_msb; }
-  inline int program_bank_lsb() const { return _prog.bank_lsb; }
-  inline int program_prog() const { return _prog.prog; }
   inline int zone_low() const { return _zone.low; }
   inline int zone_high() const { return _zone.high; }
   inline int xpose() const { return _xpose; }
@@ -45,9 +36,6 @@ public:
   void set_output(Output::Ptr val);
   void set_input_chan(int val);
   void set_output_chan(int val);
-  void set_program_bank_msb(int val);
-  void set_program_bank_lsb(int val);
-  void set_program_prog(int val);
   void set_zone_low(int val);
   void set_zone_high(int val);
   void set_xpose(int val);
@@ -58,14 +46,6 @@ public:
   void start();
   bool is_running();
   void stop();
-
-  // Returns CONNECTION_ALL_CHANNELS if we can't determine what channel to
-  // send to (because both input and output don't declare channels). This
-  // means that no program change will be sent.
-  int program_change_send_channel();
-  bool program_change_can_be_sent() {
-    return program_change_send_channel() != CONNECTION_ALL_CHANNELS;
-  }
 
   void begin_changes();
   void end_changes();
@@ -91,7 +71,6 @@ private:
   Output::Ptr _output;
   int _input_chan;
   int _output_chan;
-  struct program _prog;
   struct zone _zone;
   int _xpose;
   Curve *_velocity_curve;

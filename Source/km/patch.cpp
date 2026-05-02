@@ -19,6 +19,8 @@ void Patch::start() {
     return;
 
   send_message_to_outputs(_start_message);
+  for (auto& ipc : _instrument_program_changes)
+    ipc.send();
   for (auto& conn : _connections)
     conn->start();
   _running = true;
@@ -54,6 +56,15 @@ void Patch::set_stop_message(MessageBlock *msg) {
     _stop_message = msg;
     KeyMaster_instance()->changed();
   }
+}
+
+void Patch::add_instrument_program_change(InstrumentProgramChange ipc) {
+  _instrument_program_changes.add(ipc);
+}
+
+void Patch::set_instrument_program_changes(Array<InstrumentProgramChange> ipcs) {
+  _instrument_program_changes = ipcs;
+  KeyMaster_instance()->changed();
 }
 
 void Patch::add_connection(Connection *conn) {

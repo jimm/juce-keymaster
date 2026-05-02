@@ -124,6 +124,7 @@
               "input_name": "second input",
               "output_id": "output-2",
               "output_name": "second output",
+              "output_chan": 1,
               "program": {
                 "bank_msb": 3,
                 "bank_lsb": 2,
@@ -229,6 +230,15 @@
         },
         {
           "name": "Split Into Two Outputs",
+          "instrument_program_changes": [
+            {
+              "output_id": "output-1",
+              "output_name": "first output",
+              "channel": 3,
+              "bank_msb": 7,
+              "prog": 42
+            }
+          ],
           "connections": [
             {
               "input_id": "input-1",

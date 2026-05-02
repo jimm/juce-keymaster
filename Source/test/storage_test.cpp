@@ -2,6 +2,7 @@
 #include "storage_test.h"
 #include "../km/storage.h"
 #include "../km/editor.h"
+#include "../km/instrument_program_change.h"
 
 // These are the indices of songs in the all-songs list. Different than test
 // data file ID order because the all-songs list is sorted by song name.
@@ -140,27 +141,36 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   MessageFilter &mf = conn->message_filter();
   expect(mf.note());
 
-  // ==== load bank msb, lsb, and program
+  // ==== load IPC migration from connection
   if (call_begin_test)
-    beginTest("load bank msb, lsb, and program");
+    beginTest("load IPC migration from connection");
   s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
-  p = s->patches()[0];          // Vanilla Through
+  p = s->patches()[0];                 // Vanilla Through
   expect(p->name() == "Vanilla Through, Filter Two's Sustain");
-  conn = p->connections().getLast();
+  expect(p->instrument_program_changes().size() == 1);
+  {
+    const auto &ipc = p->instrument_program_changes()[0];
+    expect(ipc.output->name() == "second output");
+    expect(ipc.channel == 2);   // 0-based output_chan 1 -> 1-based 2
+    expect(ipc.bank_msb == 3);
+    expect(ipc.bank_lsb == 2);
+    expect(ipc.prog == 12);
+  }
 
-  expect(conn->program_bank_msb() == 3);
-  expect(conn->program_bank_lsb() == 2);
-  expect(conn->program_prog() == 12);
-
-  // ==== load bank lsb only
+  // ==== load IPC from patch
   if (call_begin_test)
-    beginTest("load bank lsb only");
-  s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
-  p = s->patches()[1];          // One Up One Oct...
-  conn = p->connections().getLast();
-  expect(conn->program_bank_msb() == UNDEFINED);
-  expect(conn->program_bank_lsb() == 5);
-  expect(conn->program_prog() == UNDEFINED);
+    beginTest("load IPC from patch");
+  s = all_songs[ANOTHER_INDEX];  // Another Song
+  p = s->patches()[1];           // Split Into Two Outputs
+  expect(p->instrument_program_changes().size() == 1);
+  {
+    const auto &ipc = p->instrument_program_changes()[0];
+    expect(ipc.output->name() == "first output");
+    expect(ipc.channel == 3);
+    expect(ipc.bank_msb == 7);
+    expect(ipc.bank_lsb == UNDEFINED);
+    expect(ipc.prog == 42);
+  }
 
   // ==== load xpose and velocity_curve
   if (call_begin_test)

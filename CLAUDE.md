@@ -130,8 +130,9 @@ Uses JUCE's `ApplicationProperties` with XML format.
   message, trigger indices)
 - `set_list.h/cpp` - Contains array of Song objects
 - `song.h/cpp` - Contains patches, notes, BPM, clock settings
-- `patch.h/cpp` - Container for connections
-- `connection.h/cpp` - Maps MIDI input to output with filtering/transformation
+- `patch.h/cpp` - Container for connections and patch-level program changes
+- `connection.h/cpp` - Maps MIDI input to output with filtering/transformation (no program changes)
+- `instrument_program_change.h/cpp` - Program change (bank MSB/LSB + prog) sent by a patch on start
 - `trigger.h/cpp` - Custom keyboard/MIDI action bindings
 - `message_block.h/cpp` - MIDI message definitions
 - `curve.h/cpp` - CC value transformation curves
@@ -144,6 +145,7 @@ KeyMaster
   ├─ SetList[]
   │    └─ Song[]
   │         └─ Patch[]
+  │              ├─ InstrumentProgramChange[]
   │              └─ Connection[]
   ├─ MessageBlock[]
   ├─ Trigger[]
@@ -198,8 +200,9 @@ Source/
 │   ├── cursor.h/cpp          # Navigation state
 │   ├── set_list.h/cpp        # Set list container
 │   ├── song.h/cpp            # Song with patches
-│   ├── patch.h/cpp           # Patch with connections
-│   ├── connection.h/cpp      # MIDI routing
+│   ├── patch.h/cpp           # Patch with connections and program changes
+│   ├── instrument_program_change.h/cpp  # Patch-level program changes
+│   ├── connection.h/cpp      # MIDI routing (no program changes)
 │   ├── message_block.h/cpp   # MIDI messages
 │   ├── trigger.h/cpp         # Key/MIDI bindings
 │   ├── storage.h/cpp         # JSON serialization

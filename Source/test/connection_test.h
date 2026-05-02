@@ -19,9 +19,6 @@ public:
     set_output_chan(_orig_ochan);
     set_xpose(0);
     set_velocity_curve(nullptr);
-    set_program_bank_msb(UNDEFINED);
-    set_program_bank_lsb(UNDEFINED);
-    set_program_prog(UNDEFINED);
     set_zone_low(0);
     set_zone_high(127);
     for (int i = 0; i < 128; ++i)
@@ -61,8 +58,6 @@ private:
   Input::Ptr input_ptr;
   Output::Ptr output_ptr;
 
-  void test_channels_test();
-  void test_pc_test();
   void test_pb_test();
   void test_filter_and_modify_test();
   void test_editing_when_not_running();

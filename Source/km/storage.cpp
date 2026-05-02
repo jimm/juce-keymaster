@@ -180,6 +180,7 @@ void Storage::load_patches(Song *song, var patches) {
       p->set_stop_message(find_message_by_id("patch", UNDEFINED_ID,
                                              (int)vpatch.getProperty("stop_message_id", v)));
     load_connections(p, vpatch.getProperty("connections", v));
+    load_instrument_program_changes(p, vpatch.getProperty("instrument_program_changes", v));
     song->patches().add(p);
   }
 }
@@ -221,10 +222,31 @@ void Storage::load_connections(Patch *patch, var connections) {
                                    find_output(output_identifier, output_name),
                                    (int)vconn.getProperty("output_chan", all_chans));
 
-    var prog = vconn.getProperty("program", v);
-    c->set_program_bank_msb((int)prog.getProperty("bank_msb", undef));
-    c->set_program_bank_lsb((int)prog.getProperty("bank_lsb", undef));
-    c->set_program_prog((int)prog.getProperty("program", undef));
+    // Migration: old format stored program changes in connections
+    if (vconn.hasProperty("program")) {
+      var prog = vconn.getProperty("program", v);
+      int out_chan = (int)vconn.getProperty("output_chan", all_chans);
+      if (out_chan != CONNECTION_ALL_CHANNELS) {
+        InstrumentProgramChange ipc;
+        ipc.output = find_output(output_identifier, output_name);
+        ipc.channel = out_chan + 1;  // stored 0-based, IPC uses 1-16
+        ipc.bank_msb = (int)prog.getProperty("bank_msb", undef);
+        ipc.bank_lsb = (int)prog.getProperty("bank_lsb", undef);
+        ipc.prog = (int)prog.getProperty("program", undef);
+        if (ipc.bank_msb != UNDEFINED || ipc.bank_lsb != UNDEFINED || ipc.prog != UNDEFINED) {
+          bool found = false;
+          for (auto &existing : patch->instrument_program_changes()) {
+            if (existing.output->identifier() == ipc.output->identifier()
+                    && existing.channel == ipc.channel) {
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+            patch->add_instrument_program_change(ipc);
+        }
+      }
+    }
 
     var zone_arr = vconn.getProperty("zone", v);
     c->set_zone_low((int)zone_arr[0]);
@@ -242,6 +264,23 @@ void Storage::load_connections(Patch *patch, var connections) {
     load_controller_mappings(c, vconn);
 
     patch->connections().add(c);
+  }
+}
+
+void Storage::load_instrument_program_changes(Patch *patch, var ipcs) {
+  var v;
+  var undef(UNDEFINED);
+  for (int i = 0; i < ipcs.size(); ++i) {
+    var vipc = ipcs[i];
+    InstrumentProgramChange ipc;
+    ipc.output = find_output(
+      (String)vipc.getProperty("output_id", v),
+      (String)vipc.getProperty("output_name", v));
+    ipc.channel = (int)vipc.getProperty("channel", v);
+    ipc.bank_msb = (int)vipc.getProperty("bank_msb", undef);
+    ipc.bank_lsb = (int)vipc.getProperty("bank_lsb", undef);
+    ipc.prog = (int)vipc.getProperty("prog", undef);
+    patch->add_instrument_program_change(ipc);
   }
 }
 
@@ -398,6 +437,8 @@ var Storage::patches_var(Array<Patch *> &patches) {
     DynamicObject::Ptr p(new DynamicObject());
     p->setProperty("name", var(patch->name()));
     p->setProperty("connections", connections_var(patch->connections()));
+    if (!patch->instrument_program_changes().isEmpty())
+      p->setProperty("instrument_program_changes", ipc_var(patch->instrument_program_changes()));
     if (patch->start_message())
       p->setProperty("start_message_id", patch->start_message()->id());
     if (patch->stop_message())
@@ -419,15 +460,6 @@ var Storage::connections_var(Array<Connection *> &connections) {
       c->setProperty("input_chan", conn->input_chan());
     if (conn->output_chan() != CONNECTION_ALL_CHANNELS)
       c->setProperty("output_chan", conn->output_chan());
-
-    DynamicObject::Ptr prog(new DynamicObject());
-    if (conn->program_bank_msb() != UNDEFINED)
-      prog->setProperty("bank_msb", var(conn->program_bank_msb()));
-    if (conn->program_bank_lsb() != UNDEFINED)
-      prog->setProperty("bank_lsb", var(conn->program_bank_lsb()));
-    if (conn->program_prog() != UNDEFINED)
-      prog->setProperty("program", var(conn->program_prog()));
-    c->setProperty("program", var(prog.get()));
 
     DynamicObject::Ptr zone(new DynamicObject());
     Array<var> zone_arr = { var(conn->zone_low()), var(conn->zone_high()) };
@@ -484,6 +516,24 @@ var Storage::message_filter_var(MessageFilter &mf) {
   if (mf.start_continue_stop()) flags |= (1 << 11);
   if (mf.system_reset()) flags |= (1 << 12);
   return var(flags);
+}
+
+var Storage::ipc_var(const Array<InstrumentProgramChange> &ipcs) {
+  Array<var> arr;
+  for (auto &ipc : ipcs) {
+    DynamicObject::Ptr obj(new DynamicObject());
+    obj->setProperty("output_id", ipc.output->identifier());
+    obj->setProperty("output_name", ipc.output->name());
+    obj->setProperty("channel", ipc.channel);
+    if (ipc.bank_msb != UNDEFINED)
+      obj->setProperty("bank_msb", ipc.bank_msb);
+    if (ipc.bank_lsb != UNDEFINED)
+      obj->setProperty("bank_lsb", ipc.bank_lsb);
+    if (ipc.prog != UNDEFINED)
+      obj->setProperty("prog", ipc.prog);
+    arr.add(var(obj.get()));
+  }
+  return var(arr);
 }
 
 var Storage::set_lists_var() {

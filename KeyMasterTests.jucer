@@ -34,6 +34,10 @@
             resource="0" file="Source/test/midi_message_learner_test.cpp"/>
       <FILE id="hTfXc3" name="midi_message_learner_test.h" compile="0" resource="0"
             file="Source/test/midi_message_learner_test.h"/>
+      <FILE id="ipc005" name="instrument_program_change_test.cpp" compile="1"
+            resource="0" file="Source/test/instrument_program_change_test.cpp"/>
+      <FILE id="ipc006" name="instrument_program_change_test.h" compile="0"
+            resource="0" file="Source/test/instrument_program_change_test.h"/>
       <FILE id="vuR96U" name="storage_test.cpp" compile="1" resource="0"
             file="Source/test/storage_test.cpp"/>
       <FILE id="gpnd65" name="storage_test.h" compile="0" resource="0" file="Source/test/storage_test.h"/>
@@ -60,6 +64,10 @@
       <FILE id="SqKtfi" name="cursor.h" compile="0" resource="0" file="Source/km/cursor.h"/>
       <FILE id="XqmSrc" name="curve.cpp" compile="1" resource="0" file="Source/km/curve.cpp"/>
       <FILE id="L0zyKI" name="curve.h" compile="0" resource="0" file="Source/km/curve.h"/>
+      <FILE id="ipc003" name="instrument_program_change.cpp" compile="1"
+            resource="0" file="Source/km/instrument_program_change.cpp"/>
+      <FILE id="ipc004" name="instrument_program_change.h" compile="0" resource="0"
+            file="Source/km/instrument_program_change.h"/>
       <FILE id="rUhnt0" name="db_obj.h" compile="0" resource="0" file="Source/km/db_obj.h"/>
       <FILE id="PBkddu" name="device_manager.cpp" compile="1" resource="0"
             file="Source/km/device_manager.cpp"/>

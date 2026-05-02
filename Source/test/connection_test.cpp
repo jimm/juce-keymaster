@@ -19,47 +19,10 @@ void ConnectionTest::shutdown() {
 }
 
 void ConnectionTest::runTest() {
-  test_channels_test();
-  test_pc_test();
   test_pb_test();
   test_filter_and_modify_test();
   test_editing_when_not_running();
   test_editing_when_running();
-}
-
-void ConnectionTest::test_channels_test() {
-  TestConnection conn(input_ptr, 0, output_ptr, 1);
-
-  beginTest("start pc channel");
-
-  conn.set_input_chan(CONNECTION_ALL_CHANNELS);
-  conn.set_output_chan(CONNECTION_ALL_CHANNELS);
-  expect(conn.program_change_send_channel() == CONNECTION_ALL_CHANNELS);
-
-  conn.set_input_chan(3);
-  conn.set_output_chan(CONNECTION_ALL_CHANNELS);
-  expect(conn.program_change_send_channel() == 3);
-
-  conn.set_input_chan(CONNECTION_ALL_CHANNELS);
-  conn.set_output_chan(5);
-  expect(conn.program_change_send_channel() == 5);
-
-  conn.set_input_chan(3);
-  conn.set_output_chan(4);
-  expect(conn.program_change_send_channel() == 4);
-}
-
-void ConnectionTest::test_pc_test() {
-  TestConnection conn(input_ptr, 0, output_ptr, 1);
-  MidiMessage msg, expected;
-
-  beginTest("start sends pc");
-
-  conn.set_program_prog(123);
-  conn.start();
-  expect(conn.program_change_send_channel() == 1);
-  expect_sent_count(1, conn);
-  expect(mm_eq(msg = SENT(0), expected = MidiMessage::programChange(JCH(1), 123)));
 }
 
 void ConnectionTest::test_pb_test() {

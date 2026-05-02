@@ -6,6 +6,7 @@
 #include "keymaster.h"
 #include "input.h"
 #include "output.h"
+#include "instrument_program_change.h"
 
 class Storage {
 public:
@@ -31,6 +32,7 @@ private:
   void load_songs(var);
   void load_patches(Song *, var);
   void load_connections(Patch *, var);
+  void load_instrument_program_changes(Patch *, var);
   void load_message_filter(Connection *, var);
   void load_controller_mappings(Connection *, var);
   void load_set_lists(var);
@@ -43,6 +45,7 @@ private:
   var songs_var();
   var patches_var(Array<Patch *> &patches);
   var connections_var(Array<Connection *> &connections);
+  var ipc_var(const Array<InstrumentProgramChange> &ipcs);
   var controller_mapping_var(Controller *controller);
   var message_filter_var(MessageFilter &mf);
   var set_lists_var();
