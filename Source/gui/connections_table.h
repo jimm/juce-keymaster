@@ -31,7 +31,6 @@ public:
 
 private:
   Patch *patch() { return cursor()->patch(); }
-  String program_str(Connection *c);
   String controllers_str(Connection *c);
 };
 

@@ -13,9 +13,8 @@ void ConnectionsTableListBoxModel::make_columns(TableHeaderComponent &header) {
   header.addColumn("Chan", 4, 25, 25, -1, props);
   header.addColumn("Zone", 5, 30, 30, -1, props);
   header.addColumn("Xpose", 6, 18, 18, -1, props);
-  header.addColumn("Prog", 7, 50, 50, -1, props);
-  header.addColumn("Curve", 8, 20, 20, -1, props);
-  header.addColumn("CC Filts/Maps", 9, 200, 200, 200, props);
+  header.addColumn("Curve", 7, 20, 20, -1, props);
+  header.addColumn("CC Filts/Maps", 8, 200, 200, 200, props);
   header.setStretchToFitActive(true);
 }
 
@@ -64,13 +63,10 @@ void ConnectionsTableListBoxModel::paintCell(
   case 6:                       // xpose
     str = String(c->xpose());
     break;
-  case 7:                       // prog
-    str = program_str(c);
-    break;
-  case 8:                       // velocity curve
+  case 7:                       // velocity curve
     str = curve == nullptr ? "lin" : curve->short_name();
     break;
-  case 9:                       // CC filters / maps
+  case 8:                       // CC filters / maps
     str = controllers_str(c);
     break;
   }
@@ -122,34 +118,6 @@ void ConnectionsTableListBox::actionListenerCallback(const String &message) {
 }
 
 // ================ helpers ================
-
-String ConnectionsTableListBoxModel::program_str(Connection *c) {
-  String str;
-  bool has_msb = c->program_bank_msb() != UNDEFINED;
-  bool has_lsb = c->program_bank_lsb() != UNDEFINED;
-  bool has_prog = c->program_prog() != UNDEFINED;
-
-  if (has_msb || has_lsb) {
-    str << '[';
-    if (has_msb)
-      str << String::formatted("%d", c->program_bank_msb());
-    if (has_msb && has_lsb)
-      str << ',';
-    if (has_lsb)
-      str << String::formatted("%d", c->program_bank_lsb());
-    str << ']';
-    if (has_prog)
-      str << ' ';
-  }
-
-  if (has_prog)
-    str << String::formatted("%d", c->program_prog());
-    
-  if (!str.isEmpty() && !c->program_change_can_be_sent())
-    str = '(' + str + ')';
-
-  return str;
-}
 
 String ConnectionsTableListBoxModel::controllers_str(Connection *c) {
   StringArray arr;
