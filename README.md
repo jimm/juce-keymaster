@@ -23,3 +23,10 @@ For more information see the [wiki](https://github.com/jimm/keymaster/wiki).
 
 See the [To Do](https://github.com/jimm/keymaster/wiki/To-Do) list on the
 Wiki.
+
+# Note on AI Use
+
+I wrote this entire app myself without AI, then started using it in late
+2025 to fix some bugs and add some features. For future features and bug
+fixes, I'll decide each time if I am in the mood to do it myself or have AI
+do it.
