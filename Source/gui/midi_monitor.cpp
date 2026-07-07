@@ -169,7 +169,7 @@ MidiMonitorWindow::MidiMonitorWindow(ApplicationProperties &app_properties)
     restoreWindowStateFromString(settings->getValue("midi_monitor.window.state"));
   }
   else {
-    auto display_area = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea.reduced(20);
+    auto display_area = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userBounds.toNearestInt().reduced(20);
     Rectangle<int> area(
       (display_area.getWidth() - contents->width()) / 2,
       (display_area.getHeight() - contents->height()) / 3,

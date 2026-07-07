@@ -200,15 +200,15 @@
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_audio_basics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="~/src/miscellaneous/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="~/src/miscellaneous/JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors_headless" path="~/src/miscellaneous/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="~/src/miscellaneous/JUCE/modules"/>
       </MODULEPATHS>
