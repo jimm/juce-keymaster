@@ -124,5 +124,5 @@ int Controller::process_data_byte(int val) {
   if (val < _min_in || val > _max_in)
     return BLOCK_CONTROLLER;
 
-  return _min_out + int(floor((_slope * (val - _min_in)) + 0.5));
+  return _min_out + int(floor((_slope * float(val - _min_in)) + 0.5));
 }

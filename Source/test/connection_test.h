@@ -19,9 +19,7 @@ public:
     set_output_chan(_orig_ochan);
     set_xpose(0);
     set_velocity_curve(nullptr);
-    set_program_bank_msb(UNDEFINED);
-    set_program_bank_lsb(UNDEFINED);
-    set_program_prog(UNDEFINED);
+    program_changes().clear(true);
     set_zone_low(0);
     set_zone_high(127);
     for (int i = 0; i < 128; ++i)
@@ -42,6 +40,21 @@ protected:
 
   virtual void midi_out(MidiMessage *msg) override { sent.add(*msg); }
   virtual void midi_out(MidiMessage msg) override { sent.add(msg); }
+
+#ifdef JUCE_UNIT_TESTS
+  virtual void start_program_changes() override {
+    for (auto *pc : program_changes()) {
+      if (pc->chan == CONNECTION_ALL_CHANNELS)
+        continue;
+      if (pc->bank_msb >= 0)
+        midi_out(MidiMessage::controllerEvent(JCH(pc->chan), CC_BANK_SELECT_MSB, pc->bank_msb));
+      if (pc->bank_lsb >= 0)
+        midi_out(MidiMessage::controllerEvent(JCH(pc->chan), CC_BANK_SELECT_LSB, pc->bank_lsb));
+      if (pc->prog >= 0)
+        midi_out(MidiMessage::programChange(JCH(pc->chan), pc->prog));
+    }
+  }
+#endif
 };
 
 
@@ -61,7 +74,6 @@ private:
   Input::Ptr input_ptr;
   Output::Ptr output_ptr;
 
-  void test_channels_test();
   void test_pc_test();
   void test_pb_test();
   void test_filter_and_modify_test();

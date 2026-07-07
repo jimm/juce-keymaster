@@ -124,31 +124,35 @@ void ConnectionsTableListBox::actionListenerCallback(const String &message) {
 // ================ helpers ================
 
 String ConnectionsTableListBoxModel::program_str(Connection *c) {
-  String str;
-  bool has_msb = c->program_bank_msb() != UNDEFINED;
-  bool has_lsb = c->program_bank_lsb() != UNDEFINED;
-  bool has_prog = c->program_prog() != UNDEFINED;
+  const auto &pcs = c->program_changes();
+  if (pcs.isEmpty())
+    return {};
 
-  if (has_msb || has_lsb) {
-    str << '[';
-    if (has_msb)
-      str << String::formatted("%d", c->program_bank_msb());
-    if (has_msb && has_lsb)
-      str << ',';
-    if (has_lsb)
-      str << String::formatted("%d", c->program_bank_lsb());
-    str << ']';
+  if (pcs.size() == 1) {
+    auto *pc = pcs[0];
+    String str;
+    bool has_msb = pc->bank_msb != UNDEFINED;
+    bool has_lsb = pc->bank_lsb != UNDEFINED;
+    bool has_prog = pc->prog != UNDEFINED;
+
+    if (has_msb || has_lsb) {
+      str << '[';
+      if (has_msb)
+        str << pc->bank_msb;
+      if (has_msb && has_lsb)
+        str << ',';
+      if (has_lsb)
+        str << pc->bank_lsb;
+      str << ']';
+      if (has_prog)
+        str << ' ';
+    }
     if (has_prog)
-      str << ' ';
+      str << pc->prog;
+    return str;
   }
 
-  if (has_prog)
-    str << String::formatted("%d", c->program_prog());
-    
-  if (!str.isEmpty() && !c->program_change_can_be_sent())
-    str = '(' + str + ')';
-
-  return str;
+  return String(pcs.size()) + " prog changes";
 }
 
 String ConnectionsTableListBoxModel::controllers_str(Connection *c) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "consts.h"
 #include "db_obj.h"
 #include "input.h"
 #include "output.h"
@@ -8,11 +9,19 @@
 #include "controller.h"
 #include "curve.h"
 
-typedef struct program {
-  int bank_msb;
-  int bank_lsb;
-  int prog;
-} program;
+struct ProgramChange {
+  Output::Ptr output;
+  int chan;       // 0-15 (internally), or CONNECTION_ALL_CHANNELS
+  int bank_msb;  // UNDEFINED or 0-127
+  int bank_lsb;  // UNDEFINED or 0-127
+  int prog;      // UNDEFINED or 0-127
+
+  ProgramChange()
+    : chan(CONNECTION_ALL_CHANNELS),
+      bank_msb(UNDEFINED), bank_lsb(UNDEFINED), prog(UNDEFINED) {}
+  ProgramChange(Output::Ptr out, int ch, int msb, int lsb, int p)
+    : output(out), chan(ch), bank_msb(msb), bank_lsb(lsb), prog(p) {}
+};
 
 typedef struct zone {
   int low;
@@ -29,9 +38,6 @@ public:
   inline Output::Ptr output() const { return _output; }
   inline int input_chan() const { return _input_chan; }
   inline int output_chan() const { return _output_chan; }
-  inline int program_bank_msb() const { return _prog.bank_msb; }
-  inline int program_bank_lsb() const { return _prog.bank_lsb; }
-  inline int program_prog() const { return _prog.prog; }
   inline int zone_low() const { return _zone.low; }
   inline int zone_high() const { return _zone.high; }
   inline int xpose() const { return _xpose; }
@@ -45,9 +51,6 @@ public:
   void set_output(Output::Ptr val);
   void set_input_chan(int val);
   void set_output_chan(int val);
-  void set_program_bank_msb(int val);
-  void set_program_bank_lsb(int val);
-  void set_program_prog(int val);
   void set_zone_low(int val);
   void set_zone_high(int val);
   void set_xpose(int val);
@@ -55,17 +58,15 @@ public:
   void set_running(bool val);
   void set_cc_map(int cc_num, Controller *val);
 
+  const OwnedArray<ProgramChange> &program_changes() const { return _program_changes; }
+  OwnedArray<ProgramChange> &program_changes() { return _program_changes; }
+  void add_program_change(ProgramChange *pc);
+  void remove_program_change(int index);
+  void program_changes_changed();
+
   void start();
   bool is_running();
   void stop();
-
-  // Returns CONNECTION_ALL_CHANNELS if we can't determine what channel to
-  // send to (because both input and output don't declare channels). This
-  // means that no program change will be sent.
-  int program_change_send_channel();
-  bool program_change_can_be_sent() {
-    return program_change_send_channel() != CONNECTION_ALL_CHANNELS;
-  }
 
   void begin_changes();
   void end_changes();
@@ -86,12 +87,17 @@ protected:
 #endif
   void midi_out(MidiMessage);
 
+#ifdef JUCE_UNIT_TESTS
+  virtual
+#endif
+  void start_program_changes();
+
 private:
   Input::Ptr _input;
   Output::Ptr _output;
   int _input_chan;
   int _output_chan;
-  struct program _prog;
+  OwnedArray<ProgramChange> _program_changes;
   struct zone _zone;
   int _xpose;
   Curve *_velocity_curve;

@@ -11,7 +11,6 @@ Connection::Connection(DBObjID id, Input::Ptr input, int in_chan, Output::Ptr ou
     _xpose(0), _velocity_curve(nullptr),
     _running(false), _changing_was_running(false)
 {
-  _prog.bank_msb = _prog.bank_lsb = _prog.prog = UNDEFINED;
   _zone = { 0, 127 };
   for (int i = 0; i < 128; ++i)
     _cc_maps[i] = nullptr;
@@ -21,13 +20,14 @@ Connection::Connection(const Connection &other) noexcept
   : DBObj(0),                   // don't need to worry about this; not saving/loading
     _input(other._input), _output(other._output),
     _input_chan(other._input_chan), _output_chan(other._output_chan),
-    _prog(other._prog),
     _zone(other._zone),
     _xpose(other._xpose), _velocity_curve(other._velocity_curve),
     _running(false), _changing_was_running(false)
 {
-    for (int i = 0; i < 128; ++i)
+  for (int i = 0; i < 128; ++i)
     _cc_maps[i] = other._cc_maps[i];
+  for (auto *pc : other._program_changes)
+    _program_changes.add(new ProgramChange(*pc));
 }
 
 Connection::~Connection() {
@@ -41,17 +41,26 @@ Connection::~Connection() {
 void Connection::start() {
   if (_running)
     return;
-
   _running = true;
+  start_program_changes();
+}
 
-  int chan = program_change_send_channel();
-  if (chan != CONNECTION_ALL_CHANNELS) {
-    if (_prog.bank_msb >= 0)
-      midi_out(MidiMessage::controllerEvent(JCH(chan), CC_BANK_SELECT_MSB, _prog.bank_msb));
-    if (_prog.bank_lsb >= 0)
-      midi_out(MidiMessage::controllerEvent(JCH(chan), CC_BANK_SELECT_LSB, _prog.bank_lsb));
-    if (_prog.prog >= 0)
-      midi_out(MidiMessage::programChange(JCH(chan), _prog.prog));
+void Connection::start_program_changes() {
+  for (auto *pc : _program_changes) {
+    if (pc->output == nullptr || pc->chan == CONNECTION_ALL_CHANNELS)
+      continue;
+    if (pc->bank_msb >= 0) {
+      auto msg = MidiMessage::controllerEvent(JCH(pc->chan), CC_BANK_SELECT_MSB, pc->bank_msb);
+      pc->output->midi_out(msg);
+    }
+    if (pc->bank_lsb >= 0) {
+      auto msg = MidiMessage::controllerEvent(JCH(pc->chan), CC_BANK_SELECT_LSB, pc->bank_lsb);
+      pc->output->midi_out(msg);
+    }
+    if (pc->prog >= 0) {
+      auto msg = MidiMessage::programChange(JCH(pc->chan), pc->prog);
+      pc->output->midi_out(msg);
+    }
   }
 }
 
@@ -91,25 +100,18 @@ void Connection::set_output_chan(int val) {
   }
 }
 
-void Connection::set_program_bank_msb(int val) {
-  if (_prog.bank_msb != val) {
-    _prog.bank_msb = val;
-    KeyMaster_instance()->changed();
-  }
+void Connection::add_program_change(ProgramChange *pc) {
+  _program_changes.add(pc);
+  KeyMaster_instance()->changed();
 }
 
-void Connection::set_program_bank_lsb(int val) {
-  if (_prog.bank_lsb != val) {
-    _prog.bank_lsb = val;
-    KeyMaster_instance()->changed();
-  }
+void Connection::remove_program_change(int index) {
+  _program_changes.remove(index);
+  KeyMaster_instance()->changed();
 }
 
-void Connection::set_program_prog(int val) {
-  if (_prog.prog != val) {
-    _prog.prog = val;
-    KeyMaster_instance()->changed();
-  }
+void Connection::program_changes_changed() {
+  KeyMaster_instance()->changed();
 }
 
 void Connection::set_zone_low(int val) {
@@ -157,15 +159,6 @@ void Connection::set_cc_map(int cc_num, Controller *val) {
     _cc_maps[cc_num] = val;
     KeyMaster_instance()->changed();
   }
-}
-
-// Returns the channel for the initial bank/program change messages. If we
-// can't determine that (both input and output channels are
-// CONNECTION_ALL_CHANNELS) then return CONNECTION_ALL_CHANNELS.
-int Connection::program_change_send_channel() {
-  if (_output_chan != CONNECTION_ALL_CHANNELS)
-    return _output_chan;
-  return _input_chan;
 }
 
 // Call this when a Connection is being edited so that it can restart itself

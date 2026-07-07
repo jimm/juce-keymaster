@@ -1,5 +1,6 @@
 #include "connection_editor.h"
 #include "cc_map_editor.h"
+#include "program_change_editor.h"
 #include "../km/consts.h"
 #include "../km/keymaster.h"
 #include "../km/patch.h"
@@ -9,8 +10,6 @@
 
 #define INSTRUMENT_WIDTH 250
 #define CHANNEL_COMBO_WIDTH 125
-#define PROG_LABEL_WIDTH 35
-#define PROG_WIDTH 40
 #define ZONE_WIDTH 40
 #define ZONE_BETWEEN_WIDTH 16
 #define XPOSE_COLUMN_WIDTH 100
@@ -20,13 +19,14 @@
 #define MESSAGE_FILTER_CHECKBOX_WIDTH 150
 #define MESSAGE_FILTER_CHECKBOX_HEIGHT 18
 
+#define PROG_CHANGES_TABLE_HEIGHT 100
 #define CC_MAPS_TABLE_HEIGHT 150
 #define CC_MAPS_TABLE_WIDTH 300
 #define CC_MAPS_BUTTON_HEIGHT 25
 #define CC_MAPS_BUTTON_WIDTH 40
 
 #define CONTENT_WIDTH (CC_MAPS_TABLE_WIDTH * 2)
-#define CONTENT_HEIGHT (SPACE * 8 + BETWEEN_ROW_SPACE * 7 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 5 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT)
+#define CONTENT_HEIGHT (SPACE * 9 + BETWEEN_ROW_SPACE * 7 + LABEL_HEIGHT * 7 + DATA_ROW_HEIGHT * 4 + MESSAGE_FILTER_CHECKBOX_HEIGHT * 7 + PROG_CHANGES_TABLE_HEIGHT + CC_MAPS_TABLE_HEIGHT + CC_MAPS_BUTTON_HEIGHT * 2)
 
 ConnectionEditor * open_connection_editor(Connection *c)
 {
@@ -59,14 +59,15 @@ ConnectionEditor::ConnectionEditor(
 {
   init_input();
   init_output();
-  init_prog();
+  init_prog_changes();
   init_zone();
   init_xpose();
   init_message_filters();
   init_velocity_curve();
   init_cc_maps();
-  update_enabled_states();
 
+  _add_prog_change.onClick = [this] { add_prog_change(); };
+  _del_prog_change.onClick = [this] { del_prog_change(); };
   _add_cc_map.onClick = [this] { add_cc_map(); };
   _del_cc_map.onClick = [this] { del_cc_map(); };
 
@@ -89,7 +90,7 @@ void ConnectionEditor::layout(Rectangle<int> &area) {
   layout_instrument(area, _output_inst_label, _output_instrument, _output_chan_label, _output_chan);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
-  layout_program(area);
+  layout_prog_changes(area);
 
   area.removeFromTop(BETWEEN_ROW_SPACE);
   layout_zone(area);
@@ -121,24 +122,16 @@ void ConnectionEditor::layout_instrument(
   chan.setBounds(row_area.removeFromLeft(CHANNEL_COMBO_WIDTH));
 }
 
-void ConnectionEditor::layout_program(Rectangle<int> &area) {
-  _prog_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
-
+void ConnectionEditor::layout_prog_changes(Rectangle<int> &area) {
+  _prog_changes_label.setBounds(area.removeFromTop(LABEL_HEIGHT));
   area.removeFromTop(SPACE);
-  auto row_area = area.removeFromTop(DATA_ROW_HEIGHT);
-  _msb_label.setBounds(row_area.removeFromLeft(PROG_LABEL_WIDTH));
-  row_area.removeFromLeft(SPACE);
-  _msb.setBounds(row_area.removeFromLeft(PROG_WIDTH));
+  _prog_changes_list_box.setBounds(area.removeFromTop(PROG_CHANGES_TABLE_HEIGHT));
+  area.removeFromTop(SPACE);
 
+  auto row_area = area.removeFromTop(CC_MAPS_BUTTON_HEIGHT);
+  _add_prog_change.setBounds(row_area.removeFromLeft(CC_MAPS_BUTTON_WIDTH));
   row_area.removeFromLeft(SPACE);
-  _lsb_label.setBounds(row_area.removeFromLeft(PROG_LABEL_WIDTH));
-  row_area.removeFromLeft(SPACE);
-  _lsb.setBounds(row_area.removeFromLeft(PROG_WIDTH));
-
-  row_area.removeFromLeft(SPACE);
-  _prog_field_label.setBounds(row_area.removeFromLeft(PROG_LABEL_WIDTH));
-  row_area.removeFromLeft(SPACE);
-  _prog.setBounds(row_area.removeFromLeft(PROG_WIDTH));
+  _del_prog_change.setBounds(row_area.removeFromLeft(CC_MAPS_BUTTON_WIDTH));
 }
 
 void ConnectionEditor::layout_zone(Rectangle<int> &area) {
@@ -224,8 +217,6 @@ void ConnectionEditor::init_input() {
   else
     _input_chan.setSelectedId(_conn->input_chan() + 1);
 
-  _input_chan.addActionListener(this);
-
   addAndMakeVisible(_input_inst_label);
   addAndMakeVisible(_input_instrument);
   addAndMakeVisible(_input_chan_label);
@@ -252,23 +243,25 @@ void ConnectionEditor::init_output() {
   else
     _output_chan.setSelectedId(_conn->output_chan() + 1);
 
-  _output_chan.addActionListener(this);
-
   addAndMakeVisible(_output_inst_label);
   addAndMakeVisible(_output_instrument);
   addAndMakeVisible(_output_chan_label);
   addAndMakeVisible(_output_chan);
 }
 
-void ConnectionEditor::init_prog() {
-  init_text_editor(_msb, _conn->program_bank_msb() == UNDEFINED ? "" : String(_conn->program_bank_msb()));
-  init_text_editor(_lsb, _conn->program_bank_lsb() == UNDEFINED ? "" : String(_conn->program_bank_lsb()));
-  init_text_editor(_prog, _conn->program_prog() == UNDEFINED ? "" : String(_conn->program_prog()));
+void ConnectionEditor::init_prog_changes() {
+  _prog_changes_model = new ProgramChangesTableListBoxModel();
+  _prog_changes_model->set_connection(_conn);
+  _prog_changes_model->make_columns(_prog_changes_list_box.getHeader());
+  _prog_changes_list_box.setModel(_prog_changes_model);
+  _prog_changes_list_box.setColour(ListBox::outlineColourId, Colours::grey);
+  _prog_changes_list_box.setOutlineThickness(1);
+  _prog_changes_model->addActionListener(&_prog_changes_list_box);
 
-  addAndMakeVisible(_prog_label);
-  addAndMakeVisible(_msb_label);
-  addAndMakeVisible(_lsb_label);
-  addAndMakeVisible(_prog_field_label);
+  addAndMakeVisible(_prog_changes_label);
+  addAndMakeVisible(_prog_changes_list_box);
+  addAndMakeVisible(_add_prog_change);
+  addAndMakeVisible(_del_prog_change);
 }
 
 void ConnectionEditor::init_text_editor(TextEditor &te, String initial_contents) {
@@ -360,20 +353,6 @@ void ConnectionEditor::init_cc_maps() {
   addAndMakeVisible(_del_cc_map);
 }
 
-void ConnectionEditor::update_enabled_states() {
-  bool enable =
-    _input_chan.getSelectedId() != CONNECTION_ALL_CHANNELS ||
-    _output_chan.getSelectedId() != CONNECTION_ALL_CHANNELS;
-
-  _prog_label.setEnabled(enable);
-  _msb_label.setEnabled(enable);
-  _msb.setEnabled(enable);
-  _lsb_label.setEnabled(enable);
-  _lsb.setEnabled(enable);
-  _prog_field_label.setEnabled(enable);
-  _prog.setEnabled(enable);
-}
-
 void ConnectionEditor::cancel_cleanup() {
   delete _conn;
 }
@@ -394,21 +373,6 @@ bool ConnectionEditor::apply() {
   int output_chan = _output_chan.getSelectedId();
   if (output_chan != CONNECTION_ALL_CHANNELS)
     --output_chan;
-
-  auto text = _msb.getText();
-  int msb = text.isEmpty() ? UNDEFINED : text.getIntValue();
-  if (msb != UNDEFINED && (msb < 0 || msb > 127))
-    add_error_message("Bank MSB value must be 0-127");
-
-  text = _lsb.getText();
-  int lsb = text.isEmpty() ? UNDEFINED : text.getIntValue();
-  if (lsb != UNDEFINED && (lsb < 0 || lsb > 127))
-    add_error_message("Bank LSB value must be 0-127");
-
-  text = _prog.getText();
-  int prog = text.isEmpty() ? UNDEFINED : text.getIntValue();
-  if (prog != UNDEFINED && (prog < 0 || prog > 127))
-    add_error_message("Program value must be 0-127");
 
   int zone_low = note_name_to_num(_zone_low.getText());
   if (zone_low < 0 || zone_low > 127)
@@ -436,9 +400,6 @@ bool ConnectionEditor::apply() {
   _conn->set_input_chan(input_chan);
   _conn->set_output(output);
   _conn->set_output_chan(output_chan);
-  _conn->set_program_bank_msb(msb);
-  _conn->set_program_bank_lsb(lsb);
-  _conn->set_program_prog(prog);
   _conn->set_zone_low(zone_low);
   _conn->set_zone_high(zone_high);
   _conn->set_xpose(xpose);
@@ -473,6 +434,19 @@ bool ConnectionEditor::apply() {
     sendActionMessage("update:table-list-box");
 
   return true;
+}
+
+void ConnectionEditor::add_prog_change() {
+  open_program_change_editor(_conn, nullptr)->addActionListener(&_prog_changes_list_box);
+}
+
+void ConnectionEditor::del_prog_change() {
+  auto rows = _prog_changes_list_box.getSelectedRows();
+  if (rows.size() > 0) {
+    _conn->remove_program_change(rows[0]);
+    _prog_changes_list_box.updateContent();
+    _prog_changes_list_box.repaint();
+  }
 }
 
 void ConnectionEditor::add_cc_map() {
@@ -551,7 +525,5 @@ void ConnectionEditor::show_zone_error(const String &msg) {
   });
 }
 
-void ConnectionEditor::actionListenerCallback(const String &message) {
-  if (message == "combo:changed")
-    update_enabled_states();
+void ConnectionEditor::actionListenerCallback(const String &) {
 }

@@ -221,10 +221,37 @@ void Storage::load_connections(Patch *patch, var connections) {
                                    find_output(output_identifier, output_name),
                                    (int)vconn.getProperty("output_chan", all_chans));
 
-    var prog = vconn.getProperty("program", v);
-    c->set_program_bank_msb((int)prog.getProperty("bank_msb", undef));
-    c->set_program_bank_lsb((int)prog.getProperty("bank_lsb", undef));
-    c->set_program_prog((int)prog.getProperty("program", undef));
+    if (vconn.hasProperty("program_changes")) {
+      var pc_arr = vconn.getProperty("program_changes", v);
+      for (int j = 0; j < pc_arr.size(); ++j) {
+        var vpc = pc_arr[j];
+        auto *pc = new ProgramChange();
+        String out_id = (String)vpc.getProperty("output_id", v);
+        String out_name = (String)vpc.getProperty("output_name", v);
+        pc->output = find_output(out_id, out_name);
+        pc->chan = (int)vpc.getProperty("chan", var(CONNECTION_ALL_CHANNELS));
+        pc->bank_msb = (int)vpc.getProperty("bank_msb", undef);
+        pc->bank_lsb = (int)vpc.getProperty("bank_lsb", undef);
+        pc->prog = (int)vpc.getProperty("program", undef);
+        c->add_program_change(pc);
+      }
+    } else {
+      // Backward compatibility: convert old single "program" field
+      var prog = vconn.getProperty("program", v);
+      int msb = (int)prog.getProperty("bank_msb", undef);
+      int lsb = (int)prog.getProperty("bank_lsb", undef);
+      int p = (int)prog.getProperty("program", undef);
+      if (msb != UNDEFINED || lsb != UNDEFINED || p != UNDEFINED) {
+        auto *pc = new ProgramChange();
+        pc->output = c->output();
+        int oc = c->output_chan();
+        pc->chan = oc != CONNECTION_ALL_CHANNELS ? oc : c->input_chan();
+        pc->bank_msb = msb;
+        pc->bank_lsb = lsb;
+        pc->prog = p;
+        c->add_program_change(pc);
+      }
+    }
 
     var zone_arr = vconn.getProperty("zone", v);
     c->set_zone_low((int)zone_arr[0]);
@@ -420,14 +447,25 @@ var Storage::connections_var(Array<Connection *> &connections) {
     if (conn->output_chan() != CONNECTION_ALL_CHANNELS)
       c->setProperty("output_chan", conn->output_chan());
 
-    DynamicObject::Ptr prog(new DynamicObject());
-    if (conn->program_bank_msb() != UNDEFINED)
-      prog->setProperty("bank_msb", var(conn->program_bank_msb()));
-    if (conn->program_bank_lsb() != UNDEFINED)
-      prog->setProperty("bank_lsb", var(conn->program_bank_lsb()));
-    if (conn->program_prog() != UNDEFINED)
-      prog->setProperty("program", var(conn->program_prog()));
-    c->setProperty("program", var(prog.get()));
+    Array<var> pc_arr;
+    for (auto *pc : conn->program_changes()) {
+      DynamicObject::Ptr pco(new DynamicObject());
+      if (pc->output != nullptr) {
+        pco->setProperty("output_id", pc->output->identifier());
+        pco->setProperty("output_name", pc->output->name());
+      }
+      if (pc->chan != CONNECTION_ALL_CHANNELS)
+        pco->setProperty("chan", pc->chan);
+      if (pc->bank_msb != UNDEFINED)
+        pco->setProperty("bank_msb", pc->bank_msb);
+      if (pc->bank_lsb != UNDEFINED)
+        pco->setProperty("bank_lsb", pc->bank_lsb);
+      if (pc->prog != UNDEFINED)
+        pco->setProperty("program", pc->prog);
+      pc_arr.add(var(pco.get()));
+    }
+    if (!pc_arr.isEmpty())
+      c->setProperty("program_changes", var(pc_arr));
 
     DynamicObject::Ptr zone(new DynamicObject());
     Array<var> zone_arr = { var(conn->zone_low()), var(conn->zone_high()) };

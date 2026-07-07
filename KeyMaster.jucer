@@ -48,6 +48,14 @@
       <FILE id="EJUIUE" name="patch_editor.cpp" compile="1" resource="0"
             file="Source/gui/patch_editor.cpp"/>
       <FILE id="Be4LaY" name="patch_editor.h" compile="0" resource="0" file="Source/gui/patch_editor.h"/>
+      <FILE id="pChg01" name="program_change_editor.cpp" compile="1" resource="0"
+            file="Source/gui/program_change_editor.cpp"/>
+      <FILE id="pChg02" name="program_change_editor.h" compile="0" resource="0"
+            file="Source/gui/program_change_editor.h"/>
+      <FILE id="pChg03" name="program_changes_table.cpp" compile="1" resource="0"
+            file="Source/gui/program_changes_table.cpp"/>
+      <FILE id="pChg04" name="program_changes_table.h" compile="0" resource="0"
+            file="Source/gui/program_changes_table.h"/>
       <FILE id="uonMF5" name="set_list_edit_box.h" compile="0" resource="0"
             file="Source/gui/set_list_edit_box.h"/>
       <FILE id="Akv7eQ" name="set_list_editor.cpp" compile="1" resource="0"

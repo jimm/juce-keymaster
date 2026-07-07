@@ -148,9 +148,11 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   expect(p->name() == "Vanilla Through, Filter Two's Sustain");
   conn = p->connections().getLast();
 
-  expect(conn->program_bank_msb() == 3);
-  expect(conn->program_bank_lsb() == 2);
-  expect(conn->program_prog() == 12);
+  expect(conn->program_changes().size() == 1);
+  auto *pc = conn->program_changes()[0];
+  expect(pc->bank_msb == 3);
+  expect(pc->bank_lsb == 2);
+  expect(pc->prog == 12);
 
   // ==== load bank lsb only
   if (call_begin_test)
@@ -158,9 +160,11 @@ void StorageTest::test_load(String data_file_path, bool call_begin_test) {
   s = all_songs[THIS_IS_A_SONG_INDEX]; // This is a Song
   p = s->patches()[1];          // One Up One Oct...
   conn = p->connections().getLast();
-  expect(conn->program_bank_msb() == UNDEFINED);
-  expect(conn->program_bank_lsb() == 5);
-  expect(conn->program_prog() == UNDEFINED);
+  expect(conn->program_changes().size() == 1);
+  pc = conn->program_changes()[0];
+  expect(pc->bank_msb == UNDEFINED);
+  expect(pc->bank_lsb == 5);
+  expect(pc->prog == UNDEFINED);
 
   // ==== load xpose and velocity_curve
   if (call_begin_test)
